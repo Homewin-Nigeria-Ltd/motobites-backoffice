@@ -15,14 +15,14 @@ Thank you for helping improve the Motobites admin dashboard. This guide covers h
    pnpm install
    ```
 
-2. Create a local environment file (if you need a real API):
+2. Create a local environment file:
 
    ```bash
    # .env.local
-   API_URL=https://your-api.example.com
+   API_BASE_URL=https://your-api.example.com
    ```
 
-   When `API_URL` is not set, features fall back to mock data where implemented (e.g. login uses a dev session, lists use in-repo mocks).
+   `API_BASE_URL` is the backend API origin (no trailing slash). When it is not set, the proxy route and server API calls fail; some features still use in-repo mock data where implemented.
 
 3. Start the development server:
 

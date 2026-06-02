@@ -1,36 +1,57 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Motobites Admin
 
-## Getting Started
+Admin dashboard for Motobites, built with [Next.js](https://nextjs.org) (App Router), React, TanStack Query, and shadcn-style UI components.
 
-First, run the development server:
+## Prerequisites
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- Node.js 20+
+- [pnpm](https://pnpm.io/)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Getting started
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Install dependencies:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+   ```bash
+   pnpm install
+   ```
 
-## Learn More
+2. Configure environment variables. Create `.env.local` in the project root (or copy from `.env`):
 
-To learn more about Next.js, take a look at the following resources:
+   ```bash
+   API_BASE_URL=https://your-api.example.com
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+   | Variable        | Required | Description |
+   | --------------- | -------- | ----------- |
+   | `API_BASE_URL`  | Yes\*    | Base URL of the Motobites backend API (no trailing slash). Used for server-side requests (`apiServer`), the `/api/proxy` route, and features that call the API directly. |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+   \*Without `API_BASE_URL`, the proxy route returns 500 and server-side auth/API calls will fail. Some list views still use mock data when the API is unavailable.
 
-## Deploy on Vercel
+3. Start the development server:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+   ```bash
+   pnpm dev
+   ```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+   Open [http://localhost:3000](http://localhost:3000). The app redirects to `/login` by default.
+
+## Scripts
+
+| Command          | Description              |
+| ---------------- | ------------------------ |
+| `pnpm dev`       | Start development server |
+| `pnpm build`     | Production build         |
+| `pnpm start`     | Run production server    |
+| `pnpm lint`      | Run ESLint               |
+| `pnpm typecheck` | Run TypeScript check     |
+
+## API architecture
+
+- **Server components / server actions** — Call the backend via `apiServer` at `{API_BASE_URL}/admin/...`.
+- **Client components** — Call same-origin `/api/proxy/admin/...`, which forwards to `{API_BASE_URL}` with the auth cookie.
+
+Set `API_BASE_URL` in `.env.local` for local development and in your deployment environment (e.g. Vercel project settings) for production.
+
+## Contributing
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for project structure, conventions, and pull request guidelines.
