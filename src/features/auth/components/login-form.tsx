@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Image from "next/image"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Controller, useForm } from "react-hook-form"
 
@@ -11,7 +12,6 @@ import {
   CardDescription,
   CardFooter,
   CardHeader,
-  CardTitle,
 } from "@/components/ui/card"
 import {
   Field,
@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/field"
 import { Icons } from "@/components/ui/icons"
 import { Input } from "@/components/ui/input"
+import { ASSETS } from "@/constants/assets"
 import { cn } from "@/lib/utils"
 import { useLogin } from "../hooks/use-login"
 import { loginSchema, type LoginInput } from "../schemas/login.schema"
@@ -43,10 +44,15 @@ export function LoginForm() {
 
   return (
     <Card className="w-full max-w-lg gap-6 px-2 py-2 shadow-soft sm:px-4 sm:py-4">
-      <CardHeader className="gap-2 px-4 sm:px-6">
-        <CardTitle className="font-heading text-3xl tracking-tight">
-          Motobites Admin
-        </CardTitle>
+      <CardHeader className="items-center gap-3 px-4 text-center sm:px-6">
+        <Image
+          src={ASSETS.brand.logo}
+          alt="Motobites Admin"
+          width={191}
+          height={32}
+          priority
+          className="h-8 w-auto max-w-full"
+        />
         <CardDescription className="text-base">
           Sign in to your admin dashboard
         </CardDescription>
