@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Controller, useForm } from "react-hook-form"
 
@@ -18,12 +19,15 @@ import {
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field"
+import { Icons } from "@/components/ui/icons"
 import { Input } from "@/components/ui/input"
+import { cn } from "@/lib/utils"
 import { useLogin } from "../hooks/use-login"
 import { loginSchema, type LoginInput } from "../schemas/login.schema"
 
 export function LoginForm() {
   const { login, isPending } = useLogin()
+  const [showPassword, setShowPassword] = useState(false)
 
   const form = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
@@ -66,7 +70,7 @@ export function LoginForm() {
                     id="login-email"
                     type="email"
                     aria-invalid={fieldState.invalid}
-                    placeholder="admin@motobites.com"
+                    placeholder="Email"
                     autoComplete="email"
                     className="h-12 rounded-md px-4 text-base md:text-base"
                   />
@@ -87,15 +91,32 @@ export function LoginForm() {
                   >
                     Password
                   </FieldLabel>
-                  <Input
-                    {...field}
-                    id="login-password"
-                    type="password"
-                    aria-invalid={fieldState.invalid}
-                    placeholder="••••••••"
-                    autoComplete="current-password"
-                    className="h-12 rounded-md px-4 text-base md:text-base"
-                  />
+                  <div className="relative w-full">
+                    <Input
+                      {...field}
+                      id="login-password"
+                      type={showPassword ? "text" : "password"}
+                      aria-invalid={fieldState.invalid}
+                      placeholder="••••••••"
+                      autoComplete="current-password"
+                      className="h-12 rounded-md px-4 pr-12 text-base md:text-base"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((visible) => !visible)}
+                      className={cn(
+                        "absolute top-1/2 right-3 -translate-y-1/2 rounded-sm text-muted-foreground transition-colors",
+                        "hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      )}
+                      aria-label={showPassword ? "Hide password" : "Show password"}
+                    >
+                      {showPassword ? (
+                        <Icons.eyeOff size={20} aria-hidden />
+                      ) : (
+                        <Icons.eye size={20} aria-hidden />
+                      )}
+                    </button>
+                  </div>
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
                   )}
