@@ -2,6 +2,7 @@
 
 import type { ComponentType, SVGAttributes } from "react"
 import {
+  AlertTriangle,
   ArrowRight,
   AtSign,
   BarChart3,
@@ -80,6 +81,7 @@ function fromLucide(LucideIcon: LucideIcon): IconComponent {
 }
 
 export const Icons = {
+  alert: fromLucide(AlertTriangle),
   account: fromLucide(UserCircle),
   add: fromLucide(Plus),
   arrowForward: fromLucide(ArrowRight),

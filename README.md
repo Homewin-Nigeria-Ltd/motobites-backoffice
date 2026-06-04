@@ -19,11 +19,13 @@ Admin dashboard for Motobites, built with [Next.js](https://nextjs.org) (App Rou
 
    ```bash
    API_BASE_URL=https://your-api.example.com
+   NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your-google-maps-embed-api-key
    ```
 
    | Variable        | Required | Description |
    | --------------- | -------- | ----------- |
    | `API_BASE_URL`  | Yes\*    | Base URL of the Motobites backend API (no trailing slash). Used for server-side requests (`apiServer`), the `/api/proxy` route, and features that call the API directly. |
+   | `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` | For order maps | Google Maps API key for order detail maps (kitchen → delivery). Enable the **Maps JavaScript API** in Google Cloud Console. |
 
    \*Without `API_BASE_URL`, the proxy route returns 500 and server-side auth/API calls will fail. Some list views still use mock data when the API is unavailable.
 

@@ -4,19 +4,11 @@ import type { ColumnDef } from "@tanstack/react-table"
 
 import { StaffRowActions } from "@/features/staff/components/staff-row-actions"
 import { StaffStatusBadge } from "@/features/staff/components/staff-status-badge"
-import { formatStaffDate } from "@/utils/format-staff-date"
+import { formatDate } from "@/utils/date"
+import { getInitials } from "@/utils/get-initials"
 import type { StaffMember } from "@/features/staff/types"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-
-function getInitials(name: string) {
-  return name
-    .split(" ")
-    .map((part) => part[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase()
-}
 
 export const staffColumns: ColumnDef<StaffMember>[] = [
   {
@@ -76,7 +68,7 @@ export const staffColumns: ColumnDef<StaffMember>[] = [
     header: "Date",
     cell: ({ row }) => (
       <span className="whitespace-nowrap text-muted-foreground">
-        {formatStaffDate(row.original.joinedAt)}
+        {formatDate(row.original.joinedAt)}
       </span>
     ),
   },

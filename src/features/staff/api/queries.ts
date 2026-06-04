@@ -1,9 +1,9 @@
 import { queryOptions } from "@tanstack/react-query"
 
-import { getStaffListMock } from "../data/staff-members.mock"
-import type { StaffListParams, StaffListResponse } from "../types"
 import { API_BASE_URL } from "@/constants/app"
 import { api } from "@/lib/api/client"
+import { getStaffListMock } from "../data/staff-members.mock"
+import type { StaffListParams, StaffListResponse } from "../types"
 import { staffKeys } from "./keys"
 
 export const staffQueries = {

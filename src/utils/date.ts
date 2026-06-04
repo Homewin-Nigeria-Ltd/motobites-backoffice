@@ -1,4 +1,4 @@
-export function formatStaffDate(isoDate: string) {
+export function formatDate(isoDate: string) {
   const date = new Date(isoDate)
   const datePart = date.toLocaleDateString("en-US", {
     month: "short",

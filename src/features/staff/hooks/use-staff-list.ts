@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query"
 
-import { staffQueries } from "../queries/staff.queries"
+import { staffQueries } from "../api/queries"
 import type { StaffListParams } from "../types"
 
 export function useStaffList(params: StaffListParams) {

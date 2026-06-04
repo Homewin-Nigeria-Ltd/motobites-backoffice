@@ -1,8 +1,11 @@
 "use client"
 
+import Link from "next/link"
+import { usePathname } from "next/navigation"
+
+import { getOrderTabPath, type OrderTab } from "@/features/order/types"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import type { OrderTab } from "@/features/order/types"
 
 const tabLabels: Record<OrderTab, string> = {
   pending: "Pending Orders",
@@ -13,16 +16,12 @@ const tabLabels: Record<OrderTab, string> = {
 }
 
 type OrderFilterTabsProps = {
-  value: OrderTab
-  onChange: (value: OrderTab) => void
   counts: Record<OrderTab, number>
 }
 
-export function OrderFilterTabs({
-  value,
-  onChange,
-  counts,
-}: OrderFilterTabsProps) {
+export function OrderFilterTabs({ counts }: OrderFilterTabsProps) {
+  const pathname = usePathname()
+
   return (
     <div
       className="flex flex-wrap items-center gap-2"
@@ -30,14 +29,15 @@ export function OrderFilterTabs({
       aria-label="Order filters"
     >
       {(Object.keys(tabLabels) as OrderTab[]).map((tab) => {
-        const isActive = value === tab
+        const href = getOrderTabPath(tab)
+        const isActive = pathname === href
         const count = counts[tab]
         const showCount = tab !== "performance" && count > 0
 
         return (
           <Button
             key={tab}
-            type="button"
+            asChild
             role="tab"
             aria-selected={isActive}
             variant={isActive ? "secondary" : "ghost"}
@@ -47,10 +47,11 @@ export function OrderFilterTabs({
                 ? "text-primary hover:bg-secondary"
                 : "text-muted-foreground hover:bg-transparent hover:text-foreground"
             )}
-            onClick={() => onChange(tab)}
           >
-            {tabLabels[tab]}
-            {showCount ? ` (${count})` : ""}
+            <Link href={href}>
+              {tabLabels[tab]}
+              {showCount ? ` (${count})` : ""}
+            </Link>
           </Button>
         )
       })}

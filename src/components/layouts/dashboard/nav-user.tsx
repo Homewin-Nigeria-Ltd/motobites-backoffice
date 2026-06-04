@@ -13,7 +13,7 @@ import {
 import { Icons } from "@/components/ui/icons"
 import { useLogout } from "@/features/auth"
 import { cn } from "@/lib/utils"
-import { getUserInitials } from "@/utils/get-user-initials"
+import { getUserInitials } from "@/utils/get-initials"
 
 export function NavUser({
   user,

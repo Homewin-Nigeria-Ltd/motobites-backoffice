@@ -1,5 +1,5 @@
-import { OrderManagementSection } from "@/features/order"
+import { redirect } from "next/navigation"
 
-export default function OrderManagementPage() {
-  return <OrderManagementSection />
+export default function OrderPage() {
+  redirect("/order/pending")
 }

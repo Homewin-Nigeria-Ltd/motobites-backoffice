@@ -11,7 +11,7 @@ import { Separator } from "@/components/ui/separator"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import { Icons } from "@/components/ui/icons"
 import type { AuthUser } from "@/features/auth"
-import { getUserInitials } from "@/utils/get-user-initials"
+import { getUserInitials } from "@/utils/get-initials"
 
 export function DashboardHeader({ user }: { user: AuthUser }) {
   const userName = user.name

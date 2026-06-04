@@ -1,6 +1,6 @@
 export function getNotificationActionHref(target: string) {
   if (target === "menu_management") return "/menu"
-  if (target === "order_management") return "/order"
+  if (target === "order_management") return "/order/pending"
   if (target === "restaurant_management") return "/kitchen"
   return "/dashboard"
 }

@@ -36,6 +36,7 @@ export type BaseModalProps = {
   size?: BaseModalSize
   className?: string
   bodyClassName?: string
+  closeButtonClassName?: string
   asForm?: boolean
   onSubmit?: (event: React.FormEvent<HTMLFormElement>) => void
 }
@@ -53,6 +54,7 @@ export function BaseModal({
   size = "md",
   className,
   bodyClassName,
+  closeButtonClassName,
   asForm = false,
   onSubmit,
 }: BaseModalProps) {
@@ -66,11 +68,11 @@ export function BaseModal({
   const body = isDetail ? (
     <div
       className={cn(
-        "max-h-[min(85vh,56rem)] overflow-y-auto",
+        "max-h-[min(85vh,56rem)] overflow-y-auto overscroll-contain max-sm:max-h-[92dvh]",
         bodyClassName
       )}
     >
-      <div className="flex flex-col gap-6 px-6 py-6">{children}</div>
+      <div className="flex flex-col gap-6 px-4 py-5 sm:px-6 sm:py-6">{children}</div>
     </div>
   ) : (
     <div className={cn("flex flex-col gap-4 px-6 pb-6", bodyClassName)}>
@@ -110,8 +112,9 @@ export function BaseModal({
             variant="ghost"
             size="icon-sm"
             className={cn(
-              "absolute top-4 right-4 z-10 bg-secondary",
-              isDetail && "top-5 right-5"
+              "absolute top-4 right-4 z-10 rounded-full bg-muted text-muted-foreground hover:bg-muted/80",
+              isDetail && "top-5 right-5 size-9",
+              closeButtonClassName
             )}
             aria-label={closeLabel}
           >
@@ -120,7 +123,7 @@ export function BaseModal({
         </DialogClose>
 
         {isDetail ? (
-          <div className="flex shrink-0 items-center border-b border-border px-6 py-5 pr-14">
+          <div className="flex shrink-0 items-center border-b border-border px-4 py-4 pr-12 sm:px-6 sm:py-5 sm:pr-14">
             <DialogTitle className="text-left text-xl font-semibold text-foreground">
               {title}
             </DialogTitle>

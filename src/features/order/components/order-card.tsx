@@ -2,15 +2,17 @@
 
 import Image from "next/image"
 
-import type { Order } from "@/features/order/types"
+import type { ApiOrder } from "@/features/order/types"
+import { getOrderStatusLabel } from "@/features/order/utils/order-status"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Icons } from "@/components/ui/icons"
+import { mealPlaceholderImage } from "@/lib/placeholder-image"
 
 type OrderCardProps = {
-  order: Order
-  onViewDetails: (order: Order) => void
+  order: ApiOrder
+  onViewDetails: (order: ApiOrder) => void
 }
 
 function DetailRow({ label, value }: { label: string; value: string }) {
@@ -26,8 +28,8 @@ export function OrderCard({ order, onViewDetails }: OrderCardProps) {
     <Card className="gap-0 overflow-hidden py-0">
       <div className="relative aspect-[4/3] w-full overflow-hidden bg-muted">
         <Image
-          src={order.imageUrl}
-          alt={order.itemName}
+          src={order.item_image ?? mealPlaceholderImage}
+          alt={order.item_name}
           fill
           className="object-cover"
           sizes="(max-width: 768px) 100vw, 25vw"
@@ -38,25 +40,22 @@ export function OrderCard({ order, onViewDetails }: OrderCardProps) {
           variant="secondary"
           className="w-fit rounded-full border-0 bg-secondary px-3 py-1 text-xs font-medium text-primary"
         >
-          Order #{order.orderNumber}
+          Order {order.order_number}
         </Badge>
-        <h3 className="text-base font-semibold text-foreground">{order.itemName}</h3>
+        <h3 className="text-base font-semibold text-foreground">{order.item_name}</h3>
         <div className="space-y-1.5">
-          <DetailRow label="Customer Name" value={order.customerName} />
-          <DetailRow label="Delivery Address" value={order.deliveryAddress} />
+          <DetailRow label="Customer Name" value={order.customer_name} />
+          <DetailRow label="Delivery Address" value={order.delivery_address} />
         </div>
         <div className="grid grid-cols-2 gap-3 pt-1">
-          <DetailRow label="Payment Method" value={order.paymentMethod} />
-          <DetailRow
-            label="Amount Paid"
-            value={`₦${order.amountPaid.toLocaleString()}`}
-          />
+          <DetailRow label="Payment Method" value={order.payment_method} />
+          <DetailRow label="Amount Paid" value={order.amount_paid_formatted} />
         </div>
         <Badge
           variant="secondary"
           className="w-fit rounded-full border-0 bg-secondary px-3 py-1 text-xs font-medium text-primary"
         >
-          {order.statusLabel}
+          {getOrderStatusLabel(order.status, order.display_status)}
         </Badge>
       </CardContent>
       <CardFooter className="pt-4 pb-5">

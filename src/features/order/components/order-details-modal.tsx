@@ -1,11 +1,27 @@
 "use client"
 
-import { useState, type ReactNode } from "react"
+import { useState } from "react"
 import Image from "next/image"
 
-import type { Order, OrderStatus } from "@/features/order/types"
+import { OrderAssigneeDialog } from "@/features/order/components/order-assignee-dialog"
+import { OrderAssigneeField } from "@/features/order/components/order-assignee-field"
+import { OrderReceiptModal } from "@/features/order/components/order-receipt-modal"
+import {
+  useExtendPrepTime,
+  useUpdateOrderStatus,
+} from "@/features/order/hooks/use-order-mutations"
+import { useOrderDetail } from "@/features/order/hooks/use-order-queries"
+import type { OrderAssigneeType } from "@/features/order/types"
+import {
+  ORDER_STATUS_LABELS,
+  OrderStatus,
+} from "@/features/order/enums/order-status"
+import {
+  formatOrderReviewRemark,
+  formatOrderReviewText,
+  getOrderDetailStatusLabel,
+} from "@/features/order/utils/order-detail"
 import { BaseModal } from "@/components/ui/base-modal"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -15,228 +31,323 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Label } from "@/components/ui/label"
+import { AppLoader } from "@/components/ui/app-loader"
 import { Icons } from "@/components/ui/icons"
 import { cn } from "@/lib/utils"
+import { OrderMap } from "@/features/order/components/order-map"
+import { getOrderMapCoordinates } from "@/features/order/utils/coordinates"
+import { mealPlaceholderImage } from "@/lib/placeholder-image"
 
-const statusOptions: { value: OrderStatus; label: string }[] = [
-  { value: "yet_to_be_prepared", label: "Yet to be prepared" },
-  { value: "preparing", label: "Preparing" },
-  { value: "ready", label: "Ready" },
-  { value: "in_transit", label: "In transit" },
-  { value: "delivered", label: "Delivered" },
-]
+const ADMIN_STATUS_OPTIONS = [
+  OrderStatus.PREPARING,
+  OrderStatus.PICKED_UP,
+] as const
+
+const detailGrid3 = "grid grid-cols-1 gap-x-10 gap-y-8 md:grid-cols-3"
+const detailGrid2 = "grid grid-cols-1 gap-x-10 gap-y-8 md:grid-cols-2"
+const detailField = "min-w-0 space-y-2"
+const detailLabel = "text-sm font-normal text-muted-foreground"
+const detailValue = "text-sm text-foreground"
+const actionLink =
+  "h-auto p-0 text-sm font-medium text-primary underline-offset-4 hover:underline"
 
 type OrderDetailsModalProps = {
-  order: Order | null
+  orderId: string | null
   open: boolean
   onOpenChange: (open: boolean) => void
 }
 
-function getInitials(name: string) {
-  return name
-    .split(" ")
-    .map((part) => part[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase()
-}
-
-function DetailField({
-  label,
-  children,
-  className,
-}: {
-  label: string
-  children: ReactNode
-  className?: string
-}) {
-  return (
-    <div className={cn("space-y-1.5", className)}>
-      <Label className="text-muted-foreground">{label}</Label>
-      <div className="text-sm text-foreground">{children}</div>
-    </div>
-  )
-}
-
-function AssigneeRow({
-  name,
-  actionLabel,
-}: {
-  name: string
-  actionLabel: string
-}) {
-  return (
-    <div className="flex flex-wrap items-center gap-2">
-      <Avatar className="size-8">
-        <AvatarFallback className="bg-primary text-xs text-primary-foreground">
-          {getInitials(name)}
-        </AvatarFallback>
-      </Avatar>
-      <span className="font-medium">{name}</span>
-      <Button type="button" variant="link" className="h-auto p-0 text-primary">
-        {actionLabel}
-      </Button>
-    </div>
-  )
-}
-
 export function OrderDetailsModal({
-  order,
+  orderId,
   open,
   onOpenChange,
 }: OrderDetailsModalProps) {
-  const [status, setStatus] = useState<OrderStatus | null>(null)
+  const { data: order, isPending, isError, error } = useOrderDetail(
+    orderId,
+    open
+  )
+  const { updateStatus, isPending: isUpdatingStatus } = useUpdateOrderStatus()
+  const { extendPrepTime, isPending: isExtendingPrepTime } = useExtendPrepTime()
+  const [assigneeDialogType, setAssigneeDialogType] =
+    useState<OrderAssigneeType | null>(null)
+  const [receiptOpen, setReceiptOpen] = useState(false)
 
-  if (!order) {
+  if (!open || !orderId) {
     return null
   }
 
-  const currentStatus = status ?? order.status
-  const statusLabel =
-    statusOptions.find((option) => option.value === currentStatus)?.label ??
-    order.statusLabel
+  if (isError) {
+    throw error
+  }
+
+  const modalProps = {
+    title: "Order Details",
+    open,
+    onOpenChange,
+    layout: "detail" as const,
+    size: "xl" as const,
+    className: "max-w-[43.75rem]",
+    bodyClassName: "font-ui",
+  }
+
+  if (isPending || !order) {
+    return (
+      <BaseModal {...modalProps}>
+        <AppLoader className="min-h-64" />
+      </BaseModal>
+    )
+  }
+
+  const mapCoords = getOrderMapCoordinates(order.map)
+  const statusLabel = getOrderDetailStatusLabel(order.status, order.display_status)
+  const customerRemark = formatOrderReviewRemark(order.reviews.customer)
+
+  const currentAssigneeId =
+    assigneeDialogType != null
+      ? order.assignments[assigneeDialogType]?.id ?? null
+      : null
 
   return (
-    <BaseModal
-      title="Order Details"
-      open={open}
-      onOpenChange={onOpenChange}
-      layout="detail"
-      size="xl"
-    >
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
-        <div className="relative aspect-[4/3] w-full shrink-0 overflow-hidden rounded-xl bg-muted sm:w-48">
+    <>
+    <BaseModal {...modalProps}>
+      <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
+        <div className="relative h-40 w-full shrink-0 overflow-hidden rounded-xl bg-muted sm:h-36 sm:w-44">
           <Image
-            src={order.imageUrl}
-            alt={order.itemName}
+            src={order.item.image ?? mealPlaceholderImage}
+            alt={order.item.name}
             fill
             className="object-cover"
-            sizes="192px"
+            sizes="176px"
+            priority
           />
         </div>
-        <div className="min-w-0 flex-1 space-y-3">
+        <div className="min-w-0 flex-1 space-y-2.5">
           <Badge
             variant="secondary"
-            className="rounded-full border-0 bg-secondary px-3 py-1 text-xs font-medium text-primary"
+            className="w-fit rounded-full border-0 bg-secondary px-3 py-1 text-xs font-medium text-primary"
           >
-            Order #{order.orderNumber}
+            Order {order.order_number}
           </Badge>
-          <h2 className="text-xl font-semibold text-foreground">{order.itemName}</h2>
-          <p className="text-sm leading-relaxed text-muted-foreground">
-            {order.customerNotes}
-          </p>
+          <h2 className="text-xl font-semibold leading-tight text-foreground">
+            {order.item.name}
+          </h2>
+          {order.customer_note ? (
+            <p className="text-sm leading-relaxed text-muted-foreground">
+              {order.customer_note}
+            </p>
+          ) : null}
         </div>
       </div>
 
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        <DetailField label="Customer Name">{order.customerName}</DetailField>
-        <DetailField label="Delivery Address">{order.deliveryAddress}</DetailField>
-        <DetailField label="Amount Paid">
-          ₦{order.amountPaid.toLocaleString()}
-        </DetailField>
-
-        <DetailField label="Payment Method">
-          <div className="space-y-1">
-            <p className="font-medium">Flutterwave</p>
-            <p className="text-muted-foreground">Online Method</p>
-            <Button type="button" variant="link" className="h-auto p-0 text-primary">
-              View Receipts
-            </Button>
+      <div className="flex flex-col gap-8">
+        <div className={detailGrid3}>
+          <div className={detailField}>
+            <Label className={detailLabel}>Customer Name</Label>
+            <p className={cn(detailValue, "font-medium")}>{order.customer_name}</p>
           </div>
-        </DetailField>
+          <div className={detailField}>
+            <Label className={detailLabel}>Delivery Address</Label>
+            <p className={cn(detailValue, "font-medium")}>{order.delivery_address}</p>
+          </div>
+          <div className={detailField}>
+            <Label className={detailLabel}>Amount Paid</Label>
+            <p className={cn(detailValue, "font-medium")}>{order.amount_paid_formatted}</p>
+          </div>
+        </div>
 
-        <DetailField label="Status">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                type="button"
-                variant="outline"
-                className="h-9 w-full justify-between bg-secondary/50 font-normal"
+        <div className={detailGrid2}>
+          <div className={detailField}>
+            <Label className={detailLabel}>Payment Method</Label>
+            <div className={cn(detailValue, "space-y-1.5")}>
+              <p className="font-medium">{order.payment.method}</p>
+              {order.payment.receipt_available ? (
+                <Button
+                  type="button"
+                  variant="link"
+                  className={actionLink}
+                  onClick={() => setReceiptOpen(true)}
+                >
+                  View Receipt
+                </Button>
+              ) : null}
+            </div>
+          </div>
+          <div className={detailField}>
+            <Label className={detailLabel}>Status</Label>
+            <div className={cn(detailValue, "flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center")}>
+              <Badge
+                variant="secondary"
+                className="h-9 min-w-40 rounded-full border-0 bg-[#E8F4FC] px-4 text-sm font-medium text-[#1E6BB8]"
               >
                 {statusLabel}
-                <Icons.chevronDown size={16} />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-56">
-              {statusOptions.map((option) => (
-                <DropdownMenuItem
-                  key={option.value}
-                  onClick={() => setStatus(option.value)}
-                >
-                  {option.label}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </DetailField>
-
-        <DetailField label="Assigned Chef">
-          <AssigneeRow
-            name={order.assignedChef.name}
-            actionLabel="Change Assigned Chef"
-          />
-        </DetailField>
-
-        <DetailField label="Estimated Preparation Time">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="font-medium">{order.estimatedPrepMinutes} Mins</span>
-            <Button type="button" variant="link" className="h-auto p-0 text-primary">
-              Increase by 5 minute
-            </Button>
+              </Badge>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    disabled={isUpdatingStatus}
+                    className="h-9 w-fit gap-2 rounded-lg border-border bg-background px-4 font-normal shadow-none"
+                  >
+                    {isUpdatingStatus ? "Updating…" : "Update status"}
+                    <Icons.chevronDown size={16} className="opacity-70" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-48">
+                  {ADMIN_STATUS_OPTIONS.map((value) => (
+                    <DropdownMenuItem
+                      key={value}
+                      disabled={isUpdatingStatus || order.status === value}
+                      onClick={() => {
+                        if (!orderId || order.status === value) return
+                        updateStatus({ orderId, status: value })
+                      }}
+                    >
+                      {ORDER_STATUS_LABELS[value]}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
-        </DetailField>
+        </div>
 
-        <DetailField label="Assigned MotoPolit (Rider)">
-          <AssigneeRow
-            name={order.assignedRider.name}
-            actionLabel="Change Assigned Motopolit"
-          />
-        </DetailField>
-
-        <DetailField label="Customer's Confirmation Code">
-          <div className="flex gap-2">
-            {order.confirmationCode.split("").map((digit, index) => (
-              <span
-                key={`${digit}-${index}`}
-                className="flex size-10 items-center justify-center rounded-lg border-2 border-primary text-base font-semibold text-primary"
-              >
-                {digit}
+        <div className={detailGrid2}>
+          <div className={detailField}>
+            <Label className={detailLabel}>Assigned Chef</Label>
+            <div className={detailValue}>
+              <OrderAssigneeField
+                assignee={order.assignments.chef}
+                assignLabel="Assign Chef"
+                changeLabel="Change Assigned Chef"
+                onChangeClick={() => setAssigneeDialogType("chef")}
+              />
+            </div>
+          </div>
+          <div className={detailField}>
+            <Label className={detailLabel}>Estimated Preparation Time</Label>
+            <div className={cn(detailValue, "flex flex-wrap items-center gap-x-2 gap-y-1")}>
+              <span className="font-medium">
+                {order.timing.estimated_preparation_minutes} Mins
               </span>
-            ))}
+              <Button
+                type="button"
+                variant="link"
+                className={actionLink}
+                disabled={isExtendingPrepTime}
+                onClick={() => extendPrepTime({ orderId })}
+              >
+                {isExtendingPrepTime ? "Extending…" : "Increase by 5 minute"}
+              </Button>
+            </div>
           </div>
-        </DetailField>
+        </div>
 
-        <DetailField label="Pick-up Time">{order.pickupTime}</DetailField>
-        <DetailField label="Delivery Time">{order.deliveryTime}</DetailField>
+        <div className={detailGrid2}>
+          <div className={detailField}>
+            <Label className={detailLabel}>Assigned MotoPolit (Rider)</Label>
+            <div className={detailValue}>
+              <OrderAssigneeField
+                assignee={order.assignments.rider}
+                assignLabel="Assign MotoPilot"
+                changeLabel="Change Assigned Motopolit"
+                onChangeClick={() => setAssigneeDialogType("rider")}
+              />
+            </div>
+          </div>
+          <div className={detailField}>
+            <Label className={detailLabel}>Customer&apos;s Confirmation Code</Label>
+            <div className={cn(detailValue, "flex gap-2")}>
+              {order.confirmation_code_digits.map((digit, index) => (
+                <span
+                  key={`${digit}-${index}`}
+                  className="flex size-11 items-center justify-center rounded-lg border-2 border-primary bg-primary text-lg font-semibold text-primary-foreground"
+                >
+                  {digit}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
 
-        <DetailField label="Assigned Customer Care Representative" className="sm:col-span-2">
-          <AssigneeRow name={order.customerCareRep.name} actionLabel="Change" />
-        </DetailField>
-      </div>
+        <div className={detailGrid2}>
+          <div className={detailField}>
+            <Label className={detailLabel}>Pick-up Time</Label>
+            <p className={cn(detailValue, "font-medium")}>
+              {order.timing.pickup_time ?? "—"}
+            </p>
+          </div>
+          <div className={detailField}>
+            <Label className={detailLabel}>Delivery Time</Label>
+            <p className={cn(detailValue, "font-medium")}>
+              {order.timing.delivered_at ?? "—"}
+            </p>
+          </div>
+        </div>
 
-      <div className="relative overflow-hidden rounded-xl border border-border bg-muted">
-        <div className="flex aspect-[21/9] items-center justify-center bg-foreground/90">
-          <span className="rounded-lg bg-background px-6 py-2 text-lg font-semibold text-foreground">
-            Closed
-          </span>
+        <div className={detailField}>
+          <Label className={detailLabel}>Assigned Customer Care Representative</Label>
+          <div className={detailValue}>
+            <OrderAssigneeField
+              assignee={order.assignments.support}
+              assignLabel="Assign Representative"
+              changeLabel="Change"
+              onChangeClick={() => setAssigneeDialogType("support")}
+            />
+          </div>
         </div>
       </div>
 
-      <div className="space-y-6 border-t border-border pt-6">
-        <DetailField label="Customer's Review">
-          <p className="leading-relaxed text-muted-foreground">
-            {order.customerReview}
-          </p>
-        </DetailField>
-        <DetailField label="Customer Remark">
-          <span className="text-2xl">{order.customerRemark}</span>
-        </DetailField>
-        <DetailField label="Rider's Review">
-          <p className="leading-relaxed text-muted-foreground">
-            {order.riderReview}
-          </p>
-        </DetailField>
+      <OrderMap
+        kitchen={mapCoords.kitchen}
+        customer={mapCoords.customer}
+        height="220px"
+        className="w-full"
+      />
+
+      <div className="grid grid-cols-1 gap-8 border-t border-border pt-8 md:grid-cols-2">
+        <div className="flex flex-col gap-8">
+          <div className={detailField}>
+            <Label className={detailLabel}>Customer&apos;s Review</Label>
+            <p className="text-sm leading-relaxed text-muted-foreground">
+              {formatOrderReviewText(order.reviews.customer)}
+            </p>
+          </div>
+          <div className={detailField}>
+            <Label className={detailLabel}>Rider&apos;s Review</Label>
+            <p className="text-sm leading-relaxed text-muted-foreground">
+              {formatOrderReviewText(order.reviews.rider)}
+            </p>
+          </div>
+        </div>
+        <div className={detailField}>
+          <Label className={detailLabel}>Customer Remark</Label>
+          {customerRemark ? (
+            <span className="text-3xl leading-none">{customerRemark}</span>
+          ) : (
+            <span className="text-muted-foreground">—</span>
+          )}
+        </div>
       </div>
     </BaseModal>
+
+    {assigneeDialogType ? (
+      <OrderAssigneeDialog
+        open
+        onOpenChange={(next) => {
+          if (!next) setAssigneeDialogType(null)
+        }}
+        orderId={orderId}
+        type={assigneeDialogType}
+        currentAssigneeId={currentAssigneeId}
+      />
+    ) : null}
+
+    <OrderReceiptModal
+      open={receiptOpen}
+      onOpenChange={setReceiptOpen}
+      orderId={orderId}
+    />
+    </>
   )
 }

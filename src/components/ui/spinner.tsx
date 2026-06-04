@@ -1,15 +1,23 @@
+"use client"
+
+import type { SVGAttributes } from "react"
+
 import { Icons } from "@/components/ui/icons"
 import { cn } from "@/lib/utils"
 
+const LoaderIcon = Icons.loader
+
 function Spinner({
   className,
+  size = 16,
   ...props
-}: React.ComponentProps<typeof Icons.loader>) {
+}: SVGAttributes<SVGSVGElement> & { size?: number }) {
   return (
-    <Icons.loader
+    <LoaderIcon
       role="status"
       aria-label="Loading"
-      className={cn("size-4 animate-spin", className)}
+      size={size}
+      className={cn("animate-spin", className)}
       {...props}
     />
   )

@@ -1,6 +1,6 @@
 export * from "./types"
-export { staffKeys } from "./queries/keys"
-export { staffQueries } from "./queries/staff.queries"
+export { staffKeys } from "./api/keys"
+export { staffQueries } from "./api/queries"
 export { useStaffList } from "./hooks/use-staff-list"
 export { StaffManagementSection } from "./sections/staff-section"
 export { staffColumns } from "./columns"
