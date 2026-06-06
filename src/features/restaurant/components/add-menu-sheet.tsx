@@ -228,7 +228,7 @@ function AddMenuSheetForm({
                       <Icons.dragIndicator size={20} />
                     </button>
 
-                    <div className="min-w-0 flex-1">
+                    <div className="min-w-0 flex-1 sm:flex-3">
                       <Input
                         value={row.optionName}
                         onChange={(e) => {
@@ -244,7 +244,7 @@ function AddMenuSheetForm({
                     <div className="flex items-center gap-3 sm:gap-2">
                       <div className="flex items-center gap-2">
                         <FieldLabel className="hidden sm:block">Price</FieldLabel>
-                        <div className="relative w-full sm:w-28">
+                        <div className="relative w-full sm:w-24">
                           <span className="pointer-events-none absolute top-1/2 left-2.5 -translate-y-1/2 text-sm text-muted-foreground">
                             ₦
                           </span>
@@ -264,7 +264,7 @@ function AddMenuSheetForm({
 
                       <div className="flex items-center gap-2">
                         <FieldLabel className="hidden sm:block">Duration</FieldLabel>
-                        <div className="relative w-full sm:w-28">
+                        <div className="relative w-full sm:w-24">
                           <Input
                             value={row.duration}
                             onChange={(e) => {
