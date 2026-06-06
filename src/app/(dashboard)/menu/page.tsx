@@ -1,5 +1,5 @@
-import { MenuCatalogSection } from "@/features/restaurant"
+import { MenuManagementSection } from "@/features/restaurant"
 
 export default function RestaurantManagementPage() {
-  return <MenuCatalogSection />
+  return <MenuManagementSection />
 }

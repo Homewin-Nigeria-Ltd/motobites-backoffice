@@ -1,19 +1,19 @@
 "use client"
 
-import { useState } from "react"
+import { useForm, Controller } from "react-hook-form"
+import { z } from "zod"
+import { zodResolver } from "@hookform/resolvers/zod"
 
-import type {
-  Menu,
-  MenuFormValues,
-} from "@/features/restaurant/types"
+import type { Menu, MenuFormValues } from "@/features/restaurant/types"
 import { BaseModal } from "@/components/ui/base-modal"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
-import { Icons } from "@/components/ui/icons"
+import { Field, FieldLabel, FieldError } from "@/components/ui/field"
+ 
 import { toast } from "@/lib/toast"
+import { ImageUpload } from "@/components/ui/image-upload"
 
 type MenuFormModalProps = {
   open: boolean
@@ -22,21 +22,37 @@ type MenuFormModalProps = {
   onSave?: (values: MenuFormValues) => void
 }
 
-const emptyValues: MenuFormValues = {
-  name: "",
-  description: "",
-  price: "",
-  durationMinutes: "",
-  enabled: true,
-}
 
-function menuToValues(menu: Menu): MenuFormValues {
+
+const menuFormSchema = z.object({
+  name: z.string().trim().min(1, "Item name is required"),
+  description: z.string().optional().default("") ,
+  price: z.string().min(1, "Price is required"),
+  durationMinutes: z.string().min(1, "Duration is required"),
+  enabled: z.boolean().optional().default(true),
+  image: z.instanceof(File).nullable().optional(),
+})
+
+type MenuFormSchemaValues = z.infer<typeof menuFormSchema>
+
+function getInitialValues(menu?: Menu | null): MenuFormSchemaValues {
+  if (!menu) {
+    return {
+      name: "",
+      description: "",
+      price: "",
+      durationMinutes: "",
+      enabled: true,
+      image: null,
+    }
+  }
   return {
     name: menu.name,
-    description: menu.description,
+    description: menu.description ?? "",
     price: String(menu.price),
     durationMinutes: String(menu.durationMinutes),
     enabled: menu.enabled,
+    image: null,
   }
 }
 
@@ -46,111 +62,171 @@ function MenuFormModalContent({
   onSave,
 }: Omit<MenuFormModalProps, "open">) {
   const isEdit = Boolean(menu)
-  const [values, setValues] = useState<MenuFormValues>(() =>
-    menu ? menuToValues(menu) : emptyValues
-  )
 
-  const handleSubmit = () => {
-    if (!values.name.trim() || !values.price.trim() || !values.durationMinutes.trim()) {
-      toast.error("Please fill in all required fields")
-      return
+  const modalTitle = isEdit ? "Edit Menu Item" : "Add Menu Item"
+  const submitLabel = isEdit ? "Save changes" : "Save and Publish"
+
+  const { handleSubmit, control, setError } = useForm<MenuFormSchemaValues>({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    resolver: zodResolver(menuFormSchema as any),
+    defaultValues: getInitialValues(menu),
+  })
+
+  const onSubmit = async (values: MenuFormSchemaValues) => {
+    const payload: MenuFormValues = {
+      name: values.name,
+      description: values.description ?? "",
+      price: values.price,
+      durationMinutes: values.durationMinutes,
+      enabled: values.enabled ?? true,
     }
-    onSave?.(values)
-    toast.success(isEdit ? "Menu item updated" : "Menu item added")
-    onOpenChange(false)
+    try {
+      await onSave?.(payload)
+      toast.success(isEdit ? "Menu item updated" : "Menu item added")
+      onOpenChange(false)
+    } catch (err) {
+      const serverErr = err as { fieldErrors?: Record<string, string[] | string>; message?: string }
+      if (serverErr.fieldErrors) {
+        Object.entries(serverErr.fieldErrors).forEach(([key, msgs]) => {
+          const message = Array.isArray(msgs) ? msgs[0] : (msgs as string)
+          setError(key as keyof MenuFormSchemaValues, { type: "server", message })
+        })
+      } else {
+        toast.error(serverErr.message ?? "Failed to save menu item")
+      }
+    }
+  }
+  
+  const onInvalid = (errors: Record<string, unknown>) => {
+    const firstKey = Object.keys(errors)[0]
+    const el = document.querySelector(`#menu-${firstKey}`) as HTMLElement | null
+    el?.focus()
   }
 
   return (
     <BaseModal
-      title={isEdit ? "Edit Menu Item" : "Add Menu Item"}
+      title={modalTitle}
       open
       onOpenChange={onOpenChange}
       layout="detail"
       size="lg"
       className="max-w-2xl"
     >
-      <div className="space-y-2">
-        <Label htmlFor="menu-name">Item Name</Label>
-        <Input
-          id="menu-name"
-          placeholder="Jollof Rice and Chicken"
-          value={values.name}
-          onChange={(e) => setValues((v) => ({ ...v, name: e.target.value }))}
-          className="h-11"
+      <form onSubmit={handleSubmit(onSubmit, onInvalid)} className="space-y-4">
+        <Controller
+          name="name"
+          control={control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={Boolean(fieldState.error)}>
+              <FieldLabel htmlFor="menu-name">Item Name</FieldLabel>
+              <Input
+                id="menu-name"
+                placeholder="Jollof Rice and Chicken"
+                className="h-11"
+                value={field.value}
+                onChange={field.onChange}
+              />
+              <FieldError errors={[fieldState.error]} />
+            </Field>
+          )}
         />
-      </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="menu-description">Description</Label>
-        <Textarea
-          id="menu-description"
-          placeholder="Enter a description"
-          value={values.description}
-          onChange={(e) =>
-            setValues((v) => ({ ...v, description: e.target.value }))
-          }
-          rows={4}
-          className="resize-none"
+        <Controller
+          name="description"
+          control={control}
+          render={({ field, fieldState }) => (
+            <Field>
+              <FieldLabel htmlFor="menu-description">Description</FieldLabel>
+              <Textarea
+                id="menu-description"
+                placeholder="Enter a description"
+                rows={4}
+                className="resize-none"
+                value={field.value}
+                onChange={field.onChange}
+              />
+              <FieldError errors={[fieldState.error]} />
+            </Field>
+          )}
         />
-      </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div className="space-y-2">
-          <Label htmlFor="menu-price">Menu Price (₦)</Label>
-          <Input
-            id="menu-price"
-            inputMode="decimal"
-            placeholder="2500"
-            value={values.price}
-            onChange={(e) => setValues((v) => ({ ...v, price: e.target.value }))}
-            className="h-11"
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="menu-duration">Duration (minutes)</Label>
-          <Input
-            id="menu-duration"
-            inputMode="numeric"
-            placeholder="20"
-            value={values.durationMinutes}
-            onChange={(e) =>
-              setValues((v) => ({ ...v, durationMinutes: e.target.value }))
-            }
-            className="h-11"
-          />
-        </div>
-      </div>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-2">
+            <Controller
+              name="price"
+              control={control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={Boolean(fieldState.error)}>
+                  <FieldLabel htmlFor="menu-price">Menu Price (₦)</FieldLabel>
+                  <Input
+                    id="menu-price"
+                    inputMode="decimal"
+                    placeholder="2500"
+                    className="h-11"
+                    value={field.value}
+                    onChange={field.onChange}
+                  />
+                  <FieldError errors={[fieldState.error]} />
+                </Field>
+              )}
+            />
+          </div>
 
-      <label
-        htmlFor="menu-image-upload"
-        className="flex cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-primary/30 bg-secondary px-6 py-10 text-center transition-colors hover:bg-secondary/80"
-      >
-        <div className="flex size-14 items-center justify-center rounded-full bg-primary/15">
-          <Icons.upload size={28} className="text-primary" />
+          <div className="space-y-2">
+            <Controller
+              name="durationMinutes"
+              control={control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={Boolean(fieldState.error)}>
+                  <FieldLabel htmlFor="menu-duration">Duration (minutes)</FieldLabel>
+                  <Input
+                    id="menu-duration"
+                    inputMode="numeric"
+                    placeholder="20"
+                    className="h-11"
+                    value={field.value}
+                    onChange={field.onChange}
+                  />
+                  <FieldError errors={[fieldState.error]} />
+                </Field>
+              )}
+            />
+          </div>
         </div>
-        <div>
-          <p className="text-base font-semibold text-foreground">Upload Files</p>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Click or drag image to upload. PNG and JPG are allowed.
-          </p>
-        </div>
-        <input id="menu-image-upload" type="file" accept="image/*" className="sr-only" />
-      </label>
 
-      <div className="flex items-center justify-between rounded-lg border border-border px-4 py-3">
-        <Label htmlFor="menu-enabled" className="cursor-pointer">
-          Available on menu
-        </Label>
-        <Switch
-          id="menu-enabled"
-          checked={values.enabled}
-          onCheckedChange={(enabled) => setValues((v) => ({ ...v, enabled }))}
+        <Controller
+          name="image"
+          control={control}
+          defaultValue={null}
+          render={({ field }) => (
+            <div>
+              <ImageUpload
+                value={field.value ?? null}
+                existingImageUrl={menu && !field.value ? undefined : undefined}
+                existingImageAlt={menu?.name ?? "Menu item image"}
+                onChange={(file) => field.onChange(file)}
+              />
+            </div>
+          )}
         />
-      </div>
 
-      <Button type="button" className="mt-2 h-11 w-full" onClick={handleSubmit}>
-        {isEdit ? "Save changes" : "Add menu item"}
-      </Button>
+        <Controller
+          name="enabled"
+          control={control}
+          render={({ field }) => (
+            <div className="flex items-center justify-between rounded-lg border border-border px-4 py-3">
+              <FieldLabel htmlFor="menu-enabled" className="cursor-pointer">Available on menu</FieldLabel>
+              <Switch id="menu-enabled" checked={field.value} onCheckedChange={field.onChange} />
+            </div>
+          )}
+        />
+
+        <div className="flex justify-end">
+          <Button type="submit" className="h-12 rounded-xl px-8 text-base font-semibold">
+            {submitLabel}
+          </Button>
+        </div>
+      </form>
     </BaseModal>
   )
 }

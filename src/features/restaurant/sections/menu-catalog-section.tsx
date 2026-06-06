@@ -77,6 +77,10 @@ export function MenuCatalogSection() {
         <div className="min-h-0 flex-1 space-y-6 overflow-y-auto px-4 py-6 md:px-6">
           {isPending ? (
             <AppLoader />
+          ) : hubs.length === 0 ? (
+            <div className="flex items-center justify-center rounded-2xl border border-border bg-background p-12 text-center">
+              <p className="text-sm text-muted-foreground">No menu hubs found.</p>
+            </div>
           ) : (
             hubs.map((hub) => (
               <CatalogHubSection key={hub.id} hub={hub} view={view} />

@@ -1,14 +1,9 @@
 "use client"
 
 import Image from "next/image"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
 import { Icons } from "@/components/ui/icons"
-import {
-  buildMenuItemHref,
-  getHubIdByName,
-} from "@/features/restaurant"
 import type { MenuDetailItem } from "@/features/restaurant/types"
+import { toImageSrc } from "@/lib/image-url"
 import { cn } from "@/lib/utils"
 
 function StarRating({ rating }: { rating: number }) {
@@ -29,13 +24,14 @@ export function MenuItemsTable({
   items,
   activeItemId,
   activeItemName,
+  onViewDetails,
 }: {
   items: MenuDetailItem[]
+  kitchenId?: string
   activeItemId?: string | null
   activeItemName?: string | null
+  onViewDetails?: (itemId: string) => void
 }) {
-  const router = useRouter()
-
   return (
     <div className="overflow-hidden rounded-xl border border-border/60 bg-card shadow-sm">
       <div className="hidden border-b border-border/60 bg-muted px-4 py-3 text-sm font-medium text-muted-foreground md:grid md:grid-cols-[minmax(0,2fr)_120px_100px_100px_80px_120px] md:gap-4 md:px-6">
@@ -49,18 +45,16 @@ export function MenuItemsTable({
 
       <ul className="divide-y divide-border/60">
         {items.map((item) => {
-          const hubId = getHubIdByName(item.hub)
-          const detailHref = buildMenuItemHref(item.id, hubId)
           const isHighlighted =
             activeItemId === item.id ||
             (activeItemName != null && item.name === activeItemName)
 
-          const goToDetail = () => router.push(detailHref)
+          const openDetails = () => onViewDetails?.(item.id)
 
           const handleRowClick = (e: React.MouseEvent<HTMLElement>) => {
             const target = e.target as HTMLElement
             if (target.closest("[data-menu-row-action]")) return
-            goToDetail()
+            openDetails()
           }
 
           return (
@@ -72,7 +66,7 @@ export function MenuItemsTable({
               onKeyDown={(e) => {
                 if (e.key === "Enter" || e.key === " ") {
                   e.preventDefault()
-                  goToDetail()
+                  openDetails()
                 }
               }}
               className={cn(
@@ -83,7 +77,7 @@ export function MenuItemsTable({
               <div className="flex gap-4">
                 <div className="relative size-20 shrink-0 overflow-hidden rounded-lg bg-muted sm:size-24">
                   <Image
-                    src={item.imageUrl}
+                    src={toImageSrc(item.imageUrl)}
                     alt={item.name}
                     fill
                     className="object-cover"
@@ -125,14 +119,17 @@ export function MenuItemsTable({
                   {item.itemErrors}
                 </p>
                 <div className="md:flex md:justify-end">
-                  <Link
-                    href={detailHref}
+                  <button
+                    type="button"
                     data-menu-row-action
                     className="inline-flex h-9 items-center justify-center rounded-lg bg-primary/10 px-4 text-sm font-medium text-primary transition-colors hover:bg-primary/15"
-                    onClick={(e) => e.stopPropagation()}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      openDetails()
+                    }}
                   >
                     View Details
-                  </Link>
+                  </button>
                 </div>
               </div>
             </li>

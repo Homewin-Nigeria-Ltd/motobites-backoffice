@@ -72,9 +72,12 @@ async function serverRequest<T>(
     token = cookieStore.get(AUTH_COOKIE_NAME)?.value ?? null
   }
 
+  const isFormData =
+    typeof FormData !== "undefined" && body instanceof FormData
+
   const headers: Record<string, string> = {
     Accept: "application/json",
-    "Content-Type": "application/json",
+    ...(isFormData ? {} : { "Content-Type": "application/json" }),
   }
 
   if (token) {
@@ -84,7 +87,12 @@ async function serverRequest<T>(
   const res = await fetch(buildApiUrl(endpoint, params), {
     method,
     headers,
-    body: body !== undefined ? JSON.stringify(body) : undefined,
+    body:
+      body === undefined
+        ? undefined
+        : isFormData
+          ? body
+          : JSON.stringify(body),
     cache: "no-store",
   })
 

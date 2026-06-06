@@ -6,6 +6,7 @@ export type Menu = {
   durationMinutes: number
   imageUrl: string
   enabled: boolean
+  isPopular?: boolean
 }
 
 export type Hub = {
@@ -50,6 +51,7 @@ export type MenuAvailabilityRow = {
   day: string
   startTime: string
   endTime: string
+  enabled?: boolean
 }
 
 export type MenuSortOption =
@@ -77,6 +79,7 @@ export type OpeningHoursRow = {
   day: string
   startTime: string
   endTime: string
+  enabled?: boolean
 }
 
 export type Restaurant = {
@@ -88,12 +91,76 @@ export type Restaurant = {
   openingHours: OpeningHoursRow[]
   hubId: string
   menus: Menu[]
+  isOpen?: boolean
 }
 
 export type RestaurantFormValues = {
   name: string
   description: string
+  tags: string[]
   openingHours: OpeningHoursRow[]
+  isOpen: boolean
+  image: File | null
+}
+
+export type ApiKitchen = {
+  id: number
+  name: string
+  image: string | null
+  is_open: boolean
+}
+
+export type ApiKitchenOpeningHour = {
+  day: string
+  start_time: string
+  end_time: string
+}
+
+export type ApiKitchenDetail = {
+  id: number
+  name: string
+  description: string | null
+  tags: string[]
+  image: string | null
+  is_open: boolean
+  meal_count: number
+  meal_count_label: string
+  opening_hours: ApiKitchenOpeningHour[]
+  opening_hours_storage?: Record<
+    string,
+    {
+      open: string
+      close: string
+    }
+  >
+}
+
+export type ApiKitchensResponse = {
+  success: boolean
+  data: ApiKitchen[]
+  message?: string
+}
+
+export type ApiKitchenDetailResponse = {
+  success: boolean
+  data: ApiKitchenDetail
+  message?: string
+}
+
+export type KitchenOpeningHoursPayload = Array<{
+  day: string
+  start_time: string
+  end_time: string
+}>
+
+export type RestaurantActionResult<T = undefined> =
+  | { success: true; data?: T }
+  | { success: false; error: string }
+
+export type KitchenMutationResponse = {
+  success: boolean
+  data: ApiKitchen
+  message?: string
 }
 
 export type MenuFormValues = {
@@ -102,4 +169,108 @@ export type MenuFormValues = {
   price: string
   durationMinutes: string
   enabled: boolean
+}
+
+export type ApiMenuKitchen = {
+  id: number
+  name: string
+  image: string | null
+}
+
+export type ApiMenuItemTags = {
+  display_rating?: number
+  display_review_count?: number
+  volume_label?: string
+  volume_ml?: number
+  is_alcoholic?: boolean
+  age_restricted?: boolean
+}
+
+export type ApiMenuItemVariation = {
+  id?: number
+  name?: string
+  option_name?: string
+  price?: number
+  preparation_time_minutes?: number
+}
+
+export type ApiMenuItem = {
+  id: number
+  name: string
+  description: string | null
+  image: string | null
+  price: number
+  preparation_time_minutes: number
+  tags?: string[] | ApiMenuItemTags | unknown[]
+  is_available: boolean
+  is_customer_available: boolean
+  unavailable_today: boolean
+  is_popular: boolean
+  availability_type: string
+  availability_start?: string | null
+  availability_end?: string | null
+  variations?: ApiMenuItemVariation[]
+  kitchen: {
+    id: number
+    name: string
+  }
+  category: {
+    id: number
+    name: string
+  }
+}
+
+export type ApiMenuItemDetail = ApiMenuItem & {
+  variations_count?: number
+}
+
+export type ApiMenuItemDetailStats = {
+  items_sold: number
+  review_count: number
+  item_errors: number
+  is_popular: boolean
+  rating: number
+}
+
+export type ApiMenuItemDetailData = {
+  item: ApiMenuItemDetail
+  stats: ApiMenuItemDetailStats
+}
+
+export type ApiMenuItemDetailResponse = {
+  success: boolean
+  data: ApiMenuItemDetailData
+  message?: string
+}
+
+export type MenuItemMutationResponse = {
+  success: boolean
+  data: ApiMenuItem
+  message?: string
+}
+
+export type ApiMenuGroupedItem = {
+  kitchen: ApiMenuKitchen
+  meal_count: number
+  items: ApiMenuItem[]
+}
+
+export type ApiMenuGroupedResponse = {
+  success: boolean
+  data: ApiMenuGroupedItem[]
+  message?: string
+}
+
+export type ApiMenuItemsMeta = {
+  current_page: number
+  last_page: number
+  per_page: number
+  total: number
+}
+
+export type ApiMenuItemsListResponse = {
+  success: boolean
+  data: ApiMenuItem[]
+  meta: ApiMenuItemsMeta
+  message?: string
 }

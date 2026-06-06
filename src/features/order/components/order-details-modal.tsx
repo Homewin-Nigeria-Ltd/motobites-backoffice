@@ -36,7 +36,7 @@ import { Icons } from "@/components/ui/icons"
 import { cn } from "@/lib/utils"
 import { OrderMap } from "@/features/order/components/order-map"
 import { getOrderMapCoordinates } from "@/features/order/utils/coordinates"
-import { mealPlaceholderImage } from "@/lib/placeholder-image"
+import { toImageSrc } from "@/lib/image-url"
 
 const ADMIN_STATUS_OPTIONS = [
   OrderStatus.PREPARING,
@@ -113,7 +113,7 @@ export function OrderDetailsModal({
       <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
         <div className="relative h-40 w-full shrink-0 overflow-hidden rounded-xl bg-muted sm:h-36 sm:w-44">
           <Image
-            src={order.item.image ?? mealPlaceholderImage}
+            src={toImageSrc(order.item.image)}
             alt={order.item.name}
             fill
             className="object-cover"

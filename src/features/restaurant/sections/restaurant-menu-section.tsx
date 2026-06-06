@@ -1,19 +1,24 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useState } from "react"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 
+import {
+  useKitchenMenuItems,
+} from "@/features/restaurant/hooks/use-restaurant-queries"
+import { useDebouncedSearch } from "@/features/restaurant/hooks/use-debounced-search"
+import { mapApiMenuItemToMenu } from "@/features/restaurant/utils/menu-item"
 import { MenuCardGrid } from "@/features/restaurant/components/menu-card-grid"
 import { MenuCardList } from "@/features/restaurant/components/menu-card-list"
+import { AddMenuSheet } from "@/features/restaurant/components/add-menu-sheet"
 import { RestaurantFormModal } from "@/features/restaurant/components/restaurant-form-modal"
-import { getHubById, useRestaurant } from "@/features/restaurant"
+import { useRestaurant } from "@/features/restaurant"
 import { PaginationControls } from "@/components/pagination-controls"
 import { Button } from "@/components/ui/button"
 import { AppLoader } from "@/components/ui/app-loader"
 import { Input } from "@/components/ui/input"
-
-const MENUS_PER_PAGE = 8
+import { cn } from "@/lib/utils"
 
 type RestaurantMenuSectionProps = {
   restaurantId: string
@@ -22,33 +27,52 @@ type RestaurantMenuSectionProps = {
 function RestaurantMenuSectionContent({
   restaurantId,
 }: RestaurantMenuSectionProps) {
-  const { data: restaurant, isPending } = useRestaurant(restaurantId)
+  const { data: restaurant, isPending: isKitchenPending } =
+    useRestaurant(restaurantId)
   const [view, setView] = useState<"grid" | "list">("grid")
   const [page, setPage] = useState(1)
+  const [searchSeed, setSearchSeed] = useState("")
   const [editRestaurantOpen, setEditRestaurantOpen] = useState(false)
+  const [menuSheetOpen, setMenuSheetOpen] = useState(false)
+  const [editingMenuItemId, setEditingMenuItemId] = useState<string>()
+  const { value: search, setValue: setSearch, debouncedValue } =
+    useDebouncedSearch()
 
-  const catalogHub = restaurant ? getHubById(restaurant.hubId) : undefined
-  const menus = useMemo(
-    () => catalogHub?.menus ?? restaurant?.menus ?? [],
-    [catalogHub, restaurant]
-  )
-  const hubId = catalogHub?.id ?? restaurant?.hubId ?? restaurantId
+  if (debouncedValue !== searchSeed) {
+    setSearchSeed(debouncedValue)
+    setPage(1)
+  }
 
-  const totalPages = Math.max(1, Math.ceil(menus.length / MENUS_PER_PAGE))
-  const currentPage = Math.min(page, totalPages)
+  const {
+    data: itemsResponse,
+    isPending: isItemsPending,
+    isError,
+    error,
+  } = useKitchenMenuItems({
+    kitchenId: restaurantId,
+    search: debouncedValue,
+    page,
+  })
 
-  const paginatedMenus = useMemo(
-    () => menus.slice((currentPage - 1) * MENUS_PER_PAGE, currentPage * MENUS_PER_PAGE),
-    [menus, currentPage]
-  )
+  const items = itemsResponse?.data ?? []
+  const menus = items.map(mapApiMenuItemToMenu)
+  const meta = itemsResponse?.meta
+  const totalPages = meta?.last_page ?? 1
+  const currentPage = meta?.current_page ?? page
 
-  if (!isPending && !restaurant) {
+  if (!isKitchenPending && !restaurant) {
     notFound()
+  }
+
+  if (isError) {
+    throw error
   }
 
   if (!restaurant) {
     return <AppLoader className="flex-1 bg-muted p-12" />
   }
+
+  const isLoading = isItemsPending && menus.length === 0
 
   return (
     <div className="flex min-h-0 flex-1 flex-col bg-muted">
@@ -59,7 +83,7 @@ function RestaurantMenuSectionContent({
             className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground"
           >
             <span aria-hidden>←</span>
-            All restaurants
+            All kitchens
           </Link>
         </div>
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
@@ -69,7 +93,8 @@ function RestaurantMenuSectionContent({
               icon={{ name: "search", position: "left" }}
               placeholder="Search menu items"
               className="h-10"
-              readOnly
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
             />
           </div>
           <div className="flex flex-wrap items-center gap-2">
@@ -101,7 +126,7 @@ function RestaurantMenuSectionContent({
               icon={{ name: "edit", position: "left" }}
               onClick={() => setEditRestaurantOpen(true)}
             >
-              Edit Restaurant
+              Edit Kitchen
             </Button>
           </div>
         </div>
@@ -112,22 +137,59 @@ function RestaurantMenuSectionContent({
           <h2 className="mb-6 text-lg font-semibold text-foreground">
             {restaurant.name}
           </h2>
-          {view === "grid" ? (
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {paginatedMenus.map((menu) => (
-                <MenuCardGrid key={menu.id} menu={menu} hubId={hubId} />
+
+          {isLoading ? (
+            <AppLoader />
+          ) : menus.length === 0 ? (
+            <div className="flex flex-1 items-center justify-center rounded-2xl border border-border bg-background p-12 text-center">
+              <p className="text-sm text-muted-foreground">
+                {debouncedValue
+                  ? `No menu items found for "${debouncedValue}".`
+                  : "No menu items found for this kitchen."}
+              </p>
+            </div>
+          ) : view === "grid" ? (
+            <div
+              className={cn(
+                "grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",
+                isItemsPending && "opacity-60"
+              )}
+            >
+              {menus.map((menu) => (
+                <MenuCardGrid
+                  key={menu.id}
+                  menu={menu}
+                  hubId={restaurantId}
+                  onEditItem={(menuId) => {
+                    setEditingMenuItemId(menuId)
+                    setMenuSheetOpen(true)
+                  }}
+                />
               ))}
             </div>
           ) : (
-            <div className="flex flex-col gap-6">
-              {paginatedMenus.map((menu) => (
-                <MenuCardList key={menu.id} menu={menu} hubId={hubId} />
+            <div
+              className={cn(
+                "flex flex-col gap-6",
+                isItemsPending && "opacity-60"
+              )}
+            >
+              {menus.map((menu) => (
+                <MenuCardList
+                  key={menu.id}
+                  menu={menu}
+                  hubId={restaurantId}
+                  onEditItem={(menuId) => {
+                    setEditingMenuItemId(menuId)
+                    setMenuSheetOpen(true)
+                  }}
+                />
               ))}
             </div>
           )}
         </div>
 
-        {menus.length > 0 ? (
+        {!isLoading && totalPages > 1 ? (
           <div className="flex shrink-0 justify-center border-t border-border/60 bg-background px-4 py-4 md:px-6">
             <PaginationControls
               page={currentPage}
@@ -141,7 +203,19 @@ function RestaurantMenuSectionContent({
       <RestaurantFormModal
         open={editRestaurantOpen}
         onOpenChange={setEditRestaurantOpen}
-        restaurant={restaurant}
+        kitchenId={restaurantId}
+      />
+
+      <AddMenuSheet
+        open={menuSheetOpen}
+        onOpenChange={(open) => {
+          setMenuSheetOpen(open)
+          if (!open) {
+            setEditingMenuItemId(undefined)
+          }
+        }}
+        menuItemId={editingMenuItemId}
+        defaultKitchenId={restaurantId}
       />
     </div>
   )

@@ -4,10 +4,13 @@ import * as React from "react"
 
 import { Button } from "@/components/ui/button"
 import { Icons } from "@/components/ui/icons"
+import { toImageSrc } from "@/lib/image-url"
 import { cn } from "@/lib/utils"
 
 type ImageUploadProps = {
   value?: File | null
+  existingImageUrl?: string | null
+  existingImageAlt?: string
   onChange?: (file: File | null) => void
   accept?: string
   className?: string
@@ -17,6 +20,8 @@ type ImageUploadProps = {
 
 function ImageUpload({
   value = null,
+  existingImageUrl = null,
+  existingImageAlt = "Current image",
   onChange,
   accept = "image/png,image/jpeg,image/jpg",
   className,
@@ -27,21 +32,45 @@ function ImageUpload({
   const inputId = React.useId()
   const resolvedId = id ?? inputId
   const [isDragging, setIsDragging] = React.useState(false)
+  const [dismissedImageUrl, setDismissedImageUrl] = React.useState<string | null>(
+    null
+  )
 
-  const previewUrl = React.useMemo(() => {
+  const filePreviewUrl = React.useMemo(() => {
     if (!value) return null
     return URL.createObjectURL(value)
   }, [value])
 
   React.useEffect(() => {
-    if (!previewUrl) return
-    return () => URL.revokeObjectURL(previewUrl)
-  }, [previewUrl])
+    if (!filePreviewUrl) return
+    return () => URL.revokeObjectURL(filePreviewUrl)
+  }, [filePreviewUrl])
+
+  const showExistingImage =
+    Boolean(existingImageUrl) && dismissedImageUrl !== existingImageUrl
+
+  const previewUrl =
+    filePreviewUrl ??
+    (showExistingImage && existingImageUrl ? toImageSrc(existingImageUrl) : null)
 
   const setFile = (file: File | null) => {
     onChange?.(file)
+    if (!file && existingImageUrl) {
+      setDismissedImageUrl(null)
+    }
     if (!file && inputRef.current) {
       inputRef.current.value = ""
+    }
+  }
+
+  const clearPreview = () => {
+    if (value) {
+      setFile(null)
+      return
+    }
+
+    if (existingImageUrl) {
+      setDismissedImageUrl(existingImageUrl)
     }
   }
 
@@ -67,7 +96,7 @@ function ImageUpload({
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={previewUrl}
-          alt="Upload preview"
+          alt={value ? "Upload preview" : existingImageAlt}
           className="aspect-video w-full object-cover"
         />
         <div className="absolute inset-0 flex items-end justify-end gap-2 bg-linear-to-t from-foreground/50 to-transparent p-3">
@@ -76,7 +105,7 @@ function ImageUpload({
             size="sm"
             variant="secondary"
             disabled={disabled}
-            onClick={() => setFile(null)}
+            onClick={clearPreview}
           >
             Remove
           </Button>

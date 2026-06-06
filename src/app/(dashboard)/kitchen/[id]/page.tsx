@@ -6,12 +6,12 @@ type PageProps = {
   params: Promise<{ id: string }>
 }
 
-export default async function RestaurantCatalogDetailPage({ params }: PageProps) {
+export default async function KitchenDetailPage({ params }: PageProps) {
   const { id } = await params
 
   return (
     <Suspense fallback={null}>
-      <MenuDetailSection menuId={decodeURIComponent(id)} />
+      <MenuDetailSection kitchenId={decodeURIComponent(id)} />
     </Suspense>
   )
 }

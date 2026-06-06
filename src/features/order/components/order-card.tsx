@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Icons } from "@/components/ui/icons"
-import { mealPlaceholderImage } from "@/lib/placeholder-image"
+import { toImageSrc } from "@/lib/image-url"
 
 type OrderCardProps = {
   order: ApiOrder
@@ -28,7 +28,7 @@ export function OrderCard({ order, onViewDetails }: OrderCardProps) {
     <Card className="gap-0 overflow-hidden py-0">
       <div className="relative aspect-[4/3] w-full overflow-hidden bg-muted">
         <Image
-          src={order.item_image ?? mealPlaceholderImage}
+          src={toImageSrc(order.item_image)}
           alt={order.item_name}
           fill
           className="object-cover"

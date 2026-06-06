@@ -44,15 +44,23 @@ export async function request<TResponse, TBody = unknown>(
   const { method = "GET", body, headers = {}, params } = options
   const url = buildUrl(endpoint, params)
 
+  const isFormData =
+    typeof FormData !== "undefined" && body instanceof FormData
+
   const res = await fetch(url, {
     method,
     credentials: "include",
     headers: {
       Accept: "application/json",
-      "Content-Type": "application/json",
+      ...(isFormData ? {} : { "Content-Type": "application/json" }),
       ...headers,
     },
-    body: body !== undefined ? JSON.stringify(body) : undefined,
+    body:
+      body === undefined
+        ? undefined
+        : isFormData
+          ? body
+          : JSON.stringify(body),
   })
 
   let data: unknown = null

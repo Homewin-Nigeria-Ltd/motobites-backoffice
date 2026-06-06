@@ -17,7 +17,7 @@ export function DashboardLayout({
   showDashboardHeader?: boolean
 }) {
   const pathname = usePathname()
-  const isMenuDetailPage = pathname.startsWith("/menu/catalog/")
+  const isMenuDetailPage = /^\/kitchen\/[^/]+$/.test(pathname)
   const shouldShowHeader = showDashboardHeader ?? !isMenuDetailPage
 
   return (

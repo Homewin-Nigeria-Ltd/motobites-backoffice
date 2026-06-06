@@ -40,8 +40,7 @@ export function NavMain({
           const isActive =
             pathname === item.url ||
             item.items?.some((sub) => pathname === sub.url) ||
-            (item.url === "/menu" &&
-              (pathname === "/menu" || pathname.startsWith("/menu/catalog"))) ||
+            (item.url === "/menu" && pathname === "/menu") ||
             (item.url === "/kitchen" && pathname.startsWith("/kitchen")) ||
             (item.url === "/order" && pathname.startsWith("/order"))
 
