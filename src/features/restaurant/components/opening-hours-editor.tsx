@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { TimeStepper } from "@/components/ui/time-stepper"
+import { normalizeTimeForApi } from "@/lib/time-format"
 import { Icons } from "@/components/ui/icons"
 import type { OpeningHoursRow } from "@/features/restaurant/types"
 
@@ -47,12 +48,12 @@ export function OpeningHoursEditor({
               {isEnabled ? (
                 <>
                   <TimeStepper
-                    value={row.startTime}
+                    value={normalizeTimeForApi(row.startTime)}
                     onChange={(value) => updateRow(row.id, "startTime", value)}
                   />
                   <span className="text-sm text-muted-foreground">to</span>
                   <TimeStepper
-                    value={row.endTime}
+                    value={normalizeTimeForApi(row.endTime)}
                     onChange={(value) => updateRow(row.id, "endTime", value)}
                   />
                   <Button
