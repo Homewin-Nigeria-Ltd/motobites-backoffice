@@ -6,11 +6,12 @@ import { buildApiUrl } from "@/lib/api/url"
 import { AUTH_COOKIE_NAME } from "@/constants/auth"
 import {
   ApiError,
+  type ApiRequestOptions,
   type HttpMethod,
   type QueryParams,
 } from "@/lib/api/client"
 
-type ServerRequestOptions = {
+type ServerRequestOptions = ApiRequestOptions & {
   method?: HttpMethod
   body?: unknown
   params?: QueryParams
@@ -62,6 +63,7 @@ async function serverRequest<T>(
     method = "GET",
     body,
     params,
+    baseUrl,
     auth = true,
     token: explicitToken,
   } = options
@@ -84,7 +86,11 @@ async function serverRequest<T>(
     headers.Authorization = `Bearer ${token}`
   }
 
-  const res = await fetch(buildApiUrl(endpoint, params), {
+  const url = baseUrl
+    ? buildApiUrl(baseUrl, endpoint, params)
+    : buildApiUrl(endpoint, params)
+
+  const res = await fetch(url, {
     method,
     headers,
     body:
@@ -129,7 +135,7 @@ async function serverRequest<T>(
   return unwrapData(envelope)
 }
 
-type ApiServerRequestOptions = {
+type ApiServerRequestOptions = ApiRequestOptions & {
   auth?: boolean
   token?: string | null
 }

@@ -1,18 +1,22 @@
+import { buildApiUrl } from "@/lib/api/url"
+
 export type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE"
 
 export type QueryParams = Record<string, string | number | boolean | undefined>
 
-type RequestOptions<TBody> = {
+export type ApiRequestOptions = {
+  baseUrl?: string | null
+}
+
+type RequestOptions<TBody> = ApiRequestOptions & {
   method?: HttpMethod
   body?: TBody
   headers?: Record<string, string>
   params?: QueryParams
 }
 
-function buildUrl(endpoint: string, params?: QueryParams) {
-  const path = endpoint.startsWith("/") ? endpoint : `/${endpoint}`
-
-  if (!params) return path
+function buildQueryString(params?: QueryParams) {
+  if (!params) return ""
 
   const query = new URLSearchParams()
   Object.entries(params).forEach(([key, value]) => {
@@ -22,7 +26,26 @@ function buildUrl(endpoint: string, params?: QueryParams) {
   })
 
   const queryString = query.toString()
-  return queryString ? `${path}?${queryString}` : path
+  return queryString ? `?${queryString}` : ""
+}
+
+function buildUrl(
+  endpoint: string,
+  params?: QueryParams,
+  baseUrl?: string | null
+) {
+  if (baseUrl) {
+    return buildApiUrl(baseUrl, endpoint, params)
+  }
+
+  const queryString = buildQueryString(params)
+
+  if (/^https?:\/\//.test(endpoint)) {
+    return `${endpoint}${queryString}`
+  }
+
+  const path = endpoint.startsWith("/") ? endpoint : `/${endpoint}`
+  return `${path}${queryString}`
 }
 
 export class ApiError extends Error {
@@ -41,8 +64,8 @@ export async function request<TResponse, TBody = unknown>(
   endpoint: string,
   options: RequestOptions<TBody> = {}
 ): Promise<TResponse> {
-  const { method = "GET", body, headers = {}, params } = options
-  const url = buildUrl(endpoint, params)
+  const { method = "GET", body, headers = {}, params, baseUrl } = options
+  const url = buildUrl(endpoint, params, baseUrl)
 
   const isFormData =
     typeof FormData !== "undefined" && body instanceof FormData
@@ -87,17 +110,27 @@ export async function request<TResponse, TBody = unknown>(
 }
 
 export const api = {
-  get: <T>(endpoint: string, params?: QueryParams) =>
-    request<T>(endpoint, { method: "GET", params }),
+  get: <T>(endpoint: string, params?: QueryParams, options?: ApiRequestOptions) =>
+    request<T>(endpoint, { method: "GET", params, ...options }),
 
-  post: <T, B = unknown>(endpoint: string, body: B) =>
-    request<T, B>(endpoint, { method: "POST", body }),
+  post: <T, B = unknown>(
+    endpoint: string,
+    body: B,
+    options?: ApiRequestOptions
+  ) => request<T, B>(endpoint, { method: "POST", body, ...options }),
 
-  put: <T, B = unknown>(endpoint: string, body: B) =>
-    request<T, B>(endpoint, { method: "PUT", body }),
+  put: <T, B = unknown>(
+    endpoint: string,
+    body: B,
+    options?: ApiRequestOptions
+  ) => request<T, B>(endpoint, { method: "PUT", body, ...options }),
 
-  patch: <T, B = unknown>(endpoint: string, body: B) =>
-    request<T, B>(endpoint, { method: "PATCH", body }),
+  patch: <T, B = unknown>(
+    endpoint: string,
+    body: B,
+    options?: ApiRequestOptions
+  ) => request<T, B>(endpoint, { method: "PATCH", body, ...options }),
 
-  delete: <T>(endpoint: string) => request<T>(endpoint, { method: "DELETE" }),
+  delete: <T>(endpoint: string, options?: ApiRequestOptions) =>
+    request<T>(endpoint, { method: "DELETE", ...options }),
 }

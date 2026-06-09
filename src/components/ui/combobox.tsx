@@ -2,7 +2,6 @@
 
 import * as React from "react"
 import { Combobox as ComboboxPrimitive } from "@base-ui/react"
-
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
@@ -16,6 +15,9 @@ import { useOverlayPortalContainer } from "@/components/overlay-portal-container
 import type { FieldIcon } from "@/components/ui/button"
 
 const Combobox = ComboboxPrimitive.Root
+
+const comboboxInputClassName =
+  "h-11 w-full rounded-sm border border-border bg-transparent shadow-none transition-colors duration-200 has-[[data-slot=input-group-control]:focus-visible]:!border-border has-[[data-slot][aria-invalid=true]]:border-destructive [&_[data-slot=input-group-control]]:h-11 [&_[data-slot=input-group-control]]:border-0 [&_[data-slot=input-group-control]]:bg-transparent [&_[data-slot=input-group-control]]:pl-2.5 [&_[data-slot=input-group-control]]:pr-0 [&_[data-slot=input-group-control]]:text-base [&_[data-slot=input-group-control]]:shadow-none [&_[data-slot=input-group-control]]:ring-0 [&_[data-slot=input-group-control]]:focus-visible:ring-0 [&_[data-slot=input-group-control]]:md:text-sm [&_[data-slot=input-group-addon][data-align=inline-start]]:pl-3"
 
 function ComboboxValue({ ...props }: ComboboxPrimitive.Value.Props) {
   return <ComboboxPrimitive.Value data-slot="combobox-value" {...props} />
@@ -70,7 +72,7 @@ function ComboboxInput({
   const InputIcon = icon ? Icons[icon.name] : null
 
   return (
-    <InputGroup className={cn("w-auto", className)}>
+    <InputGroup className={cn(comboboxInputClassName, className)}>
       {InputIcon && icon ? (
         <InputGroupAddon align="inline-start">
           <InputIcon

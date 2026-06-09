@@ -37,12 +37,16 @@ export function buildApiUrl(
       ? { baseUrl: first, endpoint: second, params: third }
       : { endpoint: first ?? "", params: second }
 
-  const resolvedBaseUrl = args.baseUrl || API_BASE_URL || ""
   const endpoint = args.endpoint
   const params = args.params
-  const path = endpoint.startsWith("/") ? endpoint : `/${endpoint}`
-  const url = `${resolvedBaseUrl}${path}`
   const queryString = buildQueryString(params)
 
-  return `${url}${queryString}`
+  if (/^https?:\/\//.test(endpoint)) {
+    return `${endpoint}${queryString}`
+  }
+
+  const resolvedBaseUrl = args.baseUrl || API_BASE_URL || ""
+  const path = endpoint.startsWith("/") ? endpoint : `/${endpoint}`
+
+  return `${resolvedBaseUrl}${path}${queryString}`
 }

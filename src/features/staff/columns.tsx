@@ -4,8 +4,6 @@ import type { ColumnDef } from "@tanstack/react-table"
 
 import { StaffRowActions } from "@/features/staff/components/staff-row-actions"
 import { StaffStatusBadge } from "@/features/staff/components/staff-status-badge"
-import { formatDate } from "@/utils/date"
-import { getInitials } from "@/utils/get-initials"
 import type { StaffMember } from "@/features/staff/types"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
@@ -38,7 +36,7 @@ export const staffColumns: ColumnDef<StaffMember>[] = [
         <div className="flex items-center gap-3">
           <Avatar className="size-10">
             <AvatarFallback className="bg-primary text-sm font-medium text-primary-foreground">
-              {getInitials(member.name)}
+              {member.initials}
             </AvatarFallback>
           </Avatar>
           <div className="min-w-0">
@@ -68,7 +66,7 @@ export const staffColumns: ColumnDef<StaffMember>[] = [
     header: "Date",
     cell: ({ row }) => (
       <span className="whitespace-nowrap text-muted-foreground">
-        {formatDate(row.original.joinedAt)}
+        {row.original.joinedAt}
       </span>
     ),
   },

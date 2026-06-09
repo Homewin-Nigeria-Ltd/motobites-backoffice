@@ -15,7 +15,6 @@ import {
 } from "@/components/ui/combobox";
 import { Icons } from "@/components/ui/icons";
 import { useRestaurants } from "@/features/restaurant";
-import { cn } from "@/lib/utils";
 
 type KitchenOption = {
   id: string;
@@ -61,10 +60,7 @@ export function RestaurantCombobox({
       <ComboboxInput
         placeholder="Entre Restaurant Or Create New Restaurant"
         showClear={Boolean(value)}
-        className={cn(
-          "w-full h-11 rounded-sm border border-border bg-background",
-          className,
-        )}
+        className={className}
       />
       <ComboboxContent>
         <ComboboxEmpty>No restaurant found.</ComboboxEmpty>

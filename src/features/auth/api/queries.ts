@@ -14,7 +14,10 @@ export const authQueries = {
           const response = await api.get<MeApiResponse>(authEndpoints.me)
           return { user: response.data.user }
         } catch (error) {
-          if (error instanceof ApiError && error.status === 401) {
+          if (
+            error instanceof ApiError &&
+            (error.status === 401 || error.status === 403)
+          ) {
             return null
           }
 

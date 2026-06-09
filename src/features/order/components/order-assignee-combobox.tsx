@@ -12,7 +12,6 @@ import {
   ComboboxList,
 } from "@/components/ui/combobox"
 import type { ApiOrderAssigneeOption } from "@/features/order/types"
-import { cn } from "@/lib/utils"
 
 function toAssigneeUserId(assignee: ApiOrderAssigneeOption) {
   return assignee.user_id ?? assignee.id
@@ -63,10 +62,7 @@ export function OrderAssigneeCombobox({
         showClear={Boolean(value)}
         icon={{ name: "account", position: "left" }}
         disabled={disabled}
-        className={cn(
-          "w-full [&_[data-slot=input-group]]:h-11 [&_[data-slot=input-group]]:rounded-sm [&_[data-slot=input-group]]:border-border [&_[data-slot=input-group]]:bg-background",
-          className
-        )}
+        className={className}
       />
       <ComboboxContent>
         <ComboboxEmpty>No assignee found.</ComboboxEmpty>

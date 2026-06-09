@@ -36,6 +36,7 @@ export type BaseModalProps = {
   size?: BaseModalSize
   className?: string
   bodyClassName?: string
+  headerClassName?: string
   closeButtonClassName?: string
   asForm?: boolean
   onSubmit?: (event: React.FormEvent<HTMLFormElement>) => void
@@ -54,6 +55,7 @@ export function BaseModal({
   size = "md",
   className,
   bodyClassName,
+  headerClassName,
   closeButtonClassName,
   asForm = false,
   onSubmit,
@@ -129,7 +131,12 @@ export function BaseModal({
             </DialogTitle>
           </div>
         ) : (
-          <div className="flex flex-col items-center px-6 pt-8 pb-2 text-center">
+          <div
+            className={cn(
+              "flex flex-col items-center px-6 pt-8 pb-2 text-center",
+              headerClassName
+            )}
+          >
             {headerIcon ? (
               <div className="mb-4 flex size-14 items-center justify-center rounded-full bg-primary/10">
                 {headerIcon}

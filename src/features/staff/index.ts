@@ -1,9 +1,17 @@
 export * from "./types"
-export { staffKeys } from "./api/keys"
-export { staffQueries } from "./api/queries"
-export { useStaffList } from "./hooks/use-staff-list"
+export {
+  inviteStaffAction,
+  removeStaffAction,
+  toggleStaffFavoriteAction,
+  updateStaffAction,
+} from "./actions/staff-member.actions"
 export { StaffManagementSection } from "./sections/staff-section"
-export { staffColumns } from "./columns"
-export { StaffRowActions } from "./components/staff-row-actions"
-export { StaffToolbar } from "./components/staff-toolbar"
-export { InviteMemberDialog } from "./components/invite-member-dialog"
+export { useStaffList } from "./hooks/use-staff-list"
+export { useStaffRoles } from "./hooks/use-staff-roles"
+export {
+  useExportStaffCsv,
+  useInviteStaff,
+  useRemoveStaff,
+  useToggleStaffFavorite,
+  useUpdateStaff,
+} from "./hooks/use-staff-mutations"
