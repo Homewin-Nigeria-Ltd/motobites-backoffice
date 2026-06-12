@@ -1,5 +1,7 @@
 "use client"
 
+import { useState } from "react"
+
 import {
   Avatar,
   AvatarFallback,
@@ -11,7 +13,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import { Icons } from "@/components/ui/icons"
-import { useLogout } from "@/features/auth"
+import { LogoutConfirmDialog } from "@/features/auth/components/logout-confirm-dialog"
 import { cn } from "@/lib/utils"
 import { getUserInitials } from "@/utils/get-initials"
 
@@ -24,7 +26,7 @@ export function NavUser({
     avatar: string
   }
 }) {
-  const { logout, isPending } = useLogout()
+  const [logoutOpen, setLogoutOpen] = useState(false)
   const userInitials = getUserInitials(user.name)
 
   return (
@@ -52,8 +54,7 @@ export function NavUser({
           </SidebarMenuButton>
           <button
             type="button"
-            onClick={() => logout()}
-            disabled={isPending}
+            onClick={() => setLogoutOpen(true)}
             aria-label="Log out"
             className={cn(
               "mr-2 shrink-0 cursor-pointer rounded-md p-1 text-sidebar-foreground/70 transition-colors",
@@ -66,6 +67,8 @@ export function NavUser({
           </button>
         </div>
       </SidebarMenuItem>
+
+      <LogoutConfirmDialog open={logoutOpen} onOpenChange={setLogoutOpen} />
     </SidebarMenu>
   )
 }
