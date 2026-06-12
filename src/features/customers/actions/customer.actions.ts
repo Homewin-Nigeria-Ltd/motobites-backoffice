@@ -1,7 +1,11 @@
 "use server"
 
 import { customerEndpoints } from "../api/endpoints"
-import type { ApiCustomer, CustomerActionResult } from "../types"
+import type {
+  ApiCustomer,
+  CustomerActionResult,
+  IncreaseCnplEligibilityInput,
+} from "../types"
 import { ApiError } from "@/lib/api/client"
 import { apiServer } from "@/lib/api/server-client"
 
@@ -68,6 +72,35 @@ export async function deactivateCustomerAction(
       return {
         success: false,
         error: error.message || "Failed to deactivate customer account",
+      }
+    }
+
+    throw error
+  }
+}
+
+export async function increaseCnplEligibilityAction({
+  id,
+  amount,
+}: IncreaseCnplEligibilityInput): Promise<CustomerActionResult> {
+  if (!id.trim()) {
+    return { success: false, error: "Customer is required" }
+  }
+
+  try {
+    await apiServer.post(customerEndpoints.increaseCnplEligibility(id), {
+      amount,
+    })
+
+    return {
+      success: true,
+      message: "CNPL eligibility limit increased",
+    }
+  } catch (error) {
+    if (error instanceof ApiError) {
+      return {
+        success: false,
+        error: error.message || "Failed to increase CNPL eligibility limit",
       }
     }
 

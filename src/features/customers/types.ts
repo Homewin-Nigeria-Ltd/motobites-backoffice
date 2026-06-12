@@ -229,6 +229,11 @@ export type ApiCustomerOverviewResponse = {
   message?: string
 }
 
+export type IncreaseCnplEligibilityInput = {
+  id: string
+  amount: number
+}
+
 export type CustomerActionResult<T = undefined> =
   | { success: true; data?: T; message?: string }
   | { success: false; error: string }

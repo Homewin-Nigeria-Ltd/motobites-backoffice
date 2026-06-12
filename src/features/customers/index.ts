@@ -2,6 +2,7 @@ export * from "./types"
 export {
   deactivateCustomerAction,
   deleteCustomerAction,
+  increaseCnplEligibilityAction,
   suspendCustomerAction,
 } from "./actions/customer.actions"
 export { CustomerManagementSection } from "./sections/customer-section"
@@ -12,5 +13,6 @@ export { useCustomerOverview, useCustomerSummary } from "./hooks/use-customer-su
 export {
   useDeactivateCustomer,
   useDeleteCustomer,
+  useIncreaseCnplEligibility,
   useSuspendCustomer,
 } from "./hooks/use-customer-mutations"

@@ -19,7 +19,9 @@ export function CustomerChopNowPayLaterSection({
       plain
     >
       <CustomerCnplSection
+        customerId={customer.id}
         overdraftBalanceFormatted={customer.overdraftBalanceFormatted}
+        overdraftEligibility={customer.overdraftEligibility}
         transactions={customer.cnplTransactions}
       />
     </CustomerDetailBlock>

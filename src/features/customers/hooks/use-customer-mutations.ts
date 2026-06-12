@@ -89,3 +89,30 @@ export function useDeactivateCustomer() {
       : null,
   }
 }
+
+export function useIncreaseCnplEligibility(customerId: string) {
+  const queryClient = useQueryClient()
+
+  const mutation = useMutation({
+    ...customerMutations.increaseCnplEligibility,
+    onSuccess: (result) => {
+      if (!result.success) {
+        toast.error(result.error)
+        return
+      }
+
+      queryClient.invalidateQueries({
+        queryKey: customerKeys.detail(customerId),
+      })
+      toast.success(result.message ?? "CNPL eligibility limit increased")
+    },
+    onError: () => {
+      toast.error("Failed to increase CNPL eligibility limit")
+    },
+  })
+
+  return {
+    increaseCnplEligibility: mutation.mutateAsync,
+    isPending: mutation.isPending,
+  }
+}

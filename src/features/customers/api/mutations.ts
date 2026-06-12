@@ -1,6 +1,7 @@
 import {
   deactivateCustomerAction,
   deleteCustomerAction,
+  increaseCnplEligibilityAction,
   suspendCustomerAction,
 } from "../actions/customer.actions"
 
@@ -15,5 +16,9 @@ export const customerMutations = {
 
   deactivate: {
     mutationFn: (id: string) => deactivateCustomerAction(id),
+  },
+
+  increaseCnplEligibility: {
+    mutationFn: increaseCnplEligibilityAction,
   },
 } as const

@@ -7,4 +7,6 @@ export const customerEndpoints = {
   member: (id: string | number) => `${customerManagementPath}/${id}`,
   suspend: (id: string | number) => `${customerManagementPath}/${id}/suspend`,
   deactivate: (id: string | number) => `${customerManagementPath}/${id}/deactivate`,
+  increaseCnplEligibility: (id: string | number) =>
+    `${customerManagementPath}/${id}/increase-cnpl-eligibility`,
 } as const
