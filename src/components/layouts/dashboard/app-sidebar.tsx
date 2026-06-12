@@ -37,7 +37,7 @@ const data = {
     { title: "Technical Report", url: "/technical-report", icon: "fileText" as IconName },
     {
       title: "Customer Retention and Loyalty",
-      url: "/customer-retention-and-loyalty",
+      url: "/customers",
       icon: "heart" as IconName,
     },
   ],

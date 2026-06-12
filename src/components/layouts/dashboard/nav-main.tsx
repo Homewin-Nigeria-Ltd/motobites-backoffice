@@ -42,7 +42,8 @@ export function NavMain({
             item.items?.some((sub) => pathname === sub.url) ||
             (item.url === "/menu" && pathname === "/menu") ||
             (item.url === "/kitchen" && pathname.startsWith("/kitchen")) ||
-            (item.url === "/order" && pathname.startsWith("/order"))
+            (item.url === "/order" && pathname.startsWith("/order")) ||
+            (item.url === "/customers" && pathname.startsWith("/customers"))
 
           return item.items?.length ? (
             <Collapsible

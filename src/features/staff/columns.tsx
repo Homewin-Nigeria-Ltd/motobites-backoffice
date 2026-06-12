@@ -10,24 +10,6 @@ import { Badge } from "@/components/ui/badge"
 
 export const staffColumns: ColumnDef<StaffMember>[] = [
   {
-    id: "select",
-    header: () => (
-      <input
-        type="checkbox"
-        aria-label="Select all staff"
-        className="size-4 rounded border-border accent-primary"
-      />
-    ),
-    cell: ({ row }) => (
-      <input
-        type="checkbox"
-        aria-label={`Select ${row.original.name}`}
-        className="size-4 rounded border-border accent-primary"
-      />
-    ),
-    enableHiding: false,
-  },
-  {
     accessorKey: "name",
     header: "Name",
     cell: ({ row }) => {

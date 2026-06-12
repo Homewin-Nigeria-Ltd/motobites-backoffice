@@ -11,12 +11,12 @@ const PROTECTED_PREFIXES = [
   "/menu",
   "/kitchen",
   "/staff",
+  "/customers",
   "/revenue-analytics",
   "/inventory-tracking",
   "/delivery-status",
   "/performance",
   "/technical-report",
-  "/customer-retention-and-loyalty",
   "/customer-support",
   "/settings",
 ]
