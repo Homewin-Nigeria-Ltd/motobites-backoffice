@@ -44,7 +44,7 @@ export function OrderFilterTabs({ counts }: OrderFilterTabsProps) {
             className={cn(
               "h-auto rounded-lg px-4 py-2 text-sm font-medium",
               isActive
-                ? "text-primary hover:bg-secondary"
+                ? "text-primary"
                 : "text-muted-foreground hover:bg-transparent hover:text-foreground"
             )}
           >

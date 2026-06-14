@@ -31,11 +31,15 @@ function SummaryCard({ stat }: { stat: CustomerSummaryStat }) {
               )}
             >
               <Image
-                src={ASSETS.illustrations.shortUpTrend}
+                src={
+                  isUp
+                    ? ASSETS.illustrations.shortUpTrend
+                    : ASSETS.illustrations.shortDownTrend
+                }
                 alt=""
                 width={13}
                 height={8}
-                className={cn("shrink-0", !isUp && "rotate-180")}
+                className="shrink-0"
                 aria-hidden
               />
               <span>+{stat.changePercent}%</span>

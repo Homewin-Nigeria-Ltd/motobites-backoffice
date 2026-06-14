@@ -29,7 +29,7 @@ export function NotificationFilterTabs({
         className={cn(
           "h-auto rounded-md px-4 py-2 text-sm font-medium sm:px-6",
           value === "all"
-            ? "text-primary hover:bg-secondary"
+            ? "text-primary"
             : "text-muted-foreground hover:bg-transparent hover:text-foreground"
         )}
         onClick={() => onChange("all")}
@@ -44,7 +44,7 @@ export function NotificationFilterTabs({
         className={cn(
           "h-auto rounded-md px-4 py-2 text-sm font-medium sm:px-6",
           value === "unread"
-            ? "text-primary hover:bg-secondary"
+            ? "text-primary"
             : "text-muted-foreground hover:bg-transparent hover:text-foreground"
         )}
         onClick={() => onChange("unread")}
