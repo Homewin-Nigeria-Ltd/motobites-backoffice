@@ -6,8 +6,6 @@ import type { RevenuePaymentMethod } from "@/features/revenue-analytics/types"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   ChartContainer,
-  ChartLegend,
-  ChartLegendContent,
   ChartTooltip,
   ChartTooltipContent,
   type ChartConfig,
@@ -50,50 +48,78 @@ export function RevenuePaymentMethodsChart({
   }, { ...chartConfig })
 
   return (
-    <Card className="flex h-full flex-col gap-4 py-5">
-      <CardHeader className="shrink-0 px-5 pb-0">
+    <Card className="flex h-full min-w-0 flex-col gap-4 py-5">
+      <CardHeader className="shrink-0 px-4 pb-0 sm:px-5">
         <CardTitle className="text-sm font-semibold text-foreground">
           Revenue Based on Payment Method
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex min-h-0 flex-1 items-center justify-center px-5 pb-5">
+      <CardContent className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden px-4 pb-5 sm:px-5">
         {paymentMethods.length === 0 ? (
           <p className="py-6 text-center text-sm text-muted-foreground">
             No payment method data for this period.
           </p>
         ) : (
-          <ChartContainer
-            config={config}
-            className="mx-auto aspect-square h-[280px] w-full max-w-[320px]"
-          >
-            <PieChart>
-              <ChartTooltip
-                content={
-                  <ChartTooltipContent
-                    hideLabel
-                    formatter={(value, name) => [`${value}%`, String(name)]}
-                  />
-                }
-              />
-              <Pie
-                data={chartData}
-                dataKey="percent"
-                nameKey="name"
-                innerRadius={70}
-                outerRadius={110}
-                paddingAngle={2}
-                strokeWidth={0}
+          <>
+            <div className="mx-auto w-full min-w-0 max-w-[17.5rem]">
+              <ChartContainer
+                config={config}
+                className="aspect-square w-full min-w-0"
+                initialDimension={{ width: 280, height: 280 }}
               >
-                {chartData.map((entry) => (
-                  <Cell
-                    key={entry.channel}
-                    fill={`var(--color-${entry.channel})`}
+                <PieChart margin={{ top: 4, right: 4, bottom: 4, left: 4 }}>
+                  <ChartTooltip
+                    content={
+                      <ChartTooltipContent
+                        hideLabel
+                        nameKey="channel"
+                        formatter={(value, _name, item) => [
+                          `${value}%`,
+                          item.payload?.name ?? String(_name),
+                        ]}
+                      />
+                    }
                   />
-                ))}
-              </Pie>
-              <ChartLegend content={<ChartLegendContent nameKey="name" />} />
-            </PieChart>
-          </ChartContainer>
+                  <Pie
+                    data={chartData}
+                    dataKey="percent"
+                    nameKey="name"
+                    cx="50%"
+                    cy="50%"
+                    innerRadius="58%"
+                    outerRadius="88%"
+                    paddingAngle={2}
+                    strokeWidth={0}
+                  >
+                    {chartData.map((entry) => (
+                      <Cell
+                        key={entry.channel}
+                        fill={`var(--color-${entry.channel})`}
+                      />
+                    ))}
+                  </Pie>
+                </PieChart>
+              </ChartContainer>
+            </div>
+
+            <ul className="mt-4 flex min-w-0 flex-col gap-2.5">
+              {paymentMethods.map((method, index) => (
+                <li
+                  key={method.channel}
+                  className="flex min-w-0 items-center gap-2.5 text-sm text-muted-foreground"
+                >
+                  <span
+                    className="size-2.5 shrink-0 rounded-full"
+                    style={{
+                      backgroundColor:
+                        PAYMENT_COLORS[index % PAYMENT_COLORS.length],
+                    }}
+                  />
+                  <span className="truncate">{method.label}</span>
+                </li>
+              ))}
+            </ul>
+          </>
         )}
       </CardContent>
     </Card>

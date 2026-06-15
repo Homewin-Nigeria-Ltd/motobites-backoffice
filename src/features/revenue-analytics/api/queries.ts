@@ -1,10 +1,10 @@
 import { queryOptions } from "@tanstack/react-query"
 
-import { dashboardEndpoints } from "@/features/dashboard/api/endpoints"
 import type { DashboardOverviewParams } from "@/features/dashboard/types"
 import { api } from "@/lib/api/client"
 
 import type { RevenueAnalyticsData, RevenueAnalyticsResponse } from "../types"
+import { revenueAnalyticsEndpoints } from "./endpoints"
 import { revenueAnalyticsKeys } from "./keys"
 
 async function fetchRevenueAnalytics(
@@ -21,11 +21,11 @@ async function fetchRevenueAnalytics(
   }
 
   const response = await api.get<RevenueAnalyticsResponse>(
-    dashboardEndpoints.overview,
+    revenueAnalyticsEndpoints.revenue,
     query
   )
 
-  return response.data.analytics
+  return response.data
 }
 
 export const revenueAnalyticsQueries = {

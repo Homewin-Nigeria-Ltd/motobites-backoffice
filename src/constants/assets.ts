@@ -12,5 +12,8 @@ export const ASSETS = {
     shortDownTrend: "/illustrations/short-down-trend.svg",
     longUpTrend: "/illustrations/long-up-trend.svg",
     cardCorner: "/illustrations/card-corner.svg",
+    gift: "/illustrations/gift.svg",
+    happyCustomer: "/illustrations/happy-customer.svg",
+    roses: "/illustrations/roses.svg",
   },
 } as const

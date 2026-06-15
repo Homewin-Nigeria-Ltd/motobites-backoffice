@@ -81,8 +81,8 @@ export function RevenueAnalyticsSection() {
 
       <RevenueTrendChart revenueTrend={data.revenue_trend} />
 
-      <div className="grid gap-4 xl:grid-cols-3">
-        <div className="xl:col-span-2">
+      <div className="grid min-w-0 gap-4 xl:grid-cols-3">
+        <div className="min-w-0 xl:col-span-2">
           <RevenueTopKitchensTable kitchens={data.top_kitchens} />
         </div>
         <RevenuePaymentMethodsChart paymentMethods={data.payment_methods} />

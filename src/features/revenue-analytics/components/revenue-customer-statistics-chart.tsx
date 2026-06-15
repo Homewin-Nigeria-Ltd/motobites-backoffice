@@ -1,7 +1,7 @@
 "use client"
 
 import { useId } from "react"
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts"
+import { Bar, BarChart, XAxis } from "recharts"
 
 import type { RevenueCustomerStatistic } from "@/features/revenue-analytics/types"
 import { formatCompactCount } from "@/features/dashboard/utils/format"
@@ -53,7 +53,7 @@ export function RevenueCustomerStatisticsChart({
           <BarChart
             accessibilityLayer
             data={customerStatistics}
-            margin={{ left: 8, right: 12, top: 8 }}
+            margin={{ left: 8, right: 12, top: 8, bottom: 0 }}
           >
             <defs>
               <linearGradient
@@ -68,14 +68,6 @@ export function RevenueCustomerStatisticsChart({
                 <stop offset="100%" stopColor="rgba(255, 181, 65, 0.35)" />
               </linearGradient>
             </defs>
-            <CartesianGrid vertical={false} strokeDasharray="4 4" />
-            <YAxis
-              width={48}
-              tickLine={false}
-              axisLine={false}
-              tickMargin={8}
-              tickFormatter={(value) => formatCompactCount(Number(value))}
-            />
             <XAxis
               dataKey="month"
               tickLine={false}
@@ -99,14 +91,16 @@ export function RevenueCustomerStatisticsChart({
             <Bar
               dataKey="returning_customers"
               fill="var(--color-returning_customers)"
-              radius={[4, 4, 0, 0]}
+              radius={[8, 8, 8, 8]}
               barSize={16}
+              stroke="none"
             />
             <Bar
               dataKey="new_customers"
               fill={`url(#${gradientId})`}
-              radius={[4, 4, 0, 0]}
+              radius={[8, 8, 8, 8]}
               barSize={16}
+              stroke="none"
             />
           </BarChart>
         </ChartContainer>

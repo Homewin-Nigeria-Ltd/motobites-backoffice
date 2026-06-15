@@ -17,6 +17,7 @@ export type LatLng = {
 type MapProps = {
   center: LatLng
   height?: string
+  fill?: boolean
   zoom?: number
   className?: string
   children?: ReactNode
@@ -25,11 +26,25 @@ type MapProps = {
 export function Map({
   center,
   height = "500px",
+  fill = false,
   zoom = 12,
   className,
   children,
 }: MapProps) {
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
+  const resolvedHeight = fill ? "100%" : height
+  const containerClassName = cn(
+    fill
+      ? "flex h-full min-h-0 items-center justify-center"
+      : "flex items-center justify-center",
+    "rounded-xl border border-border bg-muted px-4 text-center text-sm text-muted-foreground",
+    className
+  )
+  const mapWrapperClassName = cn(
+    "overflow-hidden rounded-xl border border-border",
+    fill && "h-full min-h-0",
+    className
+  )
 
   const { isLoaded, loadError } = useJsApiLoader({
     googleMapsApiKey: apiKey ?? "",
@@ -37,13 +52,7 @@ export function Map({
 
   if (!apiKey) {
     return (
-      <div
-        className={cn(
-          "flex items-center justify-center rounded-xl border border-border bg-muted px-4 text-center text-sm text-muted-foreground",
-          className
-        )}
-        style={{ height }}
-      >
+      <div className={containerClassName} style={fill ? undefined : { height }}>
         Map unavailable — set NEXT_PUBLIC_GOOGLE_MAPS_API_KEY in your environment.
       </div>
     )
@@ -51,13 +60,7 @@ export function Map({
 
   if (loadError) {
     return (
-      <div
-        className={cn(
-          "flex items-center justify-center rounded-xl border border-border bg-muted px-4 text-center text-sm text-muted-foreground",
-          className
-        )}
-        style={{ height }}
-      >
+      <div className={containerClassName} style={fill ? undefined : { height }}>
         Failed to load Google Maps.
       </div>
     )
@@ -67,10 +70,12 @@ export function Map({
     return (
       <div
         className={cn(
-          "flex items-center justify-center rounded-xl border border-border bg-muted",
+          fill
+            ? "flex h-full min-h-0 items-center justify-center rounded-xl border border-border bg-muted"
+            : "flex items-center justify-center rounded-xl border border-border bg-muted",
           className
         )}
-        style={{ height }}
+        style={fill ? undefined : { height }}
       >
         <AppLoader />
       </div>
@@ -78,14 +83,9 @@ export function Map({
   }
 
   return (
-    <div
-      className={cn(
-        "overflow-hidden rounded-xl border border-border",
-        className
-      )}
-    >
+    <div className={mapWrapperClassName}>
       <GoogleMapView
-        mapContainerStyle={{ width: "100%", height }}
+        mapContainerStyle={{ width: "100%", height: resolvedHeight }}
         center={center}
         zoom={zoom}
       >

@@ -13,19 +13,19 @@ type RevenueTopKitchensTableProps = {
 }
 
 function formatKitchenAmount(kitchen: RevenueTopKitchen) {
-  if (kitchen.formatted_amount) {
-    return kitchen.formatted_amount
+  if (kitchen.formatted_revenue) {
+    return kitchen.formatted_revenue
   }
 
-  if (kitchen.amount_kobo !== undefined) {
-    return formatDashboardCount(kitchen.amount_kobo / 100)
+  if (kitchen.revenue_kobo !== undefined) {
+    return formatDashboardCount(kitchen.revenue_kobo / 100)
   }
 
   return "—"
 }
 
 function getKitchenOrders(kitchen: RevenueTopKitchen) {
-  return kitchen.orders_count ?? kitchen.total_orders ?? 0
+  return kitchen.orders_count
 }
 
 export function RevenueTopKitchensTable({
@@ -66,13 +66,13 @@ export function RevenueTopKitchensTable({
                 </tr>
               </thead>
               <tbody>
-                {kitchens.map((kitchen, index) => (
+                {kitchens.map((kitchen) => (
                   <tr
-                    key={kitchen.kitchen_id ?? `${kitchen.name}-${index}`}
+                    key={kitchen.kitchen_id}
                     className="border-b border-border last:border-0"
                   >
                     <td className="py-4 pr-4 font-semibold text-foreground">
-                      {kitchen.serial ?? index + 1}
+                      {kitchen.serial}
                     </td>
                     <td className="py-4 pr-4">
                       <div className="flex min-w-[12rem] items-center gap-3">
