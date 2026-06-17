@@ -1,11 +1,10 @@
 "use client"
 
-import { useState } from "react"
-
 import { OrderDetailsModal } from "@/features/order/components/order-details-modal"
 import { OrderHubSection } from "@/features/order/components/order-hub-section"
+import { useOrderDetailsModal } from "@/features/order/hooks/use-order-details-modal"
 import { useOrderSearchQuery, useOrders } from "@/features/order/hooks/use-order-queries"
-import type { ApiOrder, OrderTab } from "@/features/order/types"
+import type { OrderTab } from "@/features/order/types"
 import { AppLoader } from "@/components/ui/app-loader"
 
 type OrderManagementSectionProps = {
@@ -14,8 +13,12 @@ type OrderManagementSectionProps = {
 
 export function OrderManagementSection({ tab }: OrderManagementSectionProps) {
   const search = useOrderSearchQuery()
-  const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null)
-  const [detailsOpen, setDetailsOpen] = useState(false)
+  const {
+    selectedOrderId,
+    detailsOpen,
+    handleViewDetails,
+    handleOpenChange,
+  } = useOrderDetailsModal()
 
   const { data, isPending, isError, error } = useOrders({ tab, search })
 
@@ -25,11 +28,6 @@ export function OrderManagementSection({ tab }: OrderManagementSectionProps) {
     (sum, group) => sum + group.orders.length,
     0
   )
-
-  const handleViewDetails = (order: ApiOrder) => {
-    setSelectedOrderId(order.id)
-    setDetailsOpen(true)
-  }
 
   if (isError) {
     throw error
@@ -71,10 +69,7 @@ export function OrderManagementSection({ tab }: OrderManagementSectionProps) {
         key={selectedOrderId ?? "closed"}
         orderId={selectedOrderId}
         open={detailsOpen}
-        onOpenChange={(open) => {
-          setDetailsOpen(open)
-          if (!open) setSelectedOrderId(null)
-        }}
+        onOpenChange={handleOpenChange}
       />
     </>
   )

@@ -15,6 +15,7 @@ const PROTECTED_PREFIXES = [
   "/revenue-analytics",
   "/inventory-tracking",
   "/delivery-status",
+  "/riders",
   "/performance",
   "/technical-report",
   "/customer-support",

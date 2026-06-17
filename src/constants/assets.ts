@@ -15,5 +15,9 @@ export const ASSETS = {
     gift: "/illustrations/gift.svg",
     happyCustomer: "/illustrations/happy-customer.svg",
     roses: "/illustrations/roses.svg",
+    activeRider: "/illustrations/users.svg",
+    riderInTransit: "/illustrations/smart-rider.svg",
+    awayRider: "/illustrations/normal-rider.svg",
+    offlineRider: "/illustrations/offline-rider.svg",
   },
 } as const

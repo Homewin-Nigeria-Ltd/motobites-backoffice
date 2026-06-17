@@ -23,7 +23,7 @@ export function NavUser({
   user: {
     name: string
     email: string
-    avatar: string
+    avatar: string | null
   }
 }) {
   const [logoutOpen, setLogoutOpen] = useState(false)
@@ -41,7 +41,7 @@ export function NavUser({
           >
             <div className="flex min-w-0 flex-1 items-center gap-2">
               <Avatar className="size-8 shrink-0 rounded-lg group-data-[collapsible=icon]:size-7 group-data-[collapsible=icon]:rounded-full">
-                <AvatarImage src={user.avatar} alt={user.name} />
+                <AvatarImage src={user.avatar ?? undefined} alt={user.name} />
                 <AvatarFallback className="rounded-lg group-data-[collapsible=icon]:rounded-full">
                   {userInitials}
                 </AvatarFallback>

@@ -5,6 +5,7 @@ export type AuthUser = {
   phone: string
   role: string
   status: string
+  profile_photo_url: string | null
 }
 
 export type Session = {

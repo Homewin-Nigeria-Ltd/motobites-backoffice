@@ -22,6 +22,7 @@ export {
   useOrderAssignees,
   useOrderReceipt,
 } from "./hooks/use-order-queries"
+export { useOrderDetailsModal } from "./hooks/use-order-details-modal"
 export {
   useUpdateOrderStatus,
   useAssignOrderAssignee,
@@ -31,4 +32,5 @@ export { OrderManagementSection } from "./sections/order-section"
 export { OrderManagementLayout } from "./sections/order-management-layout"
 export { isOrderTab, getOrderTabPath } from "./types"
 export { OrderCard } from "./components/order-card"
+export { OrderCardGrid } from "./components/order-card-grid"
 export { OrderDetailsModal } from "./components/order-details-modal"

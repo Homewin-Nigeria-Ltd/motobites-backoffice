@@ -15,7 +15,6 @@ import { getUserInitials } from "@/utils/get-initials"
 
 export function DashboardHeader({ user }: { user: AuthUser }) {
   const userName = user.name
-  const userAvatar = "/avatars/shadcn.jpg"
   const userInitials = getUserInitials(userName)
 
   return (
@@ -44,7 +43,7 @@ export function DashboardHeader({ user }: { user: AuthUser }) {
           }
         />
         <Avatar className="size-9">
-          <AvatarImage src={userAvatar} alt={userName} />
+          <AvatarImage src={user.profile_photo_url ?? undefined} alt={userName} />
           <AvatarFallback>{userInitials}</AvatarFallback>
         </Avatar>
       </div>

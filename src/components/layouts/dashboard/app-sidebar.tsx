@@ -27,7 +27,7 @@ const data = {
     { title: "Revenue Analytics", url: "/revenue-analytics", icon: "revenue" as IconName },
     { title: "Inventory Tracking", url: "/inventory-tracking", icon: "inventory" as IconName },
     { title: "Menu Management", url: "/menu", icon: "book" as IconName },
-    { title: "Delivery Status", url: "/delivery-status", icon: "truck" as IconName },
+    { title: "Delivery Management", url: "/delivery-status", icon: "truck" as IconName },
     { title: "Performance", url: "/performance", icon: "performance" as IconName },
     {
       title: "Staff Management",
@@ -76,7 +76,7 @@ export function AppSidebar({
           user={{
             name: user.name,
             email: user.email,
-            avatar: "/avatars/shadcn.jpg",
+            avatar: user.profile_photo_url,
           }}
         />
       </SidebarFooter>
