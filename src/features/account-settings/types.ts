@@ -40,10 +40,25 @@ export type UpdateAccountPersonalInfoApiResponse = {
 
 export type ApiAccountDevice = {
   id: number
+  session_id?: number
+  token_id: number
   name: string
+  device_name: string
+  location: string | null
+  location_name: string | null
+  location_latitude: number | null
+  location_longitude: number | null
+  location_source: string | null
+  ip_address: string | null
+  user_agent: string | null
   last_used_at: string | null
+  last_active_at: string | null
+  logged_in_at: string | null
   created_at: string
+  logged_out_at: string | null
   is_current: boolean
+  is_active: boolean
+  status: string
 }
 
 export type AccountDevicesApiResponse = {

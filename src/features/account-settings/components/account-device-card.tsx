@@ -4,26 +4,15 @@ import { useState } from "react"
 
 import { useRevokeAccountDevice } from "../hooks/use-revoke-account-device"
 import type { ApiAccountDevice } from "../types"
+import {
+  getDeviceDisplayName,
+  getDeviceLocationLabel,
+  getDeviceStatusLabel,
+} from "../utils/device"
 import { BaseAlertDialog } from "@/components/ui/base-alert-dialog"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Icons } from "@/components/ui/icons"
-import { formatDate } from "@/utils/date"
-
-const PLACEHOLDER_DEVICE_LOCATION =
-  "22 Anu Oluwapo St, Mushin, Lagos 102215, Lagos"
-
-function getDeviceStatus(device: ApiAccountDevice) {
-  if (device.is_current) {
-    return "Active now"
-  }
-
-  if (!device.last_used_at) {
-    return "No recent activity"
-  }
-
-  return `Last active ${formatDate(device.last_used_at)}`
-}
 
 type AccountDeviceCardProps = {
   device: ApiAccountDevice
@@ -32,7 +21,8 @@ type AccountDeviceCardProps = {
 export function AccountDeviceCard({ device }: AccountDeviceCardProps) {
   const [signOutOpen, setSignOutOpen] = useState(false)
   const { revokeDevice, isPending, pendingDeviceId } = useRevokeAccountDevice()
-  const isRevoking = isPending && pendingDeviceId === device.id
+  const isRevoking = isPending && pendingDeviceId === device.token_id
+  const deviceName = getDeviceDisplayName(device)
 
   return (
     <>
@@ -45,7 +35,7 @@ export function AccountDeviceCard({ device }: AccountDeviceCardProps) {
                 className="shrink-0 text-muted-foreground"
               />
               <span className="truncate text-sm font-medium text-foreground">
-                {device.name}
+                {deviceName}
               </span>
             </div>
 
@@ -72,12 +62,12 @@ export function AccountDeviceCard({ device }: AccountDeviceCardProps) {
               <div className="flex items-start gap-2">
                 <Icons.mapPin size={16} className="mt-0.5 shrink-0" />
                 <span className="leading-relaxed">
-                  {PLACEHOLDER_DEVICE_LOCATION}
+                  {getDeviceLocationLabel(device)}
                 </span>
               </div>
               <div className="flex items-center gap-2">
                 <Icons.clock size={16} className="shrink-0" />
-                <span>{getDeviceStatus(device)}</span>
+                <span>{getDeviceStatusLabel(device)}</span>
               </div>
             </div>
           </div>
@@ -93,12 +83,12 @@ export function AccountDeviceCard({ device }: AccountDeviceCardProps) {
         confirmVariant="destructive"
         isPending={isRevoking}
         onConfirm={() => {
-          void revokeDevice(device.id).then(() => {
+          void revokeDevice(device.token_id).then(() => {
             setSignOutOpen(false)
           })
         }}
       >
-        This will sign out the device session for &quot;{device.name}&quot;.
+        This will sign out the device session for &quot;{deviceName}&quot;.
       </BaseAlertDialog>
     </>
   )

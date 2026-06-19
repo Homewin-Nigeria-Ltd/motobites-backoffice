@@ -3,11 +3,16 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
-import { getDeliveryTabPath, type DeliveryTab } from "../types"
+import {
+  deliveryNavTabs,
+  getDeliveryNavTabPath,
+  type DeliveryNavTab,
+  type DeliveryTab,
+} from "../types"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
-const tabLabels: Record<DeliveryTab, string> = {
+const tabLabels: Record<DeliveryNavTab, string> = {
   all: "All",
   unassigned: "Unassigned Orders",
   ongoing: "Ongoing Orders",
@@ -19,6 +24,14 @@ type DeliveryFilterTabsProps = {
   counts?: Partial<Record<DeliveryTab, number>>
 }
 
+function isNavTabActive(pathname: string, tab: DeliveryNavTab) {
+  if (tab === "riders") {
+    return pathname === "/riders"
+  }
+
+  return pathname === getDeliveryNavTabPath(tab)
+}
+
 export function DeliveryFilterTabs({ counts = {} }: DeliveryFilterTabsProps) {
   const pathname = usePathname()
 
@@ -28,11 +41,11 @@ export function DeliveryFilterTabs({ counts = {} }: DeliveryFilterTabsProps) {
       role="tablist"
       aria-label="Delivery filters"
     >
-      {(Object.keys(tabLabels) as DeliveryTab[]).map((tab) => {
-        const href = getDeliveryTabPath(tab)
-        const isActive = pathname === href
-        const count = counts[tab]
-        const showCount = tab !== "riders" && count !== undefined && count > 0
+      {deliveryNavTabs.map((tab) => {
+        const href = getDeliveryNavTabPath(tab)
+        const isActive = isNavTabActive(pathname, tab)
+        const count = tab === "riders" ? undefined : counts[tab]
+        const showCount = count !== undefined && count > 0
 
         return (
           <Button

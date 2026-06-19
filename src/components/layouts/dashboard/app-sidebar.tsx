@@ -27,7 +27,8 @@ const data = {
     { title: "Revenue Analytics", url: "/revenue-analytics", icon: "revenue" as IconName },
     { title: "Inventory Tracking", url: "/inventory-tracking", icon: "inventory" as IconName },
     { title: "Menu Management", url: "/menu", icon: "book" as IconName },
-    { title: "Delivery Management", url: "/delivery-status", icon: "truck" as IconName },
+    { title: "Delivery Management", url: "/delivery", icon: "truck" as IconName },
+    { title: "Rider Chat", url: "/riders/chat", icon: "messageCircle" as IconName },
     { title: "Performance", url: "/performance", icon: "performance" as IconName },
     {
       title: "Staff Management",

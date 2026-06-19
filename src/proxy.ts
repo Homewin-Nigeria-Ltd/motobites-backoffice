@@ -14,7 +14,7 @@ const PROTECTED_PREFIXES = [
   "/customers",
   "/revenue-analytics",
   "/inventory-tracking",
-  "/delivery-status",
+  "/delivery",
   "/riders",
   "/performance",
   "/technical-report",
@@ -42,6 +42,22 @@ export function proxy(request: NextRequest) {
     return NextResponse.redirect(
       new URL(token ? "/dashboard" : "/login", request.url)
     )
+  }
+
+  if (pathname === "/delivery-status/riders" || pathname.startsWith("/delivery-status/riders/")) {
+    const nextPath = pathname.replace("/delivery-status/riders", "/riders")
+    return NextResponse.redirect(new URL(nextPath, request.url))
+  }
+
+  if (pathname === "/delivery-status" || pathname.startsWith("/delivery-status/")) {
+    const nextPath = pathname.replace("/delivery-status", "/delivery")
+    return NextResponse.redirect(new URL(nextPath, request.url))
+  }
+
+  if (pathname === "/rider-chat" || pathname.startsWith("/rider-chat/")) {
+    const nextUrl = new URL("/riders/chat", request.url)
+    nextUrl.search = request.nextUrl.search
+    return NextResponse.redirect(nextUrl)
   }
 
   if (isProtectedPath(pathname) && !token) {

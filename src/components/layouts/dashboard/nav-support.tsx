@@ -1,7 +1,6 @@
 "use client"
 
-import * as React from "react"
-
+import { useTheme } from "@/hooks/use-theme"
 import { Icon, Icons, type IconName } from "@/components/ui/icons"
 import { Switch } from "@/components/ui/switch"
 import {
@@ -21,7 +20,7 @@ export function NavSupport({
     icon: IconName
   }[]
 }) {
-  const [darkMode, setDarkMode] = React.useState(false)
+  const { theme, toggleTheme } = useTheme()
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
@@ -38,22 +37,19 @@ export function NavSupport({
           </SidebarMenuItem>
         ))}
         <SidebarMenuItem>
-          <SidebarMenuButton
-            asChild
-            tooltip="Dark Mode"
-            className="hover:bg-transparent hover:text-sidebar-foreground active:bg-transparent"
-          >
-            <div>
-              <Icons.moon size={24} />
-              <span>Dark Mode</span>
-              <Switch
-                className="shrink-0"
-                checked={darkMode}
-                onCheckedChange={setDarkMode}
-                onClick={(e) => e.stopPropagation()}
-              />
-            </div>
-          </SidebarMenuButton>
+          <div className="flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-sm text-sidebar-foreground group-data-[collapsible=icon]:size-8 group-data-[collapsible=icon]:p-2">
+            <Icons.moon size={24} className="shrink-0" />
+            <span className="truncate group-data-[collapsible=icon]:hidden">
+              Dark Mode
+            </span>
+            <Switch
+              className="ml-auto shrink-0 group-data-[collapsible=icon]:hidden"
+              checked={theme === "dark"}
+              onCheckedChange={toggleTheme}
+              onClick={(e) => e.stopPropagation()}
+              aria-label="Toggle dark mode"
+            />
+          </div>
         </SidebarMenuItem>
       </SidebarMenu>
     </SidebarGroup>

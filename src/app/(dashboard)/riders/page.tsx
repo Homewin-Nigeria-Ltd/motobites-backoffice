@@ -1,5 +1,5 @@
-import { RidersSection } from "@/features/riders"
+import { RidersPageClient } from "./riders-page-client"
 
 export default function RidersPage() {
-  return <RidersSection />
+  return <RidersPageClient />
 }

@@ -20,4 +20,11 @@ export const ASSETS = {
     awayRider: "/illustrations/normal-rider.svg",
     offlineRider: "/illustrations/offline-rider.svg",
   },
+  integrations: {
+    flutterwave: "/integrations/flutterwave.svg",
+    paystack: "/integrations/paystack.svg",
+    google_maps: "/integrations/google_maps.svg",
+    okor: "/integrations/okor.svg",
+    placeholder: "/images/placeholder-menu.jpg",
+  },
 } as const

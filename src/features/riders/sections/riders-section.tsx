@@ -1,12 +1,12 @@
 "use client"
 
+import Link from "next/link"
 import { useEffect, useState } from "react"
 
 import { RiderSummaryCards } from "../components/rider-summary-cards"
 import { RidersTable } from "../components/riders-table"
 import { useRiders } from "../hooks/use-riders"
-import { useRidersStatusFilter } from "../hooks/use-riders-status-filter"
-import type { RiderOverviewStatus } from "../types"
+import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
 type RidersSectionProps = {
@@ -23,7 +23,6 @@ export function RidersSection({
   const [debouncedSearch, setDebouncedSearch] = useState(
     externalSearch ?? internalSearch
   )
-  const { status, setStatus } = useRidersStatusFilter()
 
   const search = externalSearch ?? internalSearch
   const setSearch = onExternalSearchChange ?? setInternalSearch
@@ -37,23 +36,16 @@ export function RidersSection({
 
     const timer = window.setTimeout(() => {
       setDebouncedSearch(search)
-      setPage(1)
     }, 300)
 
     return () => window.clearTimeout(timer)
   }, [isExternalSearch, search])
 
   const querySearch = isExternalSearch ? search : debouncedSearch
-  const [paginationFilters, setPaginationFilters] = useState({
-    querySearch,
-    status,
-  })
+  const [prevQuerySearch, setPrevQuerySearch] = useState(querySearch)
 
-  if (
-    paginationFilters.querySearch !== querySearch ||
-    paginationFilters.status !== status
-  ) {
-    setPaginationFilters({ querySearch, status })
+  if (querySearch !== prevQuerySearch) {
+    setPrevQuerySearch(querySearch)
     setPage(1)
   }
 
@@ -61,7 +53,7 @@ export function RidersSection({
     page,
     per_page: 20,
     search: querySearch,
-    status,
+    status: "all",
   })
 
   if (isError) {
@@ -77,11 +69,6 @@ export function RidersSection({
     setSearch(value)
   }
 
-  const handleStatusSelect = (nextStatus: RiderOverviewStatus) => {
-    setStatus(status === nextStatus ? "all" : nextStatus)
-    setPage(1)
-  }
-
   const handlePageChange = (nextPage: number) => {
     setPage(nextPage)
   }
@@ -90,7 +77,10 @@ export function RidersSection({
     <div className="flex min-h-0 flex-1 flex-col bg-muted">
       <div className="min-h-0 flex-1 space-y-8 overflow-y-auto p-4 md:p-6">
         {showSearchInput ? (
-          <div className="flex justify-end">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <Button asChild className="h-10 rounded-xl px-4">
+              <Link href="/riders/new">Add Rider</Link>
+            </Button>
             <div className="w-full max-w-xs sm:w-64">
               <Input
                 type="search"
@@ -102,13 +92,15 @@ export function RidersSection({
               />
             </div>
           </div>
-        ) : null}
+        ) : (
+          <div className="flex justify-end">
+            <Button asChild className="h-10 rounded-xl px-4">
+              <Link href="/riders/new">Add Rider</Link>
+            </Button>
+          </div>
+        )}
 
-        <RiderSummaryCards
-          search={querySearch}
-          selected={status}
-          onSelect={handleStatusSelect}
-        />
+        <RiderSummaryCards />
 
         <RidersTable
           riders={riders}

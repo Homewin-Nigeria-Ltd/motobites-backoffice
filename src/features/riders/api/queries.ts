@@ -1,9 +1,15 @@
 import { queryOptions } from "@tanstack/react-query"
 
 import { api } from "@/lib/api/client"
-import type { RidersListParams, RidersListResponse } from "../types"
+import type { ApiRider, RidersListParams, RidersListResponse } from "../types"
 import { ridersEndpoints } from "./endpoints"
 import { ridersKeys } from "./keys"
+
+export type RiderDetailApiResponse = {
+  success?: boolean
+  data: ApiRider
+  message?: string
+}
 
 function fetchRidersList(params: RidersListParams) {
   const query: Record<string, string | number> = {
@@ -25,5 +31,17 @@ export const ridersQueries = {
       queryKey: ridersKeys.list(params),
       queryFn: () => fetchRidersList(params),
       placeholderData: (previous) => previous,
+    }),
+  detail: (riderId: string | number) =>
+    queryOptions({
+      queryKey: ridersKeys.detail(riderId),
+      queryFn: async () => {
+        const response = await api.get<RiderDetailApiResponse>(
+          ridersEndpoints.detail(riderId)
+        )
+        return response.data
+      },
+      enabled: Boolean(riderId),
+      staleTime: 60_000,
     }),
 }

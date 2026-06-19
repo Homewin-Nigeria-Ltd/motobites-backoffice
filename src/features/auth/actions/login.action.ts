@@ -2,7 +2,7 @@
 
 import { cookies } from "next/headers"
 
-import { loginSchema, type LoginInput } from "../schemas/login.schema"
+import { loginPayloadSchema, type LoginPayload } from "../schemas/login.schema"
 import type { LoginActionResult, LoginResponseData } from "../types"
 import { AUTH_COOKIE_NAME } from "@/constants/auth"
 import { authEndpoints } from "../api/endpoints"
@@ -20,8 +20,8 @@ async function setAuthCookie(token: string) {
   })
 }
 
-export async function loginAction(data: LoginInput): Promise<LoginActionResult> {
-  const parsed = loginSchema.safeParse(data)
+export async function loginAction(data: LoginPayload): Promise<LoginActionResult> {
+  const parsed = loginPayloadSchema.safeParse(data)
 
   if (!parsed.success) {
     return {
@@ -31,7 +31,7 @@ export async function loginAction(data: LoginInput): Promise<LoginActionResult> 
   }
 
   try {
-    const { token } = await apiServer.post<LoginResponseData, LoginInput>(
+    const { token } = await apiServer.post<LoginResponseData, LoginPayload>(
       authEndpoints.login,
       parsed.data,
       { auth: false }

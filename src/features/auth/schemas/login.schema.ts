@@ -8,4 +8,11 @@ export const loginSchema = z.object({
   password: z.string().min(1, "Password is required"),
 })
 
+export const loginPayloadSchema = loginSchema.extend({
+  latitude: z.number().optional(),
+  longitude: z.number().optional(),
+  device_name: z.string().min(1).optional(),
+})
+
 export type LoginInput = z.infer<typeof loginSchema>
+export type LoginPayload = z.infer<typeof loginPayloadSchema>

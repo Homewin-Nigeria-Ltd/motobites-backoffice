@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import type { ColumnDef } from "@tanstack/react-table"
 
 import { RiderRowActions } from "./components/rider-row-actions"
@@ -28,7 +29,12 @@ export const riderColumns: ColumnDef<ApiRider>[] = [
             </AvatarFallback>
           </Avatar>
           <div className="min-w-0">
-            <p className="truncate font-medium text-foreground">{rider.name}</p>
+            <Link
+              href={`/riders/${rider.id}`}
+              className="truncate font-medium text-foreground hover:text-primary"
+            >
+              {rider.name}
+            </Link>
             <p className="truncate text-xs text-muted-foreground">
               {rider.email}
             </p>

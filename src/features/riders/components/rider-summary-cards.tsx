@@ -3,8 +3,7 @@
 import Image from "next/image"
 
 import { useRiderStatusCount } from "../hooks/use-rider-status-count"
-import type { RiderOverviewStatus, RiderStatusFilter } from "../types"
-import { Button } from "@/components/ui/button"
+import type { RiderOverviewStatus } from "../types"
 import { ASSETS } from "@/constants/assets"
 import { cn } from "@/lib/utils"
 
@@ -40,12 +39,6 @@ const overviewCards: Array<{
   },
 ]
 
-type RiderSummaryCardsProps = {
-  search?: string
-  selected: RiderStatusFilter
-  onSelect: (status: RiderOverviewStatus) => void
-}
-
 function RiderSummaryCardSkeleton() {
   return (
     <div className="relative overflow-hidden rounded-2xl border border-border bg-background p-5">
@@ -63,28 +56,14 @@ function SummaryCard({
   value,
   illustration,
   iconBg,
-  isSelected,
-  onClick,
 }: {
   label: string
   value: number
   illustration: string
   iconBg: string
-  isSelected: boolean
-  onClick: () => void
 }) {
   return (
-    <Button
-      type="button"
-      variant="outline"
-      onClick={onClick}
-      className={cn(
-        "h-auto w-full flex-col items-start justify-start rounded-2xl border bg-background p-5 text-left whitespace-normal shadow-none",
-        isSelected
-          ? "border-primary ring-1 ring-primary/20"
-          : "border-border hover:border-primary/40"
-      )}
-    >
+    <div className="rounded-2xl border border-border bg-background p-5">
       <div className="flex items-center gap-3">
         <div
           className={cn(
@@ -107,7 +86,7 @@ function SummaryCard({
       <p className="mt-4 text-3xl font-semibold tracking-tight text-foreground">
         {value}
       </p>
-    </Button>
+    </div>
   )
 }
 
@@ -116,19 +95,13 @@ function RiderStatusCard({
   label,
   illustration,
   iconBg,
-  search,
-  selected,
-  onSelect,
 }: {
   status: RiderOverviewStatus
   label: string
   illustration: string
   iconBg: string
-  search?: string
-  selected: RiderStatusFilter
-  onSelect: (status: RiderOverviewStatus) => void
 }) {
-  const { data, isPending, isError, error } = useRiderStatusCount(status, search)
+  const { data, isPending, isError, error } = useRiderStatusCount(status)
 
   if (isError) {
     throw error
@@ -144,17 +117,11 @@ function RiderStatusCard({
       value={data.meta.total}
       illustration={illustration}
       iconBg={iconBg}
-      isSelected={selected === status}
-      onClick={() => onSelect(status)}
     />
   )
 }
 
-export function RiderSummaryCards({
-  search,
-  selected,
-  onSelect,
-}: RiderSummaryCardsProps) {
+export function RiderSummaryCards() {
   return (
     <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
       {overviewCards.map((card) => (
@@ -164,9 +131,6 @@ export function RiderSummaryCards({
           label={card.label}
           illustration={card.illustration}
           iconBg={card.iconBg}
-          search={search}
-          selected={selected}
-          onSelect={onSelect}
         />
       ))}
     </div>

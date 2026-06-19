@@ -1,10 +1,10 @@
 import { loginAction } from "../actions/login.action"
 import { logoutAction } from "../actions/logout.action"
-import type { LoginInput } from "../schemas/login.schema"
+import type { LoginPayload } from "../schemas/login.schema"
 
 export const authMutations = {
   login: {
-    mutationFn: (data: LoginInput) => loginAction(data),
+    mutationFn: (data: LoginPayload) => loginAction(data),
   },
   logout: {
     mutationFn: () => logoutAction(),

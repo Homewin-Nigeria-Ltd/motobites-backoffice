@@ -3,6 +3,7 @@
 import { AccountDeviceCard } from "../components/account-device-card"
 import { useAccountDevices } from "../hooks/use-account-devices"
 import type { ApiAccountDevice } from "../types"
+import { getDeviceLastActiveTime } from "../utils/device"
 import { AppLoader } from "@/components/ui/app-loader"
 import { Icons } from "@/components/ui/icons"
 
@@ -12,12 +13,10 @@ function sortDevices(devices: ApiAccountDevice[]) {
       return left.is_current ? -1 : 1
     }
 
-    const leftTime = left.last_used_at
-      ? new Date(left.last_used_at).getTime()
-      : 0
-    const rightTime = right.last_used_at
-      ? new Date(right.last_used_at).getTime()
-      : 0
+    const leftActiveAt = getDeviceLastActiveTime(left)
+    const rightActiveAt = getDeviceLastActiveTime(right)
+    const leftTime = leftActiveAt ? new Date(leftActiveAt).getTime() : 0
+    const rightTime = rightActiveAt ? new Date(rightActiveAt).getTime() : 0
 
     return rightTime - leftTime
   })
@@ -60,7 +59,7 @@ export function AccountManageDevicesPanel() {
       ) : (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {sortedDevices.map((device) => (
-            <AccountDeviceCard key={device.id} device={device} />
+            <AccountDeviceCard key={device.token_id} device={device} />
           ))}
         </div>
       )}

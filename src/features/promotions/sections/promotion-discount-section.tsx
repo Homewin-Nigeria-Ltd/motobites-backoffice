@@ -4,22 +4,16 @@ import { useMemo, useState } from "react"
 
 import { CreateGiftcardCard } from "@/features/promotions/components/create-giftcard-card"
 import { CreateOfferCard } from "@/features/promotions/components/create-offer-card"
-import { GiftcardCard } from "@/features/promotions/components/giftcard-card"
 import { OfferCard } from "@/features/promotions/components/offer-card"
 import { OffersToolbar } from "@/features/promotions/components/offers-toolbar"
-import {
-  DUMMY_GIFTCARDS,
-  DUMMY_OFFERS,
-} from "@/features/promotions/data/promotions.dummy"
 import type { OfferTab } from "@/features/promotions/types"
 import { filterOffers } from "@/features/promotions/utils/promotions"
 
 export function PromotionDiscountSection() {
   const [tab, setTab] = useState<OfferTab>("all")
   const [search, setSearch] = useState("")
-
   const filteredOffers = useMemo(
-    () => filterOffers(DUMMY_OFFERS, tab, search),
+    () => filterOffers([], tab, search),
     [tab, search]
   )
 
@@ -68,9 +62,6 @@ export function PromotionDiscountSection() {
         </h2>
 
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {DUMMY_GIFTCARDS.map((giftcard) => (
-            <GiftcardCard key={giftcard.id} giftcard={giftcard} />
-          ))}
           <CreateGiftcardCard />
         </div>
       </section>

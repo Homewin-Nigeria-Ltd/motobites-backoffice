@@ -18,6 +18,7 @@ import {
 
 type DeliveryOrderFrequencyCardProps = {
   orderFrequency: DeliveryOrderFrequency
+  isLoading?: boolean
 }
 
 const chartConfig = {
@@ -29,12 +30,29 @@ const chartConfig = {
 
 export function DeliveryOrderFrequencyCard({
   orderFrequency,
+  isLoading = false,
 }: DeliveryOrderFrequencyCardProps) {
   const gradientId = useId().replace(/:/g, "")
   const chartData = orderFrequency.series.map((point) => ({
     label: point.label ?? "",
     orders: point.value ?? 0,
   }))
+
+  if (isLoading) {
+    return (
+      <Card className="h-full gap-4 py-5">
+        <CardHeader className="px-5 pb-0">
+          <CardTitle className="text-sm font-medium text-muted-foreground">
+            Order Frequency
+          </CardTitle>
+          <div className="mt-2 h-9 w-40 animate-pulse rounded bg-muted" />
+        </CardHeader>
+        <CardContent className="px-2 pb-2 sm:px-4">
+          <div className="aspect-auto h-[280px] animate-pulse rounded-xl bg-muted" />
+        </CardContent>
+      </Card>
+    )
+  }
 
   return (
     <Card className="h-full gap-4 py-5">
