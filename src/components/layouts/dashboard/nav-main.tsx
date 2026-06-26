@@ -43,7 +43,11 @@ export function NavMain({
             (item.url === "/menu" && pathname === "/menu") ||
             (item.url === "/kitchen" && pathname.startsWith("/kitchen")) ||
             (item.url === "/order" && pathname.startsWith("/order")) ||
-            (item.url === "/customers" && pathname.startsWith("/customers"))
+            (item.url === "/customers" &&
+              (pathname === "/customers" ||
+                (pathname.startsWith("/customers/") &&
+                  !pathname.startsWith("/customers/tickets") &&
+                  !pathname.startsWith("/customers/chats"))))
 
           return item.items?.length ? (
             <Collapsible

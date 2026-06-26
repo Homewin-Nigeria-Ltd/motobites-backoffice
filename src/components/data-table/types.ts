@@ -7,6 +7,7 @@ export type DataTableProps<TData, TValue = unknown> = {
   page?: number
   totalPages?: number
   onPageChange?: (page: number) => void
+  onRowClick?: (row: TData) => void
   toolbar?: ReactNode
   emptyMessage?: string
   isLoading?: boolean

@@ -25,7 +25,7 @@ const data = {
       icon: "kitchen" as IconName,
     },
     { title: "Revenue Analytics", url: "/revenue-analytics", icon: "revenue" as IconName },
-    { title: "Inventory Tracking", url: "/inventory-tracking", icon: "inventory" as IconName },
+    { title: "Inventory Management", url: "/inventory", icon: "inventory" as IconName },
     { title: "Menu Management", url: "/menu", icon: "book" as IconName },
     { title: "Delivery Management", url: "/delivery", icon: "truck" as IconName },
     { title: "Rider Chat", url: "/riders/chat", icon: "messageCircle" as IconName },
@@ -43,7 +43,20 @@ const data = {
     },
   ],
   support: [
-    { name: "Customer Support", url: "/customer-support", icon: "headphones" as IconName },
+    {
+      name: "Customer",
+      icon: "headphones" as IconName,
+      items: [
+        {
+          name: "Tickets",
+          url: "/customers/tickets",
+        },
+        {
+          name: "Chat",
+          url: "/customers/chats",
+        },
+      ],
+    },
     { name: "Settings", url: "/settings", icon: "settings" as IconName },
   ],
 }

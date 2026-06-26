@@ -70,7 +70,7 @@ export function BaseModal({
   const body = isDetail ? (
     <div
       className={cn(
-        "max-h-[min(85vh,56rem)] overflow-y-auto overscroll-contain max-sm:max-h-[92dvh]",
+        "min-h-0 flex-1 overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch]",
         bodyClassName
       )}
     >
@@ -106,6 +106,8 @@ export function BaseModal({
         className={cn(
           modalSizeClass[resolvedSize],
           "gap-0 overflow-hidden p-0",
+          isDetail &&
+            "flex max-h-[min(92dvh,calc(100vh-2rem))] flex-col",
           className
         )}
       >
@@ -148,7 +150,11 @@ export function BaseModal({
           </div>
         )}
 
-        <OverlayPortalContainer>{main}</OverlayPortalContainer>
+        <OverlayPortalContainer
+          className={isDetail ? "flex min-h-0 flex-1 flex-col" : undefined}
+        >
+          {main}
+        </OverlayPortalContainer>
       </DialogContent>
     </Dialog>
   )
