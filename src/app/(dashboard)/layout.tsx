@@ -1,34 +1,29 @@
-import { redirect } from "next/navigation"
-
 import { DashboardLayout } from "@/components/layouts/dashboard"
-import type { AuthUser } from "@/features/auth"
-import { authEndpoints } from "@/features/auth/api/endpoints"
-import type { MeResponseData } from "@/features/auth/types"
-import { ApiError } from "@/lib/api/client"
-import { apiServer } from "@/lib/api/server-client"
+import { navMain, navSupport } from "@/config/sidebar"
+import { getPermissions, hasPermission } from "@/lib/permissions"
+import { getUser } from "@/lib/get-user"
 
 export default async function Layout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  let user: AuthUser
+  const [user, permissions] = await Promise.all([getUser(), getPermissions()])
 
-  try {
-    const { user: sessionUser } = await apiServer.get<MeResponseData>(
-      authEndpoints.meServer
-    )
-    user = sessionUser
-  } catch (error) {
-    if (
-      error instanceof ApiError &&
-      (error.status === 401 || error.status === 403)
-    ) {
-      redirect("/api/auth/clear-session")
-    }
+  const filteredNavMain = navMain.filter((item) =>
+    hasPermission(permissions, item.permission),
+  )
+  const filteredSupport = navSupport.filter((item) =>
+    hasPermission(permissions, item.permission),
+  )
 
-    throw error
-  }
-
-  return <DashboardLayout user={user}>{children}</DashboardLayout>
+  return (
+    <DashboardLayout
+      user={user}
+      filteredNavMain={filteredNavMain}
+      filteredSupport={filteredSupport}
+    >
+      {children}
+    </DashboardLayout>
+  )
 }

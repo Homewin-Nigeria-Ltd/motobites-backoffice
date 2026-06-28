@@ -12,46 +12,21 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar"
-import type { IconName } from "@/components/ui/icons"
+import type { NavItem, SupportItem } from "@/config/sidebar"
 import type { AuthUser } from "@/features/auth"
 
-const data = {
-  navMain: [
-    { title: "Overview", url: "/dashboard", icon: "dashboard" as IconName },
-    { title: "Order Management", url: "/order", icon: "orders" as IconName },
-    {
-      title: "Kitchen Workflow",
-      url: "/kitchen",
-      icon: "kitchen" as IconName,
-    },
-    { title: "Revenue Analytics", url: "/revenue-analytics", icon: "revenue" as IconName },
-    { title: "Inventory Tracking", url: "/inventory-tracking", icon: "inventory" as IconName },
-    { title: "Menu Management", url: "/menu", icon: "book" as IconName },
-    { title: "Delivery Management", url: "/delivery", icon: "truck" as IconName },
-    { title: "Rider Chat", url: "/riders/chat", icon: "messageCircle" as IconName },
-    { title: "Performance", url: "/performance", icon: "performance" as IconName },
-    {
-      title: "Staff Management",
-      url: "/staff",
-      icon: "shield" as IconName,
-    },
-    { title: "Technical Report", url: "/technical-report", icon: "fileText" as IconName },
-    {
-      title: "Customer Retention and Loyalty",
-      url: "/customers",
-      icon: "heart" as IconName,
-    },
-  ],
-  support: [
-    { name: "Customer Support", url: "/customer-support", icon: "headphones" as IconName },
-    { name: "Settings", url: "/settings", icon: "settings" as IconName },
-  ],
+type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
+  user: AuthUser
+  filteredNavMain: NavItem[]
+  filteredSupport: SupportItem[]
 }
 
 export function AppSidebar({
   user,
+  filteredNavMain,
+  filteredSupport,
   ...props
-}: React.ComponentProps<typeof Sidebar> & { user: AuthUser }) {
+}: AppSidebarProps) {
   return (
     <Sidebar
       collapsible="icon"
@@ -69,8 +44,8 @@ export function AppSidebar({
         </div>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
-        <NavSupport items={data.support} />
+        <NavMain items={filteredNavMain} />
+        <NavSupport items={filteredSupport} />
       </SidebarContent>
       <SidebarFooter className="pb-12">
         <NavUser

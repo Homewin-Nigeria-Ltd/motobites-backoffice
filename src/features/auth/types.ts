@@ -1,3 +1,17 @@
+export type AuthUserPermission = {
+  key: string
+  name: string
+  description: string
+  has_access: boolean
+}
+
+export type AuthUserPermissionsSummary = {
+  granted_count: number
+  total_count: number
+  grant_status: string
+  grant_label: string
+}
+
 export type AuthUser = {
   id: number
   name: string
@@ -6,6 +20,10 @@ export type AuthUser = {
   role: string
   status: string
   profile_photo_url: string | null
+  admin_role?: string | null
+  permissions?: AuthUserPermission[]
+  permission_keys?: string[]
+  permissions_summary?: AuthUserPermissionsSummary
 }
 
 export type Session = {

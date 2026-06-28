@@ -13,12 +13,13 @@ const PROTECTED_PREFIXES = [
   "/staff",
   "/customers",
   "/revenue-analytics",
-  "/inventory-tracking",
+  "/inventory",
   "/delivery",
   "/riders",
   "/performance",
   "/technical-report",
-  "/customer-support",
+  "/admin",
+  "/ticket",
   "/settings",
 ]
 
@@ -44,6 +45,11 @@ export function proxy(request: NextRequest) {
     )
   }
 
+  if (pathname === "/inventory-tracking" || pathname.startsWith("/inventory-tracking/")) {
+    const nextPath = pathname.replace("/inventory-tracking", "/inventory")
+    return NextResponse.redirect(new URL(nextPath, request.url))
+  }
+
   if (pathname === "/delivery-status/riders" || pathname.startsWith("/delivery-status/riders/")) {
     const nextPath = pathname.replace("/delivery-status/riders", "/riders")
     return NextResponse.redirect(new URL(nextPath, request.url))
@@ -58,6 +64,42 @@ export function proxy(request: NextRequest) {
     const nextUrl = new URL("/riders/chat", request.url)
     nextUrl.search = request.nextUrl.search
     return NextResponse.redirect(nextUrl)
+  }
+
+  if (pathname === "/admin/customers/chats" || pathname.startsWith("/admin/customers/chats/")) {
+    const nextUrl = new URL("/customers/chats", request.url)
+    nextUrl.search = request.nextUrl.search
+    return NextResponse.redirect(nextUrl)
+  }
+
+  if (pathname === "/admin/customers/tickets/list" || pathname.startsWith("/admin/customers/tickets/list/")) {
+    return NextResponse.redirect(new URL("/customers/tickets/list", request.url))
+  }
+
+  if (pathname === "/admin/customers/tickets" || pathname.startsWith("/admin/customers/tickets/")) {
+    return NextResponse.redirect(new URL("/customers/tickets", request.url))
+  }
+
+  if (pathname === "/ticket/chat" || pathname.startsWith("/ticket/chat/")) {
+    const nextUrl = new URL("/customers/chats", request.url)
+    nextUrl.search = request.nextUrl.search
+    return NextResponse.redirect(nextUrl)
+  }
+
+  if (pathname === "/ticket/list" || pathname.startsWith("/ticket/list/")) {
+    return NextResponse.redirect(new URL("/customers/tickets/list", request.url))
+  }
+
+  if (pathname === "/ticket" || pathname.startsWith("/ticket/")) {
+    return NextResponse.redirect(new URL("/customers/tickets", request.url))
+  }
+
+  if (pathname === "/customer-support" || pathname.startsWith("/customer-support/")) {
+    const nextPath = pathname
+      .replace("/customer-support/tickets/list", "/customers/tickets/list")
+      .replace("/customer-support/tickets", "/customers/tickets")
+      .replace("/customer-support", "/customers/tickets")
+    return NextResponse.redirect(new URL(nextPath, request.url))
   }
 
   if (isProtectedPath(pathname) && !token) {

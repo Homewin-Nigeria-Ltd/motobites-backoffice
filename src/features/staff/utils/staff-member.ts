@@ -19,6 +19,7 @@ export function mapApiStaffMemberToStaffMember(
 ): StaffMember {
   return {
     id: String(member.id),
+    userId: member.user_id,
     name: member.full_name || member.name,
     email: member.email,
     initials: member.initials,

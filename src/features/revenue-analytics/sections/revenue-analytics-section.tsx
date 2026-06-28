@@ -13,15 +13,26 @@ import { RevenueTopKitchensTable } from "@/features/revenue-analytics/components
 import { RevenueTrendChart } from "@/features/revenue-analytics/components/revenue-trend-chart"
 import { useRevenueAnalytics } from "@/features/revenue-analytics/hooks/use-revenue-analytics"
 import { AppLoader } from "@/components/ui/app-loader"
+import { useFilterToast } from "@/hooks/use-filter-toast"
 import { cn } from "@/lib/utils"
 
 export function RevenueAnalyticsSection() {
   const [period, setPeriod] = useState(DashboardPeriod.TwentyFourHours)
   const [dateRange, setDateRange] = useState<DateRange | undefined>()
-  const { data, isPending, isError, error } = useRevenueAnalytics(
+  const { data, isPending, isFetching, isError, error } = useRevenueAnalytics(
     period,
     dateRange
   )
+
+  useFilterToast({
+    isFetching,
+    isPending,
+    isError,
+    error,
+    loadingMessage: "Updating revenue analytics...",
+    successMessage: "Revenue analytics updated",
+    errorMessage: "Failed to load revenue analytics",
+  })
 
   const handlePeriodChange = (next: DashboardPeriod) => {
     setPeriod(next)

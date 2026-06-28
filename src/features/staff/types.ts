@@ -9,6 +9,7 @@ export type StaffRoleOption = ApiStaffRoleOption
 
 export type StaffMember = {
   id: string
+  userId: number
   name: string
   email: string
   initials: string

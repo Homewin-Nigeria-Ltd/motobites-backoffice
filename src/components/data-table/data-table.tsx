@@ -25,6 +25,7 @@ export function DataTable<TData, TValue>({
   page,
   totalPages,
   onPageChange,
+  onRowClick,
   toolbar,
   emptyMessage = "No results.",
   isLoading = false,
@@ -48,7 +49,7 @@ export function DataTable<TData, TValue>({
     <div
       data-slot="data-table"
       className={cn(
-        "overflow-hidden rounded-2xl border border-border bg-background",
+        "min-w-0 overflow-hidden rounded-2xl border border-border bg-background",
         className
       )}
     >
@@ -90,7 +91,17 @@ export function DataTable<TData, TValue>({
               <TableRow
                 key={row.id}
                 data-state={row.getIsSelected() ? "selected" : undefined}
-                className="border-border/60"
+                className={cn(
+                  "border-border/60",
+                  onRowClick && "cursor-pointer hover:bg-muted/40"
+                )}
+                onClick={
+                  onRowClick
+                    ? () => {
+                        onRowClick(row.original)
+                      }
+                    : undefined
+                }
               >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell

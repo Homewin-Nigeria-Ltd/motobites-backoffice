@@ -17,20 +17,13 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar"
-import { Icon, Icons, type IconName } from "@/components/ui/icons"
+import { Icon, Icons } from "@/components/ui/icons"
+import type { NavItem } from "@/config/sidebar"
 
 export function NavMain({
   items,
 }: {
-  items: {
-    title: string
-    url: string
-    icon?: IconName
-    items?: {
-      title: string
-      url: string
-    }[]
-  }[]
+  items: NavItem[]
 }) {
   const pathname = usePathname()
   return (
@@ -43,7 +36,14 @@ export function NavMain({
             (item.url === "/menu" && pathname === "/menu") ||
             (item.url === "/kitchen" && pathname.startsWith("/kitchen")) ||
             (item.url === "/order" && pathname.startsWith("/order")) ||
-            (item.url === "/customers" && pathname.startsWith("/customers"))
+            (item.url === "/delivery" && pathname.startsWith("/delivery")) ||
+            (item.url === "/inventory" && pathname.startsWith("/inventory")) ||
+            (item.url === "/performance" && pathname.startsWith("/performance")) ||
+            (item.url === "/customers" &&
+              (pathname === "/customers" ||
+                (pathname.startsWith("/customers/") &&
+                  !pathname.startsWith("/customers/tickets") &&
+                  !pathname.startsWith("/customers/chats"))))
 
           return item.items?.length ? (
             <Collapsible

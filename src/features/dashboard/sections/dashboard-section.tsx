@@ -15,15 +15,26 @@ import { DashboardTopSellingList } from "@/features/dashboard/components/dashboa
 import { useDashboardOverview } from "@/features/dashboard/hooks/use-dashboard-overview"
 import { DashboardPeriod } from "@/features/dashboard/enums"
 import { AppLoader } from "@/components/ui/app-loader"
+import { useFilterToast } from "@/hooks/use-filter-toast"
 import { cn } from "@/lib/utils"
 
 export function DashboardSection() {
   const [period, setPeriod] = useState(DashboardPeriod.TwentyFourHours)
   const [dateRange, setDateRange] = useState<DateRange | undefined>()
-  const { data, isPending, isError, error } = useDashboardOverview(
+  const { data, isPending, isFetching, isError, error } = useDashboardOverview(
     period,
     dateRange
   )
+
+  useFilterToast({
+    isFetching,
+    isPending,
+    isError,
+    error,
+    loadingMessage: "Updating overview data...",
+    successMessage: "Overview data updated",
+    errorMessage: "Failed to load dashboard overview",
+  })
 
   const handlePeriodChange = (next: DashboardPeriod) => {
     setPeriod(next)
