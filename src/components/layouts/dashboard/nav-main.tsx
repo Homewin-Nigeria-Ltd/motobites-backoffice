@@ -41,6 +41,7 @@ export function NavMain({
             (item.url === "/performance" && pathname.startsWith("/performance")) ||
             (item.url === "/customers" &&
               (pathname === "/customers" ||
+                pathname.startsWith("/promotions") ||
                 (pathname.startsWith("/customers/") &&
                   !pathname.startsWith("/customers/tickets") &&
                   !pathname.startsWith("/customers/chats"))))

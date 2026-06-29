@@ -1,23 +1,19 @@
-import type { Offer, OfferTab } from "@/features/promotions/types"
+import type { Offer } from "@/features/promotions/types"
 
-export function filterOffers(
-  offers: Offer[],
-  tab: OfferTab,
-  search: string
-): Offer[] {
+export function filterOffers(offers: Offer[], search: string): Offer[] {
   const normalizedSearch = search.trim().toLowerCase()
 
+  if (!normalizedSearch) {
+    return offers
+  }
+
   return offers.filter((offer) => {
-    const matchesTab =
-      tab === "all" ? true : offer.status === tab
-
-    if (!matchesTab) return false
-
-    if (!normalizedSearch) return true
-
     return (
       offer.title.toLowerCase().includes(normalizedSearch) ||
-      offer.description.toLowerCase().includes(normalizedSearch)
+      offer.description.toLowerCase().includes(normalizedSearch) ||
+      offer.promoCode.toLowerCase().includes(normalizedSearch) ||
+      offer.detailsLabel.toLowerCase().includes(normalizedSearch) ||
+      offer.restrictionLabel.toLowerCase().includes(normalizedSearch)
     )
   })
 }

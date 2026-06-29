@@ -1,6 +1,10 @@
 "use client"
 
+import Link from "next/link"
+
 import type { Offer } from "@/features/promotions/types"
+import { PROMOTIONS_ROUTES } from "@/features/promotions/constants"
+import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Icons } from "@/components/ui/icons"
 import { cn } from "@/lib/utils"
@@ -39,9 +43,30 @@ export function OfferCard({ offer, onClick }: OfferCardProps) {
           <h3 className="truncate text-base font-semibold text-foreground">
             {offer.title}
           </h3>
+          {offer.promoCode ? (
+            <p className="mt-1 truncate text-xs font-medium text-primary">
+              {offer.promoCode}
+            </p>
+          ) : null}
           <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
-            {offer.description}
+            {offer.description || offer.detailsLabel}
           </p>
+        </div>
+        <div onClick={(event) => event.stopPropagation()}>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-sm"
+            className="shrink-0 text-muted-foreground hover:text-foreground"
+            asChild
+          >
+            <Link
+              href={PROMOTIONS_ROUTES.edit(offer.id)}
+              aria-label={`Edit ${offer.title}`}
+            >
+              <Icons.edit size={18} />
+            </Link>
+          </Button>
         </div>
       </div>
     </Card>

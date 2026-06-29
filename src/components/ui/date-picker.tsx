@@ -46,6 +46,7 @@ type DatePickerProps = {
   id?: string
   className?: string
   "aria-invalid"?: boolean
+  isDateDisabled?: (date: Date) => boolean
 }
 
 export function DatePicker({
@@ -56,6 +57,7 @@ export function DatePicker({
   id,
   className,
   "aria-invalid": ariaInvalid,
+  isDateDisabled,
 }: DatePickerProps) {
   const [open, setOpen] = React.useState(false)
   const selectedDate = parseIsoDate(value)
@@ -92,7 +94,7 @@ export function DatePicker({
               setOpen(false)
             }
           }}
-          disabled={(date) => date > new Date()}
+          disabled={isDateDisabled ?? ((date) => date > new Date())}
         />
       </PopoverContent>
     </Popover>

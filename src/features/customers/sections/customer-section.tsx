@@ -9,6 +9,7 @@ import { CustomerSummaryCards } from "@/features/customers/components/customer-s
 import { CustomerToolbar } from "@/features/customers/components/customer-toolbar"
 import { useCustomerList, useCustomerOverview } from "@/features/customers"
 import type { CustomerTab } from "@/features/customers/types"
+import { PROMOTIONS_ROUTES } from "@/features/promotions/constants"
 import { DataTable } from "@/components/data-table"
 import { Button } from "@/components/ui/button"
 
@@ -57,7 +58,7 @@ export function CustomerManagementSection() {
     <div className="flex min-h-0 flex-1 flex-col gap-4 bg-muted p-4 md:gap-6 md:p-6">
       <div className="flex justify-end">
         <Button asChild className="h-10 px-4">
-          <Link href="/customer-retention-and-loyalty">
+          <Link href={PROMOTIONS_ROUTES.list}>
             View Promotion and Discounts
           </Link>
         </Button>
