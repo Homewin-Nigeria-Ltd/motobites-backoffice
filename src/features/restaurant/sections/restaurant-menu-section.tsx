@@ -123,6 +123,17 @@ function RestaurantMenuSectionContent({
             <Button
               type="button"
               className="h-10 px-4"
+              icon={{ name: "add", position: "left" }}
+              onClick={() => {
+                setEditingMenuItemId(undefined)
+                setMenuSheetOpen(true)
+              }}
+            >
+              Add New Item
+            </Button>
+            <Button
+              type="button"
+              className="h-10 px-4"
               icon={{ name: "edit", position: "left" }}
               onClick={() => setEditRestaurantOpen(true)}
             >

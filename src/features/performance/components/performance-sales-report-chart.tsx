@@ -135,6 +135,7 @@ export function PerformanceSalesReportChart({
           <div className="space-y-2">
             <PerformanceChartHeader
               title="Sales Report"
+              info="Sales performance broken down by location."
               icon={
                 <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-600">
                   <Icons.fileSpreadsheet className="size-4" aria-hidden />

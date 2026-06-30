@@ -63,20 +63,6 @@ export const offerDetailOptions = [
     discountType: "percentage",
     discountValue: 30,
   },
-  {
-    value: "fixed:500",
-    label: "₦500 off",
-    detailsLabel: "₦500 off",
-    discountType: "fixed",
-    discountValue: 500,
-  },
-  {
-    value: "fixed:1000",
-    label: "₦1,000 off",
-    detailsLabel: "₦1,000 off",
-    discountType: "fixed",
-    discountValue: 1000,
-  },
 ] as const
 
 export type OfferDetailValue = (typeof offerDetailOptions)[number]["value"]

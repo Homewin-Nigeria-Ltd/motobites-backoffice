@@ -87,6 +87,7 @@ export function PerformanceCustomerGrowthChart({
       <CardHeader className="gap-3 px-5 pb-0">
         <PerformanceChartHeader
           title="Customer Growth"
+          info="Customer sales growth across key delivery areas."
           icon={<CustomerGrowthIcon />}
         />
         <p className="text-2xl font-semibold tracking-tight text-foreground">

@@ -65,13 +65,13 @@ function DoughnutPercentLabel({
 
   return (
     <g filter="url(#inventory-doughnut-shadow)">
-      <circle cx={x} cy={y} r={badgeRadius} fill="white" />
+      <circle cx={x} cy={y} r={badgeRadius} fill="var(--card)" />
       <text
         x={x}
         y={y}
         textAnchor="middle"
         dominantBaseline="central"
-        fill="#1f2937"
+        fill="var(--foreground)"
         fontSize={11}
         fontWeight={600}
       >

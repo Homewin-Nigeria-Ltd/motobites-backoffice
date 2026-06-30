@@ -136,6 +136,7 @@ export function PerformanceSalesGeneratedChart({
       <CardHeader className="gap-3 px-5 pb-0">
         <PerformanceChartHeader
           title="Sales Generated"
+          info="Total sales revenue over the selected period."
           icon={
             <Image
               src={ASSETS.illustrations.wallet}

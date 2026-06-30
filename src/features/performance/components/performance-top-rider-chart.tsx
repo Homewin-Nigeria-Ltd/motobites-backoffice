@@ -139,6 +139,7 @@ export function PerformanceTopRiderChart({
       <CardHeader className="gap-3 px-5 pb-0">
         <PerformanceChartHeader
           title="Top Rider Performance"
+          info="Rider delivery performance for the selected period."
           icon={
             <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
               <Icons.listAlt className="size-4" aria-hidden />

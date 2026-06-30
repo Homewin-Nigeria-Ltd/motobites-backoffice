@@ -75,6 +75,7 @@ export function PerformanceDeviceSalesChart({
       <CardHeader className="gap-4 px-5 pb-0">
         <PerformanceChartHeader
           title="Device Sales"
+          info="Sales split by customer device type."
           icon={
             <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-600">
               <Icons.monitorSmartphone className="size-4" aria-hidden />

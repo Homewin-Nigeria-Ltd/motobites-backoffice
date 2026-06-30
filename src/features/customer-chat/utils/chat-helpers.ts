@@ -42,7 +42,7 @@ export function sortMessagesChronologically(messages: ApiCustomerChatMessage[]) 
 export function getConversationPreview(
   conversation: Pick<ApiCustomerChatListItem, "preview">
 ) {
-  return conversation.preview.trim() || null
+  return conversation.preview?.trim() || null
 }
 
 export function getConversationTimestamp(

@@ -69,7 +69,6 @@ export function PerformanceTopSellingRestaurantsChart({
       <CardHeader className="gap-3 px-5 pb-0">
         <PerformanceChartHeader
           title="Top Selling Restaurants"
-          showInfo={false}
           icon={
             <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
               <Icons.store className="size-4" aria-hidden />

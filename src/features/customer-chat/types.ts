@@ -58,7 +58,7 @@ export type ApiCustomerChatListItem = {
   status: "open" | "closed"
   is_closed: boolean
   customer: ApiCustomerChatCustomer
-  preview: string
+  preview: string | null
   unread_count: number
   last_message_at: string
   last_message_at_iso: string
