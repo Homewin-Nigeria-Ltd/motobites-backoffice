@@ -13,14 +13,13 @@ import {
 import { useOrderDetail } from "@/features/order/hooks/use-order-queries"
 import type { OrderAssigneeType } from "@/features/order/types"
 import {
-  ORDER_STATUS_LABELS,
   OrderStatus,
 } from "@/features/order/enums/order-status"
 import {
   formatOrderReviewRemark,
   formatOrderReviewText,
-  getOrderDetailStatusLabel,
 } from "@/features/order/utils/order-detail"
+import { formatOrderStatusKey } from "@/features/order/utils/order-status"
 import { BaseModal } from "@/components/ui/base-modal"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -38,10 +37,7 @@ import { OrderMap } from "@/features/order/components/order-map"
 import { getOrderMapCoordinates } from "@/features/order/utils/coordinates"
 import { toImageSrc } from "@/lib/image-url"
 
-const ADMIN_STATUS_OPTIONS = [
-  OrderStatus.PREPARING,
-  OrderStatus.PICKED_UP,
-] as const
+const ADMIN_STATUS_OPTIONS = Object.values(OrderStatus)
 
 const detailGrid3 = "grid grid-cols-1 gap-x-10 gap-y-8 md:grid-cols-3"
 const detailGrid2 = "grid grid-cols-1 gap-x-10 gap-y-8 md:grid-cols-2"
@@ -99,7 +95,6 @@ export function OrderDetailsModal({
   }
 
   const mapCoords = getOrderMapCoordinates(order.map)
-  const statusLabel = getOrderDetailStatusLabel(order.status, order.display_status)
   const customerRemark = formatOrderReviewRemark(order.reviews.customer)
 
   const currentAssigneeId =
@@ -179,7 +174,7 @@ export function OrderDetailsModal({
                 variant="secondary"
                 className="h-9 min-w-40 rounded-full border-0 bg-[#E8F4FC] px-4 text-sm font-medium text-[#1E6BB8]"
               >
-                {statusLabel}
+                {order.display_status}
               </Badge>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -203,7 +198,7 @@ export function OrderDetailsModal({
                         updateStatus({ orderId, status: value })
                       }}
                     >
-                      {ORDER_STATUS_LABELS[value]}
+                      {formatOrderStatusKey(value)}
                     </DropdownMenuItem>
                   ))}
                 </DropdownMenuContent>

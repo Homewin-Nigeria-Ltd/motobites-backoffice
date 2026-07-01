@@ -15,6 +15,7 @@ import {
   type RiderExistingFiles,
 } from "./rider-form-options"
 import { RiderFormSection } from "./rider-form-section"
+import { BranchCombobox } from "@/features/restaurant/components/branch-combobox"
 import { AddressCombobox } from "@/components/address-combobox"
 import { Button } from "@/components/ui/button"
 import {
@@ -114,6 +115,24 @@ export function EditRiderForm({
                 type="email"
                 placeholder="Input details here"
                 className="h-11 bg-muted/50"
+                aria-invalid={fieldState.invalid}
+                disabled={isPending}
+              />
+              <FieldError errors={[fieldState.error]} />
+            </Field>
+          )}
+        />
+
+        <Controller
+          name="branchId"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor="edit-rider-branch">Branch</FieldLabel>
+              <BranchCombobox
+                id="edit-rider-branch"
+                value={field.value}
+                onChange={field.onChange}
                 aria-invalid={fieldState.invalid}
                 disabled={isPending}
               />

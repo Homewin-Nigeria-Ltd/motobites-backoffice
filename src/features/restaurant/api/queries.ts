@@ -1,15 +1,18 @@
 import { queryOptions } from "@tanstack/react-query"
 
 import type {
+  ApiFulfillmentBranchesResponse,
   ApiKitchen,
   ApiKitchenDetailResponse,
   ApiKitchensResponse,
   ApiMenuGroupedResponse,
   ApiMenuItemDetailResponse,
   ApiMenuItemsListResponse,
+  FulfillmentBranch,
   Hub,
   Restaurant,
 } from "../types"
+import { mapApiFulfillmentBranch } from "../utils/fulfillment-branch"
 import { mapKitchenDetailToRestaurant } from "../utils/kitchen-form"
 import { api } from "@/lib/api/client"
 import { restaurantEndpoints } from "./endpoints"
@@ -39,6 +42,13 @@ async function fetchKitchenDetail(kitchenId: string) {
     restaurantEndpoints.kitchen(kitchenId)
   )
   return mapKitchenDetailToRestaurant(response.data)
+}
+
+async function fetchFulfillmentBranches(): Promise<FulfillmentBranch[]> {
+  const response = await api.get<ApiFulfillmentBranchesResponse>(
+    restaurantEndpoints.fulfillmentBranches
+  )
+  return response.data.map(mapApiFulfillmentBranch)
 }
 
 export async function getRestaurantById(restaurantId: string) {
@@ -146,6 +156,13 @@ export const restaurantQueries = {
           .get<ApiMenuItemDetailResponse>(restaurantEndpoints.menuItem(itemId))
           .then((response) => response.data.item),
       enabled: Boolean(itemId),
+      staleTime: 30_000,
+    }),
+
+  branches: () =>
+    queryOptions({
+      queryKey: restaurantKeys.branches(),
+      queryFn: fetchFulfillmentBranches,
       staleTime: 30_000,
     }),
 } as const

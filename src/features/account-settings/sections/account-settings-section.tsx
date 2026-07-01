@@ -8,6 +8,7 @@ import { AccountPersonalInformationPanel } from "../components/account-personal-
 import { AccountSettingsTabs } from "../components/account-settings-tabs"
 import { AccountTwoFactorPanel } from "../components/account-two-factor-panel"
 import type { AccountSettingsTab, AccountUser } from "../types"
+import { BackLink } from "@/components/back-link"
 
 type AccountSettingsSectionProps = {
   user: AccountUser
@@ -22,6 +23,9 @@ export function AccountSettingsSection({
 
   return (
     <div className="flex min-h-0 flex-1 flex-col bg-muted p-4 md:p-6">
+      <div className="mb-4">
+        <BackLink href="/settings" label="settings" />
+      </div>
       <div className="rounded-2xl border border-border bg-background p-5 md:p-8">
         <AccountSettingsTabs value={tab} onChange={setTab} />
 

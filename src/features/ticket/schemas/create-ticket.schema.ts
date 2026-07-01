@@ -13,7 +13,7 @@ export const createTicketSchema = z.object({
   type: z.enum(ticketTypes),
   issueCategory: z.string().min(1, "Issue category is required"),
   description: z.string().min(10, "Description must be at least 10 characters"),
-  resolverId: z.string().optional(),
+  resolverId: z.string().min(1, "Resolver is required"),
   orderId: z
     .string()
     .trim()

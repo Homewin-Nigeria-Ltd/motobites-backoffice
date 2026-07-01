@@ -52,6 +52,7 @@ function AddMenuSheetForm({
   existingImageUrl?: string | null;
   onOpenChange: (open: boolean) => void;
 }) {
+  const [existingImageRemoved, setExistingImageRemoved] = React.useState(false);
   const { createMenuItem, isPending: isCreating } = useCreateMenuItem();
   const { updateMenuItem, isPending: isUpdating } = useUpdateMenuItem();
   const isSaving = isCreating || isUpdating;
@@ -90,7 +91,7 @@ function AddMenuSheetForm({
           });
         }
       } else {
-        if (!hasFile && !existingImageUrl) {
+        if (!hasFile && (!existingImageUrl || existingImageRemoved)) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             message: "Menu image is required",
@@ -446,16 +447,36 @@ function AddMenuSheetForm({
         </div>
 
         <div>
+          <div className="mb-2 flex items-center justify-between gap-2">
+            <Field>
+              <FieldLabel>Menu Image</FieldLabel>
+            </Field>
+            <span className="text-xs text-muted-foreground">Required</span>
+          </div>
           <Controller
             name="image"
             control={control}
-            render={({ field }) => (
-              <ImageUpload
-                value={field.value}
-                existingImageUrl={isEdit && !field.value ? existingImageUrl : null}
-                existingImageAlt={form.getValues("name") || "Menu item image"}
-                onChange={(image) => field.onChange(image)}
-              />
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <ImageUpload
+                  value={field.value}
+                  existingImageUrl={
+                    isEdit && !field.value && !existingImageRemoved
+                      ? existingImageUrl
+                      : null
+                  }
+                  existingImageAlt={form.getValues("name") || "Menu item image"}
+                  onChange={(image) => {
+                    field.onChange(image);
+                    if (image) {
+                      clearErrors("image");
+                      setExistingImageRemoved(false);
+                    }
+                  }}
+                  onExistingImageRemove={() => setExistingImageRemoved(true)}
+                />
+                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+              </Field>
             )}
           />
         </div>

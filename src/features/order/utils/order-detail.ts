@@ -1,9 +1,4 @@
 import type { ApiOrderReview } from "@/features/order/types"
-import { getOrderStatusLabel } from "@/features/order/utils/order-status"
-
-export function getOrderDetailStatusLabel(status: string, displayStatus: string) {
-  return getOrderStatusLabel(status, displayStatus)
-}
 
 export function formatOrderReviewText(
   review: ApiOrderReview | string | null | undefined

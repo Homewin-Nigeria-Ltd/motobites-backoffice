@@ -22,7 +22,9 @@ export function DashboardLayout({
   showDashboardHeader?: boolean
 }) {
   const pathname = usePathname()
-  const isMenuDetailPage = /^\/kitchen\/[^/]+$/.test(pathname)
+  const kitchenSegment = pathname.match(/^\/kitchen\/([^/]+)$/)?.[1]
+  const isMenuDetailPage =
+    kitchenSegment != null && kitchenSegment !== "branches"
   const shouldShowHeader = showDashboardHeader ?? !isMenuDetailPage
 
   return (

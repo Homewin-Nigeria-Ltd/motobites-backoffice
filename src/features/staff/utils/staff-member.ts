@@ -28,5 +28,10 @@ export function mapApiStaffMemberToStaffMember(
     joinedAt: member.joined_at,
     status: normalizeStaffStatus(member.presence_status),
     isFavorited: member.is_favorited,
+    branchId: member.fulfillment_branch_id
+      ? String(member.fulfillment_branch_id)
+      : member.fulfillment_branch?.id
+        ? String(member.fulfillment_branch.id)
+        : "",
   }
 }

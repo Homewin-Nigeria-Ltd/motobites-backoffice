@@ -59,6 +59,12 @@ export type ApiRider = {
   stats: ApiRiderStats
   created_at: string
   updated_at: string
+  fulfillment_branch_id?: number | null
+  fulfillment_branch?: {
+    id: number
+    name: string
+    key?: string
+  } | null
 }
 
 export type RidersListMeta = {

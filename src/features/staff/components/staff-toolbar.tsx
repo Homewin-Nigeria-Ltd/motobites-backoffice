@@ -47,14 +47,14 @@ export function StaffToolbar({
         >
           Invite Member
         </Button>
-        <Button
+        {/* <Button
           type="button"
           variant="outline"
           size="icon"
           className="border-primary text-primary"
           icon={{ name: "filter", position: "left" }}
           aria-label="Filter staff"
-        />
+        /> */}
       </div>
     </div>
   )

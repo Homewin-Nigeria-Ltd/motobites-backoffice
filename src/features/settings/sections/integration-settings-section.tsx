@@ -6,6 +6,7 @@ import { IntegrationCard } from "../components/integration-card"
 import { IntegrationCategoryTabs } from "../components/integration-category-tabs"
 import { useIntegrations } from "../hooks/use-integrations"
 import type { IntegrationCategory } from "../integration.types"
+import { BackLink } from "@/components/back-link"
 import { AppLoader } from "@/components/ui/app-loader"
 
 const categoryErrorMessages: Record<IntegrationCategory, string> = {
@@ -19,6 +20,9 @@ export function IntegrationSettingsSection() {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col bg-muted p-4 md:p-6">
+      <div className="mb-4">
+        <BackLink href="/settings" label="settings" />
+      </div>
       <div className="rounded-2xl border border-border bg-background p-5 md:p-8">
         <div className="space-y-8">
           <IntegrationCategoryTabs value={category} onChange={setCategory} />

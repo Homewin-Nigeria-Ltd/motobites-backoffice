@@ -61,14 +61,30 @@ export async function deleteMenuItemAction(
 export async function toggleMenuItemAvailabilityAction({
   itemId,
   is_available,
+  unavailable_today,
+  fulfillment_branch_id,
 }: {
   itemId: string | number
   is_available: boolean
+  unavailable_today?: boolean
+  fulfillment_branch_id?: number
 }): Promise<RestaurantActionResult<ApiMenuItem>> {
   try {
-    const data = await apiServer.patch<ApiMenuItem, { is_available: boolean }>(
+    const payload =
+      fulfillment_branch_id !== undefined
+        ? {
+            is_available,
+            fulfillment_branch_id,
+            ...(unavailable_today !== undefined ? { unavailable_today } : {}),
+          }
+        : {
+            is_available,
+            ...(unavailable_today !== undefined ? { unavailable_today } : {}),
+          }
+
+    const data = await apiServer.patch<ApiMenuItem, typeof payload>(
       restaurantServerEndpoints.menuItemAvailability(itemId),
-      { is_available }
+      payload
     )
 
     return { success: true, data }

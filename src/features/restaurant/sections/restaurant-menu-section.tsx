@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import Link from "next/link"
 import { notFound } from "next/navigation"
 
 import {
@@ -15,6 +14,7 @@ import { AddMenuSheet } from "@/features/restaurant/components/add-menu-sheet"
 import { RestaurantFormModal } from "@/features/restaurant/components/restaurant-form-modal"
 import { useRestaurant } from "@/features/restaurant"
 import { PaginationControls } from "@/components/pagination-controls"
+import { BackLink } from "@/components/back-link"
 import { Button } from "@/components/ui/button"
 import { AppLoader } from "@/components/ui/app-loader"
 import { Input } from "@/components/ui/input"
@@ -78,13 +78,7 @@ function RestaurantMenuSectionContent({
     <div className="flex min-h-0 flex-1 flex-col bg-muted">
       <div className="border-b border-border/50 bg-background px-4 py-4 md:px-6">
         <div className="mb-4">
-          <Link
-            href="/kitchen"
-            className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground"
-          >
-            <span aria-hidden>←</span>
-            All kitchens
-          </Link>
+          <BackLink href="/kitchen" label="all kitchens" />
         </div>
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="max-w-2xl flex-1">

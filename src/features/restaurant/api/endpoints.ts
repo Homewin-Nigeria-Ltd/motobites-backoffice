@@ -18,4 +18,5 @@ export const restaurantEndpoints = {
     `/api/proxy/admin/menu-management/items/${itemId}`,
   menuItemAvailability: (itemId: string | number) =>
     `/api/proxy/admin/menu-management/items/${itemId}/availability`,
+  fulfillmentBranches: "/api/proxy/admin/fulfillment-branches",
 } as const

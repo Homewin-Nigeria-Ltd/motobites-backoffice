@@ -3,7 +3,6 @@
 import Link from "next/link"
 import { useState } from "react"
 
-import { useToggleMenuItemAvailability } from "@/features/restaurant/hooks/use-restaurant-mutations"
 import { Icons } from "@/components/ui/icons"
 import { Button } from "@/components/ui/button"
 import {
@@ -12,7 +11,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Switch } from "@/components/ui/switch"
 import type { Menu } from "@/features/restaurant/types"
 
 type MenuCardActionsProps = {
@@ -35,16 +33,6 @@ export function MenuCardActions({
   isDeletingItem = false,
 }: MenuCardActionsProps) {
   const [dropdownOpen, setDropdownOpen] = useState(false)
-  const { toggleAvailability, isPending, pendingItemId } =
-    useToggleMenuItemAvailability()
-  const isToggling = isPending && pendingItemId === menu.id
-
-  const handleAvailabilityChange = (checked: boolean) => {
-    toggleAvailability({
-      itemId: menu.id,
-      is_available: checked,
-    })
-  }
 
   const runDropdownAction = (action: () => void) => {
     suppressNextCardClick?.()
@@ -116,13 +104,6 @@ export function MenuCardActions({
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-        <Switch
-          checked={menu.enabled}
-          disabled={isToggling}
-          aria-label={`Toggle ${menu.name}`}
-          onCheckedChange={handleAvailabilityChange}
-          onClick={(e) => e.stopPropagation()}
-        />
       </div>
     </div>
   )

@@ -75,3 +75,7 @@ export function useMenuItemDetail(
     staleTime: 0,
   })
 }
+
+export function useFulfillmentBranches() {
+  return useQuery(restaurantQueries.branches())
+}

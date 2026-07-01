@@ -15,6 +15,7 @@ import {
 import type { PermissionCategory } from "../types"
 import { buildCreateRoleInput } from "../utils/build-role-payload"
 import { filterPermissionCatalog } from "../utils/filter-permissions"
+import { BackLink } from "@/components/back-link"
 import { AppLoader } from "@/components/ui/app-loader"
 
 type EditRoleSectionProps = {
@@ -95,6 +96,9 @@ export function EditRoleSection({ roleId }: EditRoleSectionProps) {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col bg-muted p-4 md:p-6">
+      <div className="mb-4">
+        <BackLink href={`/settings/permissions/${roleId}`} label="role details" />
+      </div>
       <div className="rounded-2xl border border-border bg-background p-5 md:p-8">
         <RoleForm
           form={form}

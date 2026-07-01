@@ -19,6 +19,7 @@ export async function inviteStaffAction(
       full_name: input.name,
       email: input.email,
       staff_role: input.staff_role,
+      fulfillment_branch_id: Number(input.fulfillment_branch_id),
     })
 
     return { success: true, data }
@@ -45,7 +46,12 @@ export async function updateStaffAction({
   try {
     const data = await apiServer.patch<ApiStaffMember>(
       staffEndpoints.member(id),
-      body
+      {
+        ...body,
+        ...(body.fulfillment_branch_id
+          ? { fulfillment_branch_id: Number(body.fulfillment_branch_id) }
+          : {}),
+      }
     )
 
     return { success: true, data }

@@ -141,6 +141,34 @@ export type ApiKitchensResponse = {
   message?: string
 }
 
+export type ApiFulfillmentBranch = {
+  id: number
+  key: string
+  name: string
+  address: string
+  latitude: number
+  longitude: number
+  is_active: boolean
+  is_open: boolean
+}
+
+export type ApiFulfillmentBranchesResponse = {
+  success: boolean
+  data: ApiFulfillmentBranch[]
+  message?: string
+}
+
+export type FulfillmentBranch = {
+  id: string
+  key: string
+  name: string
+  address: string
+  latitude: number
+  longitude: number
+  isActive: boolean
+  isOpen: boolean
+}
+
 export type ApiKitchenDetailResponse = {
   success: boolean
   data: ApiKitchenDetail
@@ -194,6 +222,19 @@ export type ApiMenuItemVariation = {
   preparation_time_minutes?: number
 }
 
+export type ApiMenuItemBranchAvailability = {
+  fulfillment_branch_id: number
+  fulfillment_branch: {
+    id: number
+    key: string
+    name: string
+  }
+  is_available: boolean
+  is_customer_available: boolean
+  unavailable_today: boolean
+  unavailable_until: string | null
+}
+
 export type ApiMenuItem = {
   id: number
   name: string
@@ -214,6 +255,13 @@ export type ApiMenuItem = {
     id: number
     name: string
   }
+  fulfillment_branch_id?: number | null
+  fulfillment_branch?: {
+    id: number
+    name: string
+    key?: string
+  } | null
+  branch_availability?: ApiMenuItemBranchAvailability[]
   category: {
     id: number
     name: string

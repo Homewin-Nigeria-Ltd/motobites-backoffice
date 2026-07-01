@@ -57,6 +57,11 @@ export function mapRiderToFormValues(rider: ApiRider): UpdateRiderFormValues {
     bankAccountNumber: rider.profile.bank_account_number ?? "",
     bankName: rider.profile.bank_name ?? "",
     bankAccountName: rider.profile.bank_account_name ?? "",
+    branchId: rider.fulfillment_branch_id
+      ? String(rider.fulfillment_branch_id)
+      : rider.fulfillment_branch?.id
+        ? String(rider.fulfillment_branch.id)
+        : "",
   }
 }
 

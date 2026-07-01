@@ -13,6 +13,14 @@ export type UpdateRiderInput = {
   formData: FormData
 }
 
+export type UpdateRiderStatusInput = {
+  riderId: string | number
+  onboarding_status: "approved" | "rejected"
+  user_status: string
+  is_online: boolean
+  review_notes?: string
+}
+
 export const ridersMutations = {
   create: {
     mutationFn: (formData: FormData) =>
@@ -26,6 +34,13 @@ export const ridersMutations = {
       api.post<RiderMutationApiResponse, FormData>(
         ridersEndpoints.update(riderId),
         formData
+      ),
+  },
+  updateStatus: {
+    mutationFn: ({ riderId, ...body }: UpdateRiderStatusInput) =>
+      api.patch<RiderMutationApiResponse, Omit<UpdateRiderStatusInput, "riderId">>(
+        ridersEndpoints.status(riderId),
+        body
       ),
   },
 } as const

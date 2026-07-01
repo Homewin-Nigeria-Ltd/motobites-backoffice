@@ -14,6 +14,7 @@ import {
   notificationPreferencesSchema,
   type NotificationPreferencesFormValues,
 } from "@/features/settings/schemas/notification-preferences.schema"
+import { BackLink } from "@/components/back-link"
 import { AppLoader } from "@/components/ui/app-loader"
 import { RadioGroup } from "@/components/ui/radio-group"
 
@@ -74,6 +75,9 @@ export function NotificationsSettingsSection() {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col bg-muted p-4 md:p-6">
+      <div className="mb-4">
+        <BackLink href="/settings" label="settings" />
+      </div>
       <div className="rounded-2xl border border-border bg-background p-5 md:p-8">
         <div className="grid gap-8 lg:grid-cols-[minmax(0,15rem)_minmax(0,1fr)] lg:gap-12">
           <div>

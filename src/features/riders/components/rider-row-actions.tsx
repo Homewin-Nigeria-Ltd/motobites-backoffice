@@ -1,8 +1,11 @@
 "use client"
 
 import Link from "next/link"
+import { useState } from "react"
 
+import { RiderReviewModal } from "./rider-review-modal"
 import type { ApiRider } from "../types"
+import { canReviewRider } from "../utils/rider-review"
 import { Button } from "@/components/ui/button"
 import { Icons } from "@/components/ui/icons"
 
@@ -11,8 +14,24 @@ type RiderRowActionsProps = {
 }
 
 export function RiderRowActions({ rider }: RiderRowActionsProps) {
+  const [reviewOpen, setReviewOpen] = useState(false)
+  const showReviewActions = canReviewRider(rider)
+
   return (
-    <div className="flex items-center gap-0.5">
+    <>
+      <div className="flex items-center gap-0.5">
+        {showReviewActions ? (
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-sm"
+            className="text-muted-foreground"
+            aria-label={`Approve or decline ${rider.name}`}
+            onClick={() => setReviewOpen(true)}
+          >
+            <Icons.listAlt size={16} />
+          </Button>
+        ) : null}
       <Button
         variant="ghost"
         size="icon-sm"
@@ -55,6 +74,14 @@ export function RiderRowActions({ rider }: RiderRowActionsProps) {
         aria-label={`Favorite ${rider.name}`}
         icon={{ name: "heart", position: "left" }}
       /> */}
-    </div>
+      </div>
+
+      <RiderReviewModal
+        riderId={rider.id}
+        riderName={rider.name}
+        open={reviewOpen}
+        onOpenChange={setReviewOpen}
+      />
+    </>
   )
 }

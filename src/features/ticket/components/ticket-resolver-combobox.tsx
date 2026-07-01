@@ -25,6 +25,7 @@ type TicketResolverComboboxProps = {
   placeholder?: string
   className?: string
   disabled?: boolean
+  allowClear?: boolean
 }
 
 export function TicketResolverCombobox({
@@ -35,6 +36,7 @@ export function TicketResolverCombobox({
   placeholder = "Select staff member",
   className,
   disabled = false,
+  allowClear = true,
 }: TicketResolverComboboxProps) {
   const selectedStaff = useMemo(
     () => findStaffByResolverId(staff, value),
@@ -56,7 +58,7 @@ export function TicketResolverCombobox({
       <ComboboxInput
         id={id}
         placeholder={placeholder}
-        showClear={Boolean(value)}
+        showClear={allowClear && Boolean(value)}
         icon={{ name: "account", position: "left" }}
         disabled={disabled}
         className={className}

@@ -4,6 +4,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 
 import { restaurantKeys } from "../api/keys"
 import { restaurantMutations } from "../api/mutations"
+import type { ApiMenuItemDetail } from "../types"
+import { mergeBranchAvailability } from "../utils/menu-item-branch-availability"
 import { ApiError } from "@/lib/api/client"
 import { toast } from "@/lib/toast"
 
@@ -144,18 +146,64 @@ export function useToggleMenuItemAvailability() {
 
   const mutation = useMutation({
     ...restaurantMutations.toggleMenuItemAvailability,
-    onSuccess: (result, { itemId, is_available }) => {
+    onSuccess: (
+      result,
+      { itemId, is_available, unavailable_today, fulfillment_branch_id }
+    ) => {
       if (!result.success) {
         toast.error(result.error)
         return
       }
 
+      const itemKey = String(itemId)
+      const updatedItem = result.data
+
+      queryClient.setQueryData<ApiMenuItemDetail>(
+        restaurantKeys.menuItemDetail(itemKey),
+        (old) => {
+          if (!old) {
+            return old
+          }
+
+          if (fulfillment_branch_id === undefined) {
+            return {
+              ...old,
+              is_available,
+              is_customer_available: updatedItem?.is_customer_available ?? is_available,
+              unavailable_today:
+                unavailable_today ?? updatedItem?.unavailable_today ?? false,
+              branch_availability: updatedItem?.branch_availability ?? old.branch_availability,
+            }
+          }
+
+          return {
+            ...old,
+            branch_availability: updatedItem?.branch_availability ??
+              mergeBranchAvailability(
+                old.branch_availability,
+                fulfillment_branch_id,
+                is_available
+              ),
+          }
+        }
+      )
+
       queryClient.invalidateQueries({ queryKey: restaurantKeys.menuItems })
       queryClient.invalidateQueries({
-        queryKey: restaurantKeys.menuItemDetail(String(itemId)),
+        queryKey: restaurantKeys.menuItemDetail(itemKey),
       })
+
+      if (fulfillment_branch_id === undefined) {
+        toast.success(
+          is_available ? "Item marked as available" : "Item marked as unavailable"
+        )
+        return
+      }
+
       toast.success(
-        is_available ? "Item marked as available" : "Item marked as unavailable"
+        is_available
+          ? "Item marked as available for this branch"
+          : "Item marked as unavailable for this branch"
       )
     },
     onError: () => {
@@ -163,11 +211,24 @@ export function useToggleMenuItemAvailability() {
     },
   })
 
+  const pendingItemId =
+    mutation.isPending &&
+    mutation.variables &&
+    mutation.variables.fulfillment_branch_id === undefined
+      ? String(mutation.variables.itemId)
+      : null
+
+  const pendingBranchKey =
+    mutation.isPending &&
+    mutation.variables &&
+    mutation.variables.fulfillment_branch_id !== undefined
+      ? `${mutation.variables.itemId}:${mutation.variables.fulfillment_branch_id}`
+      : null
+
   return {
     toggleAvailability: mutation.mutate,
     isPending: mutation.isPending,
-    pendingItemId: mutation.isPending
-      ? String(mutation.variables?.itemId ?? "")
-      : null,
+    pendingItemId,
+    pendingBranchKey,
   }
 }

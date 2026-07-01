@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useMemo, useState } from "react";
 
 import { RestaurantCard } from "@/features/restaurant/components/restaurant-card";
@@ -37,15 +36,6 @@ export function RestaurantsSection() {
   return (
     <div className="flex min-h-0 flex-1 flex-col bg-muted">
       <div className="border-b border-border/50 bg-background px-4 py-4 md:px-6">
-        <div className="mb-4">
-          <Link
-            href="/menu"
-            className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground"
-          >
-            <span aria-hidden>←</span>
-            Menu catalog
-          </Link>
-        </div>
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="max-w-2xl flex-1">
             <Input

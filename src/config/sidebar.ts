@@ -32,10 +32,14 @@ export const navMain: NavItem[] = [
     permission: PERMISSION_KEYS.orderManagement,
   },
   {
-    title: "Kitchen Workflow",
+    title: "Kitchen",
     url: "/kitchen",
     icon: "kitchen",
     permission: PERMISSION_KEYS.kitchenWorkflow,
+    items: [
+      { title: "Kitchens", url: "/kitchen" },
+      { title: "Branches", url: "/kitchen/branches" },
+    ],
   },
   {
     title: "Revenue Analytics",

@@ -1,10 +1,11 @@
 "use client"
 
 import Link from "next/link"
-import { useMemo } from "react"
+import { useMemo, useState } from "react"
 
 import { RiderProfileDocument } from "../components/rider-profile-document"
 import { RiderProfileField } from "../components/rider-profile-field"
+import { RiderReviewModal } from "../components/rider-review-modal"
 import { RiderFormSection } from "../components/rider-form-section"
 import { RiderStatusBadge } from "../components/rider-status-badge"
 import { useRiderDetail } from "../hooks/use-rider-detail"
@@ -14,6 +15,7 @@ import {
   formatRiderGender,
   splitGuarantorName,
 } from "../utils/format-rider-profile"
+import { canReviewRider } from "../utils/rider-review"
 import {
   Avatar,
   AvatarFallback,
@@ -30,6 +32,7 @@ type RiderProfileSectionProps = {
 
 export function RiderProfileSection({ riderId }: RiderProfileSectionProps) {
   const { data: rider, isPending, isError } = useRiderDetail(riderId)
+  const [reviewOpen, setReviewOpen] = useState(false)
 
   const guarantor = useMemo(
     () => splitGuarantorName(rider?.profile.guarantor_name),
@@ -47,6 +50,8 @@ export function RiderProfileSection({ riderId }: RiderProfileSectionProps) {
       </div>
     )
   }
+
+  const showReviewActions = canReviewRider(rider)
 
   return (
     <div className="flex min-h-0 flex-1 flex-col bg-muted p-4 md:p-6">
@@ -69,10 +74,32 @@ export function RiderProfileSection({ riderId }: RiderProfileSectionProps) {
             </p>
           </div>
         </div>
-        <Button asChild className="shrink-0 rounded-xl">
-          <Link href={`/riders/${rider.id}/edit`}>Edit Rider</Link>
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          {showReviewActions ? (
+            <Button
+              type="button"
+              className="shrink-0 rounded-xl"
+              onClick={() => setReviewOpen(true)}
+            >
+              Approve or Decline
+            </Button>
+          ) : null}
+          <Button
+            asChild
+            variant={showReviewActions ? "outline" : "default"}
+            className="shrink-0 rounded-xl"
+          >
+            <Link href={`/riders/${rider.id}/edit`}>Edit Rider</Link>
+          </Button>
+        </div>
       </div>
+
+      <RiderReviewModal
+        riderId={rider.id}
+        riderName={rider.name}
+        open={reviewOpen}
+        onOpenChange={setReviewOpen}
+      />
 
       <div className="rounded-2xl border border-border bg-background p-5 md:p-8">
         <RiderFormSection
@@ -225,6 +252,19 @@ export function RiderProfileSection({ riderId }: RiderProfileSectionProps) {
             value={formatRiderDisplayValue(rider.profile.bank_account_name)}
           />
         </RiderFormSection>
+
+        {rider.onboarding_status === "rejected" &&
+        rider.profile.review_notes?.trim() ? (
+          <RiderFormSection
+            title="Review notes"
+            description="Reason provided when this rider application was rejected."
+          >
+            <RiderProfileField
+              label="Rejection reason"
+              value={rider.profile.review_notes}
+            />
+          </RiderFormSection>
+        ) : null}
 
         <RiderFormSection
           title="Chat with Rider"

@@ -29,6 +29,7 @@ const baseRiderFormFields = {
   bankAccountNumber: z.string().trim().min(1, "Account number is required"),
   bankName: z.string().trim().min(1, "Bank name is required"),
   bankAccountName: z.string().trim().min(1, "Account name is required"),
+  branchId: z.string().min(1, "Branch is required"),
 }
 
 export const addRiderSchema = z.object({
@@ -85,4 +86,5 @@ export const addRiderDefaultValues: AddRiderFormValues = {
   bankAccountNumber: "",
   bankName: "",
   bankAccountName: "",
+  branchId: "",
 }

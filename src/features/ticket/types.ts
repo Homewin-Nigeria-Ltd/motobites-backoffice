@@ -98,7 +98,7 @@ export type CreateTicketInput = {
   type: TicketType
   issueCategory: string
   description: string
-  resolverId?: number
+  resolverId: number
   orderId?: string
 }
 

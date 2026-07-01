@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { Controller, useForm } from "react-hook-form"
 
 import { RoleCombobox } from "@/features/staff/components/role-combobox"
+import { BranchCombobox } from "@/features/restaurant/components/branch-combobox"
 import { useUpdateStaff } from "@/features/staff/hooks/use-staff-mutations"
 import {
   staffMemberFormDefaults,
@@ -45,6 +46,7 @@ export function EditMemberDialog({
       name: member.name,
       email: member.email,
       role: member.staffRole,
+      branchId: member.branchId,
     })
   }, [member, open, form])
 
@@ -58,6 +60,7 @@ export function EditMemberDialog({
       name: values.name,
       email: values.email,
       staff_role: values.role,
+      fulfillment_branch_id: values.branchId,
     })
 
     if (result.success) {
@@ -129,6 +132,23 @@ export function EditMemberDialog({
               <FieldLabel htmlFor="edit-role">Choose Role</FieldLabel>
               <RoleCombobox
                 id="edit-role"
+                value={field.value}
+                onChange={field.onChange}
+                aria-invalid={fieldState.invalid}
+              />
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+
+        <Controller
+          name="branchId"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor="edit-branch">Branch</FieldLabel>
+              <BranchCombobox
+                id="edit-branch"
                 value={field.value}
                 onChange={field.onChange}
                 aria-invalid={fieldState.invalid}

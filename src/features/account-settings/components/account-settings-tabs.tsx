@@ -26,7 +26,9 @@ export function AccountSettingsTabs({
       role="tablist"
       aria-label="Account settings"
     >
-      {(Object.keys(tabLabels) as AccountSettingsTab[]).map((tab) => {
+      {(Object.keys(tabLabels) as AccountSettingsTab[])
+        .filter((tab) => tab !== "two-factor-authentication")
+        .map((tab) => {
         const isActive = value === tab
 
         return (

@@ -10,6 +10,7 @@ import { useRoleDetail } from "../hooks/use-role-detail"
 import { useDeleteRole } from "../hooks/use-role-mutations"
 import type { PermissionCategory } from "../types"
 import { filterPermissionCatalog } from "../utils/filter-permissions"
+import { BackLink } from "@/components/back-link"
 import { BaseAlertDialog } from "@/components/ui/base-alert-dialog"
 import { AppLoader } from "@/components/ui/app-loader"
 
@@ -80,6 +81,9 @@ export function RoleDetailSection({ roleId }: RoleDetailSectionProps) {
   return (
     <>
       <div className="flex min-h-0 flex-1 flex-col bg-muted p-4 md:p-6">
+        <div className="mb-4">
+          <BackLink href="/settings/permissions" label="permissions" />
+        </div>
         <div className="rounded-2xl border border-border bg-background p-5 md:p-8">
           <div className="space-y-8">
             <PermissionsSearchInput value={search} onChange={setSearch} />

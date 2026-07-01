@@ -78,14 +78,17 @@ export function CreateTicketDialog({
   }, [open, defaultIssueCategory, form])
 
   const onSubmit = (values: CreateTicketFormValues) => {
-    const resolverId = values.resolverId ? Number(values.resolverId) : undefined
+    const resolverId = Number(values.resolverId)
+
+    if (!values.resolverId || Number.isNaN(resolverId)) {
+      return
+    }
 
     createTicket({
       type: values.type,
       issueCategory: values.issueCategory,
       description: values.description,
-      resolverId:
-        resolverId != null && !Number.isNaN(resolverId) ? resolverId : undefined,
+      resolverId,
       orderId: values.orderId?.trim() || undefined,
     }).then((result) => {
       if (!result.success) {
@@ -216,7 +219,7 @@ export function CreateTicketDialog({
           control={form.control}
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
-              <FieldLabel>Resolver (optional)</FieldLabel>
+              <FieldLabel>Resolver</FieldLabel>
               {isStaffPending ? (
                 <AppLoader className="py-4" spinnerClassName="size-5" />
               ) : isStaffError ? (
@@ -231,9 +234,10 @@ export function CreateTicketDialog({
                 <TicketResolverCombobox
                   id="create-ticket-resolver"
                   staff={staff}
-                  value={field.value ?? ""}
+                  value={field.value}
                   onChange={field.onChange}
                   disabled={isPending}
+                  allowClear={false}
                 />
               )}
               {fieldState.error ? (

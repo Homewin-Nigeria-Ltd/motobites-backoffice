@@ -5,4 +5,6 @@ export const ridersEndpoints = {
     `/api/proxy/admin/delivery-management/riders/${encodeURIComponent(String(riderId))}`,
   update: (riderId: string | number) =>
     `/api/proxy/admin/delivery-management/riders/${encodeURIComponent(String(riderId))}`,
+  status: (riderId: string | number) =>
+    `/api/proxy/admin/delivery-management/riders/${encodeURIComponent(String(riderId))}/status`,
 } as const

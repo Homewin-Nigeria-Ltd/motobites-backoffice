@@ -1,4 +1,4 @@
-import { ORDER_STATUS_LABELS, OrderStatus } from "@/features/order/enums/order-status"
+import { OrderStatus } from "@/features/order/enums/order-status"
 
 const ORDER_STATUS_VALUES = new Set<string>(Object.values(OrderStatus))
 
@@ -6,13 +6,22 @@ export function isOrderStatus(value: string): value is OrderStatus {
   return ORDER_STATUS_VALUES.has(value)
 }
 
-export function getOrderStatusLabel(
-  status: string,
-  fallbackDisplayStatus?: string
-): string {
-  if (isOrderStatus(status)) {
-    return ORDER_STATUS_LABELS[status]
+function capitalizeFirstLetter(value: string) {
+  if (!value) {
+    return value
   }
 
-  return fallbackDisplayStatus ?? status
+  return value.charAt(0).toUpperCase() + value.slice(1)
+}
+
+export function formatOrderStatusKey(status: string) {
+  return capitalizeFirstLetter(status.replace(/_/g, " "))
+}
+
+export function getOrderStatusLabel(
+  status: string,
+  displayStatus?: string
+): string {
+  const label = displayStatus ?? status.replace(/_/g, " ")
+  return capitalizeFirstLetter(label)
 }

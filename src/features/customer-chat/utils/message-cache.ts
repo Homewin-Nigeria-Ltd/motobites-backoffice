@@ -3,6 +3,7 @@ import type { QueryClient } from "@tanstack/react-query"
 import { customerChatKeys } from "../api/keys"
 import type {
   ApiCustomerChatMessage,
+  ApiCustomerChatSender,
   CustomerChatDetailResponse,
   CustomerChatListResponse,
 } from "../types"
@@ -73,30 +74,40 @@ export function appendMessageToCache(
   chatId: string,
   message: ApiCustomerChatMessage
 ) {
-  queryClient.setQueryData<CustomerChatDetailResponse>(
-    customerChatKeys.detail(chatId),
-    (old) => {
-      if (!old?.data) {
-        return old
-      }
+  const detailKey = customerChatKeys.detail(chatId)
+  let updated = false
 
-      const existing = old.data.messages ?? []
+  queryClient.setQueryData<CustomerChatDetailResponse>(detailKey, (old) => {
+    const existing = old?.data?.messages ?? []
 
-      if (existing.some((item) => item.id === message.id)) {
-        return old
-      }
-
-      const nextMessages = [...existing, message]
-
-      return {
-        ...old,
-        data: {
-          ...old.data,
-          messages: nextMessages,
-        },
-      }
+    if (existing.some((item) => item.id === message.id)) {
+      updated = Boolean(old?.data)
+      return old
     }
-  )
+
+    const nextMessages = [...existing, message]
+
+    if (!old?.data) {
+      return old
+    }
+
+    updated = true
+
+    return {
+      ...old,
+      data: {
+        ...old.data,
+        messages: nextMessages,
+      },
+    }
+  })
+
+  if (!updated) {
+    void queryClient.invalidateQueries({
+      queryKey: detailKey,
+      refetchType: "active",
+    })
+  }
 
   updateConversationPreviewInCache(queryClient, chatId, message)
 }
@@ -174,20 +185,92 @@ export function removeMessageFromCache(
   )
 }
 
-export function parseRealtimeMessage(
-  event: { message?: ApiCustomerChatMessage } & Partial<ApiCustomerChatMessage>
-): ApiCustomerChatMessage | null {
-  const candidate = event.message ?? event
+type BroadcastMessagePayload = {
+  id?: string | number
+  body?: string
+  message?: string | ApiCustomerChatMessage
+  message_type?: string
+  type?: string
+  sender_role?: string
+  file_url?: string | null
+  attachment_url?: string | null
+  is_admin?: boolean
+  is_system?: boolean
+  sender?: ApiCustomerChatSender
+  created_at?: string
+}
 
-  if (
-    typeof candidate.id !== "string" ||
-    typeof candidate.body !== "string" ||
-    !candidate.sender_role
-  ) {
+function resolveBroadcastCandidate(
+  event: BroadcastMessagePayload & {
+    message?: ApiCustomerChatMessage | string
+    data?: BroadcastMessagePayload
+  }
+): BroadcastMessagePayload | null {
+  if (event.data && typeof event.data === "object" && "id" in event.data) {
+    return event.data
+  }
+
+  if (event.message && typeof event.message === "object") {
+    return event.message
+  }
+
+  if (event.id !== undefined) {
+    return event
+  }
+
+  return null
+}
+
+export function parseRealtimeMessage(
+  event: BroadcastMessagePayload & {
+    message?: ApiCustomerChatMessage | string
+    data?: BroadcastMessagePayload
+  }
+): ApiCustomerChatMessage | null {
+  const candidate = resolveBroadcastCandidate(event)
+
+  if (!candidate) {
     return null
   }
 
-  return candidate as ApiCustomerChatMessage
+  const id =
+    typeof candidate.id === "string"
+      ? candidate.id
+      : typeof candidate.id === "number"
+        ? String(candidate.id)
+        : null
+
+  const body =
+    typeof candidate.body === "string"
+      ? candidate.body
+      : typeof candidate.message === "string"
+        ? candidate.message
+        : null
+
+  const senderRole = candidate.sender_role
+
+  if (!id || !body || !senderRole) {
+    return null
+  }
+
+  const messageType = candidate.message_type ?? candidate.type ?? "text"
+  const isSystem = candidate.is_system ?? messageType === "system"
+  const isAdmin = candidate.is_admin ?? senderRole === "admin"
+
+  return {
+    id,
+    body,
+    message_type: messageType,
+    sender_role: senderRole,
+    is_admin: isAdmin,
+    is_system: isSystem,
+    attachment_url: candidate.attachment_url ?? candidate.file_url ?? null,
+    sender: candidate.sender ?? {
+      id: 0,
+      name: isAdmin ? "Support" : "Customer",
+    },
+    created_at: candidate.created_at ?? new Date().toISOString(),
+  }
 }
 
 export function markChatClosedInCache(

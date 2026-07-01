@@ -30,7 +30,7 @@ function toCreateTicketBody(input: CreateTicketInput): ApiCreateTicketBody {
     type: input.type,
     issue_category: input.issueCategory,
     description: input.description,
-    resolver_id: input.resolverId ?? 0,
+    resolver_id: input.resolverId,
   }
 
   if (input.orderId?.trim()) {

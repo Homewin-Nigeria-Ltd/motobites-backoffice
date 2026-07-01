@@ -1,11 +1,10 @@
 export * from "./types"
-export { OrderStatus, ORDER_STATUS_LABELS } from "./enums"
+export { OrderStatus } from "./enums"
 export { getOrderStatusLabel, isOrderStatus } from "./utils/order-status"
 export { formatKoboAmount } from "./utils/currency"
 export { formatDate } from "./utils/date"
 export { getOrderMapCoordinates } from "./utils/coordinates"
 export {
-  getOrderDetailStatusLabel,
   formatOrderReviewText,
   formatOrderReviewRemark,
 } from "./utils/order-detail"

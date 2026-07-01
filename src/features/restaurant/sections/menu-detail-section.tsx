@@ -1,8 +1,8 @@
 "use client"
 
-import Link from "next/link"
 import { useState } from "react"
 
+import { BackLink } from "@/components/back-link"
 import { PageHeader } from "@/components/layouts/dashboard"
 import { AddMenuSheet } from "@/features/restaurant/components/add-menu-sheet"
 import { MenuItemDetailsModal } from "@/features/restaurant/components/menu-item-details-modal"
@@ -63,13 +63,10 @@ export function MenuDetailSection({ kitchenId }: MenuDetailSectionProps) {
 
       <div className="border-b border-border/50 bg-background px-4 py-4 md:px-6">
         <div className="mb-4">
-          <Link
+          <BackLink
             href={buildRestaurantMenuHref(kitchenId)}
-            className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground"
-          >
-            <span aria-hidden>←</span>
-            Menu items
-          </Link>
+            label="menu items"
+          />
         </div>
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex flex-1 flex-col gap-3 sm:flex-row sm:items-center">

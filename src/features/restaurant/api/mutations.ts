@@ -14,6 +14,8 @@ import { restaurantEndpoints } from "./endpoints"
 export type ToggleMenuItemAvailabilityInput = {
   itemId: string | number
   is_available: boolean
+  unavailable_today?: boolean
+  fulfillment_branch_id?: number
 }
 
 export const restaurantMutations = {

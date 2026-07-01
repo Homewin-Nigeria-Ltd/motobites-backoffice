@@ -6,8 +6,8 @@ import { useQueryClient } from "@tanstack/react-query"
 import { getEcho } from "@/lib/echo"
 import { customerChatKeys } from "../api/keys"
 import {
-  CUSTOMER_SUPPORT_MESSAGE_EVENT,
   getCustomerSupportChannelName,
+  isCustomerSupportMessageEvent,
 } from "../constants"
 import type { ApiCustomerChatMessage } from "../types"
 import {
@@ -16,7 +16,8 @@ import {
 } from "../utils/message-cache"
 
 export type CustomerSupportMessageEvent = {
-  message?: ApiCustomerChatMessage
+  message?: ApiCustomerChatMessage | string
+  data?: ApiCustomerChatMessage
 } & Partial<ApiCustomerChatMessage>
 
 type UseCustomerChatRealtimeOptions = {
@@ -24,14 +25,39 @@ type UseCustomerChatRealtimeOptions = {
   onMessage?: (event: CustomerSupportMessageEvent) => void
 }
 
+function handleSupportMessageEvent(
+  queryClient: ReturnType<typeof useQueryClient>,
+  conversationId: string,
+  event: CustomerSupportMessageEvent,
+  onMessage?: (event: CustomerSupportMessageEvent) => void
+) {
+  onMessage?.(event)
+
+  const message = parseRealtimeMessage(event)
+
+  if (message) {
+    appendMessageToCache(queryClient, conversationId, message)
+    return
+  }
+
+  void queryClient.invalidateQueries({
+    queryKey: customerChatKeys.detail(conversationId),
+    refetchType: "active",
+  })
+  void queryClient.invalidateQueries({
+    queryKey: [...customerChatKeys.all, "conversations"],
+    refetchType: "active",
+  })
+}
+
 export function useCustomerChatRealtime(
-  chatId: string | null,
+  conversationId: string | null,
   { enabled = true, onMessage }: UseCustomerChatRealtimeOptions = {}
 ) {
   const queryClient = useQueryClient()
 
   useEffect(() => {
-    if (!enabled || !chatId || typeof window === "undefined") {
+    if (!enabled || !conversationId || typeof window === "undefined") {
       return
     }
 
@@ -40,31 +66,30 @@ export function useCustomerChatRealtime(
       return
     }
 
-    const channelName = getCustomerSupportChannelName(chatId)
+    const channelName = getCustomerSupportChannelName(conversationId)
     const channel = echo.private(channelName)
 
-    channel.listen(
-      CUSTOMER_SUPPORT_MESSAGE_EVENT,
-      (event: CustomerSupportMessageEvent) => {
-        onMessage?.(event)
-
-        const message = parseRealtimeMessage(event)
-
-        if (message) {
-          appendMessageToCache(queryClient, chatId, message)
-        } else {
-          void queryClient.invalidateQueries({
-            queryKey: customerChatKeys.detail(chatId),
-          })
-          void queryClient.invalidateQueries({
-            queryKey: [...customerChatKeys.all, "conversations"],
-          })
-        }
+    const handleAllEvents = (
+      eventName: string,
+      event: CustomerSupportMessageEvent
+    ) => {
+      if (!isCustomerSupportMessageEvent(eventName)) {
+        return
       }
-    )
+
+      handleSupportMessageEvent(
+        queryClient,
+        conversationId,
+        event,
+        onMessage
+      )
+    }
+
+    channel.listenToAll(handleAllEvents)
 
     return () => {
+      channel.stopListeningToAll(handleAllEvents)
       echo.leave(channelName)
     }
-  }, [chatId, enabled, onMessage, queryClient])
+  }, [enabled, onMessage, queryClient, conversationId])
 }

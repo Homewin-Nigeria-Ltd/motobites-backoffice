@@ -12,6 +12,7 @@ type ImageUploadProps = {
   existingImageUrl?: string | null
   existingImageAlt?: string
   onChange?: (file: File | null) => void
+  onExistingImageRemove?: () => void
   accept?: string
   className?: string
   disabled?: boolean
@@ -23,6 +24,7 @@ function ImageUpload({
   existingImageUrl = null,
   existingImageAlt = "Current image",
   onChange,
+  onExistingImageRemove,
   accept = "image/png,image/jpeg,image/jpg",
   className,
   disabled = false,
@@ -71,6 +73,7 @@ function ImageUpload({
 
     if (existingImageUrl) {
       setDismissedImageUrl(existingImageUrl)
+      onExistingImageRemove?.()
     }
   }
 

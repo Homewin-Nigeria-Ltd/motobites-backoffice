@@ -18,6 +18,7 @@ export type StaffMember = {
   joinedAt: string
   status: StaffStatus
   isFavorited: boolean
+  branchId: string
 }
 
 export type StaffListParams = {
@@ -50,6 +51,12 @@ export type ApiStaffMember = {
   presence_status: string
   is_favorited: boolean
   joined_at: string
+  fulfillment_branch_id?: number | null
+  fulfillment_branch?: {
+    id: number
+    name: string
+    key?: string
+  } | null
 }
 
 export type ApiStaffListResponse = {
@@ -75,6 +82,7 @@ export type InviteStaffInput = {
   name: string
   email: string
   staff_role: string
+  fulfillment_branch_id: string
 }
 
 export type UpdateStaffInput = {
@@ -82,6 +90,7 @@ export type UpdateStaffInput = {
   name?: string
   email?: string
   staff_role?: string
+  fulfillment_branch_id?: string
 }
 
 export type StaffActionResult<T = undefined> =

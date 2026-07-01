@@ -3,6 +3,7 @@
 import { CreateRoleCard } from "../components/create-role-card"
 import { RoleCard } from "../components/role-card"
 import { useRoles } from "../hooks/use-roles"
+import { BackLink } from "@/components/back-link"
 import { AppLoader } from "@/components/ui/app-loader"
 
 export function PermissionsListSection() {
@@ -22,6 +23,9 @@ export function PermissionsListSection() {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col bg-muted p-4 md:p-6">
+      <div className="mb-4">
+        <BackLink href="/settings" label="settings" />
+      </div>
       <div className="rounded-2xl border border-border bg-background p-5 md:p-8">
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {roles?.map((role) => (

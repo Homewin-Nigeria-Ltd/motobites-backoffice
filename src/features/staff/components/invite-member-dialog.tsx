@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { Controller, useForm } from "react-hook-form"
 
 import { RoleCombobox } from "@/features/staff/components/role-combobox"
+import { BranchCombobox } from "@/features/restaurant/components/branch-combobox"
 import { useInviteStaff } from "@/features/staff/hooks/use-staff-mutations"
 import {
   staffMemberFormDefaults,
@@ -37,6 +38,7 @@ export function InviteMemberDialog({
       name: values.name,
       email: values.email,
       staff_role: values.role,
+      fulfillment_branch_id: values.branchId,
     })
 
     if (result.success) {
@@ -112,6 +114,23 @@ export function InviteMemberDialog({
               <FieldLabel htmlFor="invite-role">Choose Role</FieldLabel>
               <RoleCombobox
                 id="invite-role"
+                value={field.value}
+                onChange={field.onChange}
+                aria-invalid={fieldState.invalid}
+              />
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+
+        <Controller
+          name="branchId"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor="invite-branch">Branch</FieldLabel>
+              <BranchCombobox
+                id="invite-branch"
                 value={field.value}
                 onChange={field.onChange}
                 aria-invalid={fieldState.invalid}

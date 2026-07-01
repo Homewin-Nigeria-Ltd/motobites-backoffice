@@ -3,7 +3,6 @@
 import Image from "next/image"
 
 import type { ApiOrder } from "@/features/order/types"
-import { getOrderStatusLabel } from "@/features/order/utils/order-status"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
@@ -55,7 +54,7 @@ export function OrderCard({ order, onViewDetails }: OrderCardProps) {
           variant="secondary"
           className="w-fit rounded-full border-0 bg-secondary px-3 py-1 text-xs font-medium text-primary"
         >
-          {getOrderStatusLabel(order.status, order.display_status)}
+          {order.display_status}
         </Badge>
       </CardContent>
       <CardFooter className="pt-4 pb-5">
