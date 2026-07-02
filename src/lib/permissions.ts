@@ -39,11 +39,13 @@ export type Permissions = {
 }
 
 function userHasPermission(user: AuthUser, permission: PermissionKey) {
-  if ((user.permission_keys ?? []).includes(permission)) {
-    return true
+  if (user.permissions && user.permissions.length > 0) {
+    return user.permissions.some(
+      (entry) => entry.key === permission && entry.has_access
+    )
   }
 
-  return user.permissions?.some((entry) => entry.key === permission) ?? false
+  return (user.permission_keys ?? []).includes(permission)
 }
 
 function buildPermissions(user: AuthUser): Permissions {
