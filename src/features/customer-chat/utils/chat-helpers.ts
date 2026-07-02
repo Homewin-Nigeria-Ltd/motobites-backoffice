@@ -32,13 +32,6 @@ export function isChatClosed(
   return chat.is_closed === true || chat.status === "closed"
 }
 
-export function sortMessagesChronologically(messages: ApiCustomerChatMessage[]) {
-  return [...messages].sort(
-    (a, b) =>
-      new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
-  )
-}
-
 export function getConversationPreview(
   conversation: Pick<ApiCustomerChatListItem, "preview">
 ) {

@@ -22,19 +22,8 @@ function fetchSupportConversations(params: SupportConversationsParams = {}) {
   )
 }
 
-function fetchSupportMessages(
-  riderId: string | number,
-  params: SupportMessagesParams = {}
-) {
-  const query: Record<string, string | number> = {
-    page: params.page ?? 1,
-    per_page: params.per_page ?? 50,
-  }
-
-  return api.get<SupportMessagesResponse>(
-    riderChatEndpoints.messages(riderId),
-    query
-  )
+function fetchSupportMessages(riderId: string | number) {
+  return api.get<SupportMessagesResponse>(riderChatEndpoints.messages(riderId))
 }
 
 export const riderChatQueries = {
@@ -46,7 +35,7 @@ export const riderChatQueries = {
   messages: (riderId: string | number, params: SupportMessagesParams = {}) =>
     queryOptions({
       queryKey: riderChatKeys.messages(riderId, params),
-      queryFn: () => fetchSupportMessages(riderId, params),
+      queryFn: () => fetchSupportMessages(riderId),
       enabled: Boolean(riderId),
     }),
 }

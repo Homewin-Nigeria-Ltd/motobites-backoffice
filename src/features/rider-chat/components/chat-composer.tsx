@@ -3,7 +3,6 @@
 import { useState } from "react"
 
 import { Button } from "@/components/ui/button"
-import { Icons } from "@/components/ui/icons"
 import { Input } from "@/components/ui/input"
 
 type ChatComposerProps = {
@@ -33,27 +32,6 @@ export function ChatComposer({
   return (
     <div className="shrink-0 border-t border-border bg-background px-4 py-4 md:px-6">
       <div className="flex items-center gap-3">
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          className="size-10 shrink-0 rounded-full"
-          disabled={disabled}
-          aria-label="Add attachment"
-        >
-          <Icons.add size={18} />
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          className="size-10 shrink-0 rounded-full"
-          disabled={disabled}
-          aria-label="Attach document"
-        >
-          <Icons.fileText size={18} />
-        </Button>
-
         <Input
           value={message}
           onChange={(event) => setMessage(event.target.value)}

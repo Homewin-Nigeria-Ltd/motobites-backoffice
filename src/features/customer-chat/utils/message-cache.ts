@@ -12,17 +12,20 @@ import { getMessageBody } from "./chat-helpers"
 
 let pendingMessageId = 0
 
-export function createPendingMessage(body: string): ApiCustomerChatMessage {
+export function createPendingMessage(
+  body: string,
+  previewUrl?: string
+): ApiCustomerChatMessage {
   pendingMessageId += 1
 
   return {
     id: `pending-${pendingMessageId}`,
     body,
-    message_type: "text",
+    message_type: previewUrl ? "image" : "text",
     sender_role: "admin",
     is_admin: true,
     is_system: false,
-    attachment_url: null,
+    attachment_url: previewUrl ?? null,
     sender: {
       id: 0,
       name: "You",

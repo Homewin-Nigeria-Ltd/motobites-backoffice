@@ -60,6 +60,10 @@ export function ChatMessageBubble({
   const isSupport = isSupportMessage(message)
   const senderName = message.sender?.name ?? (isSupport ? supportName : customerName)
   const senderAvatar = isSupport ? supportAvatar : customerAvatar
+  const imageSrc =
+    message.message_type === "image" ? message.attachment_url : null
+  const body = getMessageBody(message)
+  const caption = imageSrc && body && body !== "image" ? body : null
 
   return (
     <div
@@ -80,13 +84,26 @@ export function ChatMessageBubble({
       >
         <div
           className={cn(
-            "rounded-2xl px-4 py-3 text-sm leading-relaxed",
+            "rounded-2xl text-sm leading-relaxed",
+            imageSrc ? "overflow-hidden p-1" : "px-4 py-3",
             isSupport
               ? "bg-primary text-primary-foreground"
               : "border border-primary bg-secondary text-primary"
           )}
         >
-          {getMessageBody(message)}
+          {imageSrc ? (
+            <div className="flex flex-col gap-2">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={imageSrc}
+                alt={body}
+                className="max-h-64 w-full rounded-xl object-cover"
+              />
+              {caption ? <p className="px-2 pb-1">{caption}</p> : null}
+            </div>
+          ) : (
+            body
+          )}
         </div>
         <span className="px-1 text-[11px] text-muted-foreground">
           {formatChatMessageTime(message.created_at)}

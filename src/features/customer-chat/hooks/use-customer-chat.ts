@@ -10,7 +10,6 @@ import {
   getCustomerAvatar,
   getConversationPreview,
   isChatClosed,
-  sortMessagesChronologically,
 } from "../utils/chat-helpers"
 import {
   appendMessageToCache,
@@ -111,10 +110,7 @@ export function useCustomerChat(initialChatId?: string | null) {
   const queryClient = useQueryClient()
 
   const selectedConversation = chatDetailResponse?.data ?? null
-  const messages = useMemo(
-    () => sortMessagesChronologically(selectedConversation?.messages ?? []),
-    [selectedConversation?.messages]
-  )
+  const messages = selectedConversation?.messages ?? []
 
   const filteredConversations = useMemo(() => {
     const query = debouncedSearch.trim().toLowerCase()
@@ -158,14 +154,15 @@ export function useCustomerChat(initialChatId?: string | null) {
   )
 
   const handleSendMessage = useCallback(
-    (content: string) => {
+    (content: string, file?: File) => {
       const trimmed = content.trim()
 
-      if (!trimmed || !activeChatId || isSelectedClosed) {
+      if ((!trimmed && !file) || !activeChatId || isSelectedClosed) {
         return
       }
 
-      const pendingMessage = createPendingMessage(trimmed)
+      const previewUrl = file ? URL.createObjectURL(file) : undefined
+      const pendingMessage = createPendingMessage(trimmed, previewUrl)
 
       appendMessageToCache(queryClient, activeChatId, pendingMessage)
 
@@ -173,6 +170,7 @@ export function useCustomerChat(initialChatId?: string | null) {
         {
           chatId: activeChatId,
           body: trimmed,
+          file,
         },
         {
           onSuccess: (response) => {
@@ -200,6 +198,11 @@ export function useCustomerChat(initialChatId?: string | null) {
               activeChatId,
               pendingMessage.id
             )
+          },
+          onSettled: () => {
+            if (previewUrl) {
+              URL.revokeObjectURL(previewUrl)
+            }
           },
         }
       )

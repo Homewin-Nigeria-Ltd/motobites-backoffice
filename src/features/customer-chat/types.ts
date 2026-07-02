@@ -2,7 +2,7 @@ export const customerChatFilters = ["all", "unread", "closed"] as const
 
 export type CustomerChatFilter = (typeof customerChatFilters)[number]
 
-export type ApiCustomerChatMessageType = "text" | "system" | string
+export type ApiCustomerChatMessageType = "text" | "image" | "system" | string
 
 export type ApiCustomerChatSenderRole = "customer" | "admin" | string
 
@@ -93,6 +93,7 @@ export type CustomerChatDetailResponse = {
 export type SendCustomerChatMessageInput = {
   chatId: string
   body: string
+  file?: File
 }
 
 export type SendCustomerChatMessageResponse = {
