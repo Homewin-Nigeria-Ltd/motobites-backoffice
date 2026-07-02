@@ -10,15 +10,9 @@ import type {
 import { riderChatEndpoints } from "./endpoints"
 import { riderChatKeys } from "./keys"
 
-function fetchSupportConversations(params: SupportConversationsParams = {}) {
-  const query: Record<string, string | number> = {
-    page: params.page ?? 1,
-    per_page: params.per_page ?? 20,
-  }
-
+function fetchSupportConversations() {
   return api.get<SupportConversationsResponse>(
-    riderChatEndpoints.conversations,
-    query
+    riderChatEndpoints.conversations
   )
 }
 
@@ -30,7 +24,7 @@ export const riderChatQueries = {
   conversations: (params: SupportConversationsParams = {}) =>
     queryOptions({
       queryKey: riderChatKeys.conversations(params),
-      queryFn: () => fetchSupportConversations(params),
+      queryFn: () => fetchSupportConversations(),
     }),
   messages: (riderId: string | number, params: SupportMessagesParams = {}) =>
     queryOptions({
