@@ -6,6 +6,7 @@ import type {
   InviteStaffInput,
   StaffActionResult,
   UpdateStaffInput,
+  UpdateStaffStatusInput,
 } from "../types"
 import { ApiError } from "@/lib/api/client"
 import { apiServer } from "@/lib/api/server-client"
@@ -60,6 +61,33 @@ export async function updateStaffAction({
       return {
         success: false,
         error: error.message || "Failed to update team member",
+      }
+    }
+
+    throw error
+  }
+}
+
+export async function updateStaffStatusAction({
+  id,
+  status,
+}: UpdateStaffStatusInput): Promise<StaffActionResult<ApiStaffMember>> {
+  if (!id.trim()) {
+    return { success: false, error: "Team member is required" }
+  }
+
+  try {
+    const data = await apiServer.patch<ApiStaffMember>(
+      staffEndpoints.member(id),
+      { status }
+    )
+
+    return { success: true, data }
+  } catch (error) {
+    if (error instanceof ApiError) {
+      return {
+        success: false,
+        error: error.message || "Failed to update team member status",
       }
     }
 

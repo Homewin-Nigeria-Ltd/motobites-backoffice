@@ -4,7 +4,11 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 
 import { staffKeys } from "../api/keys"
 import { staffMutations } from "../api/mutations"
-import type { InviteStaffInput, UpdateStaffInput } from "../types"
+import type {
+  InviteStaffInput,
+  UpdateStaffInput,
+  UpdateStaffStatusInput,
+} from "../types"
 import { downloadStaffCsv } from "../utils/export-staff-csv"
 import { ApiError } from "@/lib/api/client"
 import { toast } from "@/lib/toast"
@@ -67,6 +71,35 @@ export function useUpdateStaff() {
 
   return {
     updateStaff: (input: UpdateStaffInput) => mutation.mutateAsync(input),
+    isPending: mutation.isPending,
+    pendingMemberId: mutation.isPending
+      ? String(mutation.variables?.id ?? "")
+      : null,
+  }
+}
+
+export function useUpdateStaffStatus() {
+  const queryClient = useQueryClient()
+
+  const mutation = useMutation({
+    ...staffMutations.updateStatus,
+    onSuccess: (result) => {
+      if (!result.success) {
+        toast.error(result.error)
+        return
+      }
+
+      queryClient.invalidateQueries({ queryKey: staffKeys.all })
+      toast.success(result.message ?? "Team member status updated")
+    },
+    onError: () => {
+      toast.error("Failed to update team member status")
+    },
+  })
+
+  return {
+    updateStatus: (input: UpdateStaffStatusInput) =>
+      mutation.mutateAsync(input),
     isPending: mutation.isPending,
     pendingMemberId: mutation.isPending
       ? String(mutation.variables?.id ?? "")

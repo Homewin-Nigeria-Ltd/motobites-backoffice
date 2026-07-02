@@ -55,7 +55,9 @@ export const staffColumns: ColumnDef<StaffMember>[] = [
   {
     accessorKey: "status",
     header: "Status",
-    cell: ({ row }) => <StaffStatusBadge status={row.original.status} />,
+    cell: ({ row }) => (
+      <StaffStatusBadge status={row.original.accountStatus} />
+    ),
   },
   {
     id: "actions",

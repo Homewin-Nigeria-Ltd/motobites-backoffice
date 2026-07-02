@@ -1,5 +1,11 @@
 export type StaffStatus = "active" | "away" | "inactive"
 
+export type StaffAccountStatus =
+  | "pending"
+  | "active"
+  | "inactive"
+  | "suspended"
+
 export type ApiStaffRoleOption = {
   key: string
   label: string
@@ -17,6 +23,7 @@ export type StaffMember = {
   staffRole: string
   joinedAt: string
   status: StaffStatus
+  accountStatus: StaffAccountStatus
   isFavorited: boolean
   branchId: string
 }
@@ -49,6 +56,7 @@ export type ApiStaffMember = {
   staff_role: string
   role_label: string
   presence_status: string
+  status?: string
   is_favorited: boolean
   joined_at: string
   fulfillment_branch_id?: number | null
@@ -91,6 +99,11 @@ export type UpdateStaffInput = {
   email?: string
   staff_role?: string
   fulfillment_branch_id?: string
+}
+
+export type UpdateStaffStatusInput = {
+  id: string
+  status: StaffAccountStatus
 }
 
 export type StaffActionResult<T = undefined> =

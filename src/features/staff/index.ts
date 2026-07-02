@@ -4,6 +4,7 @@ export {
   removeStaffAction,
   toggleStaffFavoriteAction,
   updateStaffAction,
+  updateStaffStatusAction,
 } from "./actions/staff-member.actions"
 export { StaffManagementSection } from "./sections/staff-section"
 export { useStaffList } from "./hooks/use-staff-list"
@@ -14,4 +15,5 @@ export {
   useRemoveStaff,
   useToggleStaffFavorite,
   useUpdateStaff,
+  useUpdateStaffStatus,
 } from "./hooks/use-staff-mutations"

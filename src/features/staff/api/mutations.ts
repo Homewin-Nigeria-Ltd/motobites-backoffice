@@ -3,8 +3,13 @@ import {
   removeStaffAction,
   toggleStaffFavoriteAction,
   updateStaffAction,
+  updateStaffStatusAction,
 } from "../actions/staff-member.actions"
-import type { InviteStaffInput, UpdateStaffInput } from "../types"
+import type {
+  InviteStaffInput,
+  UpdateStaffInput,
+  UpdateStaffStatusInput,
+} from "../types"
 
 export const staffMutations = {
   invite: {
@@ -13,6 +18,11 @@ export const staffMutations = {
 
   update: {
     mutationFn: (input: UpdateStaffInput) => updateStaffAction(input),
+  },
+
+  updateStatus: {
+    mutationFn: (input: UpdateStaffStatusInput) =>
+      updateStaffStatusAction(input),
   },
 
   remove: {

@@ -1,4 +1,9 @@
-import type { ApiStaffMember, StaffMember, StaffStatus } from "../types"
+import type {
+  ApiStaffMember,
+  StaffAccountStatus,
+  StaffMember,
+  StaffStatus,
+} from "../types"
 
 function normalizeStaffStatus(status: string): StaffStatus {
   const normalized = status.trim().toLowerCase()
@@ -14,6 +19,22 @@ function normalizeStaffStatus(status: string): StaffStatus {
   return "inactive"
 }
 
+function normalizeStaffAccountStatus(
+  status: string | undefined
+): StaffAccountStatus {
+  const normalized = status?.trim().toLowerCase()
+
+  if (
+    normalized === "pending" ||
+    normalized === "inactive" ||
+    normalized === "suspended"
+  ) {
+    return normalized
+  }
+
+  return "active"
+}
+
 export function mapApiStaffMemberToStaffMember(
   member: ApiStaffMember
 ): StaffMember {
@@ -27,6 +48,7 @@ export function mapApiStaffMemberToStaffMember(
     staffRole: member.staff_role,
     joinedAt: member.joined_at,
     status: normalizeStaffStatus(member.presence_status),
+    accountStatus: normalizeStaffAccountStatus(member.status),
     isFavorited: member.is_favorited,
     branchId: member.fulfillment_branch_id
       ? String(member.fulfillment_branch_id)

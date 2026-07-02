@@ -3,6 +3,7 @@
 import { useState } from "react"
 
 import { EditMemberDialog } from "@/features/staff/components/edit-member-dialog"
+import { StaffStatusDialog } from "@/features/staff/components/staff-status-dialog"
 import {
   useRemoveStaff,
   useToggleStaffFavorite,
@@ -23,6 +24,7 @@ export function StaffRowActions({ member }: StaffRowActionsProps) {
     pendingMemberId: favoritePendingMemberId,
   } = useToggleStaffFavorite()
   const [editOpen, setEditOpen] = useState(false)
+  const [statusOpen, setStatusOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
   const isDeleting = isPending && pendingMemberId === member.id
   const isTogglingFavorite =
@@ -39,6 +41,15 @@ export function StaffRowActions({ member }: StaffRowActionsProps) {
           aria-label={`Edit ${member.name}`}
           icon={{ name: "edit", position: "left" }}
           onClick={() => setEditOpen(true)}
+        />
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon-sm"
+          className="text-muted-foreground"
+          aria-label={`Update status for ${member.name}`}
+          icon={{ name: "userCog", position: "left" }}
+          onClick={() => setStatusOpen(true)}
         />
         <Button
           type="button"
@@ -80,6 +91,12 @@ export function StaffRowActions({ member }: StaffRowActionsProps) {
         member={member}
         open={editOpen}
         onOpenChange={setEditOpen}
+      />
+
+      <StaffStatusDialog
+        member={member}
+        open={statusOpen}
+        onOpenChange={setStatusOpen}
       />
 
       <BaseAlertDialog

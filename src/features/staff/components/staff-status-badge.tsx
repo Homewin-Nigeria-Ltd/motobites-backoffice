@@ -1,29 +1,34 @@
 import { Badge } from "@/components/ui/badge"
-import type { StaffStatus } from "@/features/staff/types"
+import type { StaffAccountStatus } from "@/features/staff/types"
 import { cn } from "@/lib/utils"
 
 const statusConfig: Record<
-  StaffStatus,
+  StaffAccountStatus,
   { label: string; dot: string; badge: string }
 > = {
+  pending: {
+    label: "Pending",
+    dot: "bg-amber-500",
+    badge: "bg-amber-500/10 text-amber-700",
+  },
   active: {
     label: "Active",
     dot: "bg-emerald-500",
     badge: "bg-emerald-500/10 text-emerald-700",
   },
-  away: {
-    label: "Away",
-    dot: "bg-primary",
-    badge: "bg-primary/10 text-primary",
-  },
   inactive: {
     label: "Inactive",
+    dot: "bg-muted-foreground",
+    badge: "bg-muted text-muted-foreground",
+  },
+  suspended: {
+    label: "Suspended",
     dot: "bg-destructive",
     badge: "bg-destructive/10 text-destructive",
   },
 }
 
-export function StaffStatusBadge({ status }: { status: StaffStatus }) {
+export function StaffStatusBadge({ status }: { status: StaffAccountStatus }) {
   const config = statusConfig[status]
 
   return (
