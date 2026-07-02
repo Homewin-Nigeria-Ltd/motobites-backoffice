@@ -5,10 +5,10 @@ import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
 const tabLabels: Record<CustomerTab, string> = {
-  all: "All User",
-  active: "Active User",
-  deactivated: "Deactivated User",
-  churn: "Churn User",
+  all: "All Users",
+  active: "Active Users",
+  deactivated: "Deactivated Users",
+  churn: "Churn Users",
 }
 
 type CustomerFilterTabsProps = {

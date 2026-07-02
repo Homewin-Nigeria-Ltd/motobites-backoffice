@@ -13,10 +13,10 @@ import type {
 } from "../types"
 
 const TAB_LABELS: Record<CustomerTab, string> = {
-  all: "All User",
-  active: "Active User",
-  deactivated: "Deactivated User",
-  churn: "Churn User",
+  all: "All Users",
+  active: "Active Users",
+  deactivated: "Deactivated Users",
+  churn: "Churn Users",
 }
 
 const TAB_KEY_ALIASES: Record<CustomerTab, string[]> = {
@@ -138,7 +138,7 @@ function mapOverviewStat(
 
   return {
     key,
-    label: stat.label || TAB_LABELS[key],
+    label: TAB_LABELS[key],
     value: stat.value ?? stat.count ?? 0,
     changePercent: stat.change_percent ?? stat.change ?? 0,
     trend: normalizeTrend(stat.trend),
