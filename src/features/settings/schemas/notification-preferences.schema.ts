@@ -1,8 +1,7 @@
 import { z } from "zod/v3"
 
 export const notificationPreferencesSchema = z.object({
-  login_attempts: z.enum(["email", "push", "sms"]),
-  login_alert_method: z.enum(["email", "push", "sms"]),
+  login_attempts: z.array(z.enum(["email", "push", "sms"])),
   push_notifications: z.enum(["do_not_notify", "all_activity"]),
   push_notification_mode: z.enum(["none", "all"]),
   reminders: z.enum(["do_not_notify", "important_only", "all_reminders"]),
@@ -23,8 +22,7 @@ export type NotificationPreferencesFormValues = z.infer<
 
 export const notificationPreferencesDefaults: NotificationPreferencesFormValues =
   {
-    login_attempts: "email",
-    login_alert_method: "email",
+    login_attempts: ["email"],
     push_notifications: "do_not_notify",
     push_notification_mode: "none",
     reminders: "all_reminders",

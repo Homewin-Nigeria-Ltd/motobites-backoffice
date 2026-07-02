@@ -7,7 +7,7 @@ type NotificationCheckboxOptionProps = {
   checked: boolean
   onCheckedChange: (checked: boolean) => void
   label: string
-  description: string
+  description?: string
   id: string
 }
 
@@ -28,9 +28,11 @@ export function NotificationCheckboxOption({
       />
       <Label htmlFor={id} className="cursor-pointer font-normal">
         <span className="text-sm font-medium text-foreground">{label}</span>
-        <span className="mt-1 block text-sm text-muted-foreground">
-          {description}
-        </span>
+        {description ? (
+          <span className="mt-1 block text-sm text-muted-foreground">
+            {description}
+          </span>
+        ) : null}
       </Label>
     </div>
   )

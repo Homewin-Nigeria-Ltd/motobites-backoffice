@@ -14,6 +14,7 @@ import {
   notificationPreferencesSchema,
   type NotificationPreferencesFormValues,
 } from "@/features/settings/schemas/notification-preferences.schema"
+import type { LoginAlertMethod } from "@/features/settings/types"
 import { BackLink } from "@/components/back-link"
 import { AppLoader } from "@/components/ui/app-loader"
 import { RadioGroup } from "@/components/ui/radio-group"
@@ -37,7 +38,6 @@ export function NotificationsSettingsSection() {
 
     form.reset({
       login_attempts: preferences.login_attempts,
-      login_alert_method: preferences.login_alerts.method,
       push_notifications:
         preferences.push_notifications as NotificationPreferencesFormValues["push_notifications"],
       push_notification_mode:
@@ -99,36 +99,48 @@ export function NotificationsSettingsSection() {
               <Controller
                 name="login_attempts"
                 control={form.control}
-                render={({ field }) => (
-                  <RadioGroup
-                    value={field.value}
-                    onValueChange={(value) => {
-                      field.onChange(value)
-                      form.setValue(
-                        "login_alert_method",
-                        value as NotificationPreferencesFormValues["login_alert_method"]
-                      )
-                      void handlePreferenceUpdate()
-                    }}
-                    className="gap-4"
-                  >
-                    <NotificationRadioOption
-                      id="login-attempts-email"
-                      value="email"
-                      label="Email"
-                    />
-                    <NotificationRadioOption
-                      id="login-attempts-push"
-                      value="push"
-                      label="Push Notification"
-                    />
-                    <NotificationRadioOption
-                      id="login-attempts-sms"
-                      value="sms"
-                      label="SMS"
-                    />
-                  </RadioGroup>
-                )}
+                render={({ field }) => {
+                  const selected = field.value ?? []
+                  const toggleChannel = (
+                    channel: LoginAlertMethod,
+                    checked: boolean
+                  ) => {
+                    const next = checked
+                      ? [...selected, channel]
+                      : selected.filter((item) => item !== channel)
+                    field.onChange(next)
+                    void handlePreferenceUpdate()
+                  }
+
+                  return (
+                    <div className="space-y-4">
+                      <NotificationCheckboxOption
+                        id="login-attempts-email"
+                        checked={selected.includes("email")}
+                        onCheckedChange={(checked) =>
+                          toggleChannel("email", checked)
+                        }
+                        label="Email"
+                      />
+                      <NotificationCheckboxOption
+                        id="login-attempts-push"
+                        checked={selected.includes("push")}
+                        onCheckedChange={(checked) =>
+                          toggleChannel("push", checked)
+                        }
+                        label="Push Notification"
+                      />
+                      <NotificationCheckboxOption
+                        id="login-attempts-sms"
+                        checked={selected.includes("sms")}
+                        onCheckedChange={(checked) =>
+                          toggleChannel("sms", checked)
+                        }
+                        label="SMS"
+                      />
+                    </div>
+                  )
+                }}
               />
             </NotificationPreferenceSection>
 

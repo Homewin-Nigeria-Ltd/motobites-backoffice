@@ -54,7 +54,7 @@ export const SETTINGS_RIGHT_COLUMN: SettingsItem[] = [
 export type LoginAlertMethod = "email" | "push" | "sms"
 
 export type ApiNotificationPreferences = {
-  login_attempts: LoginAlertMethod
+  login_attempts: LoginAlertMethod[]
   push_notifications: string
   reminders: string
   news_and_updates: boolean
