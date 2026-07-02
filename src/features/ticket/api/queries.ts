@@ -1,37 +1,85 @@
 import type {
+  ApiTicketByIssueResponse,
+  ApiTicketByStatusResponse,
   ApiTicketDetailResponse,
-  ApiTicketOverviewResponse,
   ApiTicketListResponse,
+  ApiTicketResolutionRateResponse,
+  ApiTicketSummaryResponse,
+  ApiTicketUrgentAlertResponse,
   SupportTicket,
-  TicketDashboardData,
-  TicketDashboardParams,
+  TicketAlert,
+  TicketIssueCategory,
   TicketListParams,
   TicketListResponse,
+  TicketOverviewParams,
+  TicketResolutionRate,
+  TicketSummaryKpi,
+  TicketVolumeByStatus,
 } from "../types"
 import {
-  mapApiOverviewToDashboard,
+  mapApiByIssueItem,
+  mapApiByStatusItem,
+  mapApiSummaryItem,
   mapApiTicketToSupportTicket,
+  mapApiUrgentAlert,
+  mapResolutionRate,
 } from "../utils/ticket"
 import { ticketEndpoints } from "./endpoints"
 import { ticketKeys } from "./keys"
 import { api } from "@/lib/api/client"
 import { queryOptions } from "@tanstack/react-query"
 
-async function fetchTicketOverview(
-  params: TicketDashboardParams = {}
-): Promise<TicketDashboardData> {
-  const query: Record<string, string> = {}
+function periodQuery(params: TicketOverviewParams) {
+  return params.period ? { period: params.period } : undefined
+}
 
-  if (params.period) {
-    query.period = params.period
-  }
-
-  const response = await api.get<ApiTicketOverviewResponse>(
-    ticketEndpoints.overview,
-    Object.keys(query).length > 0 ? query : undefined
+async function fetchTicketSummary(): Promise<TicketSummaryKpi[]> {
+  const response = await api.get<ApiTicketSummaryResponse>(
+    ticketEndpoints.overviewSummary
   )
 
-  return mapApiOverviewToDashboard(response.data)
+  return response.data.map(mapApiSummaryItem)
+}
+
+async function fetchTicketResolutionRate(
+  params: TicketOverviewParams = {}
+): Promise<TicketResolutionRate> {
+  const response = await api.get<ApiTicketResolutionRateResponse>(
+    ticketEndpoints.overviewResolutionRate,
+    periodQuery(params)
+  )
+
+  return mapResolutionRate(response.data)
+}
+
+async function fetchTicketByIssue(
+  params: TicketOverviewParams = {}
+): Promise<TicketIssueCategory[]> {
+  const response = await api.get<ApiTicketByIssueResponse>(
+    ticketEndpoints.overviewByIssue,
+    periodQuery(params)
+  )
+
+  return response.data.map(mapApiByIssueItem)
+}
+
+async function fetchTicketByStatus(
+  params: TicketOverviewParams = {}
+): Promise<TicketVolumeByStatus[]> {
+  const response = await api.get<ApiTicketByStatusResponse>(
+    ticketEndpoints.overviewByStatus,
+    periodQuery(params)
+  )
+
+  return response.data.map(mapApiByStatusItem)
+}
+
+async function fetchTicketUrgentAlert(): Promise<TicketAlert | null> {
+  const response = await api.get<ApiTicketUrgentAlertResponse>(
+    ticketEndpoints.overviewUrgentAlert
+  )
+
+  return response.data ? mapApiUrgentAlert(response.data) : null
 }
 
 async function fetchTicketList(
@@ -62,10 +110,38 @@ async function fetchTicketDetail(id: string): Promise<SupportTicket> {
 }
 
 export const ticketQueries = {
-  overview: (params: TicketDashboardParams = {}) =>
+  overviewSummary: () =>
     queryOptions({
-      queryKey: ticketKeys.overview(params),
-      queryFn: () => fetchTicketOverview(params),
+      queryKey: ticketKeys.overviewSummary(),
+      queryFn: () => fetchTicketSummary(),
+      staleTime: 60 * 1000,
+    }),
+
+  overviewResolutionRate: (params: TicketOverviewParams = {}) =>
+    queryOptions({
+      queryKey: ticketKeys.overviewResolutionRate(params),
+      queryFn: () => fetchTicketResolutionRate(params),
+      staleTime: 60 * 1000,
+    }),
+
+  overviewByIssue: (params: TicketOverviewParams = {}) =>
+    queryOptions({
+      queryKey: ticketKeys.overviewByIssue(params),
+      queryFn: () => fetchTicketByIssue(params),
+      staleTime: 60 * 1000,
+    }),
+
+  overviewByStatus: (params: TicketOverviewParams = {}) =>
+    queryOptions({
+      queryKey: ticketKeys.overviewByStatus(params),
+      queryFn: () => fetchTicketByStatus(params),
+      staleTime: 60 * 1000,
+    }),
+
+  overviewUrgentAlert: () =>
+    queryOptions({
+      queryKey: ticketKeys.overviewUrgentAlert(),
+      queryFn: () => fetchTicketUrgentAlert(),
       staleTime: 60 * 1000,
     }),
 

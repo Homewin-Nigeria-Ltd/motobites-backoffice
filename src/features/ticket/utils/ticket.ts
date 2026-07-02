@@ -1,12 +1,13 @@
 import type {
   ApiTicket,
-  ApiTicketOverviewData,
+  ApiTicketByIssueItem,
+  ApiTicketByStatusItem,
+  ApiTicketResolutionRateData,
   ApiTicketResolver,
   ApiTicketSummaryItem,
   ApiUrgentAlert,
   SupportTicket,
   TicketAlert,
-  TicketDashboardData,
   TicketIssueCategory,
   TicketResolutionRate,
   TicketStatus,
@@ -114,7 +115,7 @@ export function mapApiTicketToSupportTicket(ticket: ApiTicket): SupportTicket {
   }
 }
 
-function mapApiUrgentAlert(alert: ApiUrgentAlert): TicketAlert {
+export function mapApiUrgentAlert(alert: ApiUrgentAlert): TicketAlert {
   const ticketId = alert.ticket_id ?? alert.id ?? ""
   const ticketNumber = alert.ticket_number.startsWith("Ticket ")
     ? alert.ticket_number
@@ -131,7 +132,7 @@ function mapApiUrgentAlert(alert: ApiUrgentAlert): TicketAlert {
   }
 }
 
-function mapApiSummaryItem(item: ApiTicketSummaryItem): TicketSummaryKpi {
+export function mapApiSummaryItem(item: ApiTicketSummaryItem): TicketSummaryKpi {
   return {
     key: item.key,
     label: item.label,
@@ -142,8 +143,8 @@ function mapApiSummaryItem(item: ApiTicketSummaryItem): TicketSummaryKpi {
   }
 }
 
-function mapResolutionRate(
-  rate: ApiTicketOverviewData["resolution_rate"]
+export function mapResolutionRate(
+  rate: ApiTicketResolutionRateData
 ): TicketResolutionRate {
   return {
     total: rate.total,
@@ -152,31 +153,22 @@ function mapResolutionRate(
   }
 }
 
-export function mapApiOverviewToDashboard(
-  data: ApiTicketOverviewData
-): TicketDashboardData {
+export function mapApiByIssueItem(
+  item: ApiTicketByIssueItem
+): TicketIssueCategory {
   return {
-    alert: data.urgent_alert ? mapApiUrgentAlert(data.urgent_alert) : null,
-    summaryKpis: data.summary.map(mapApiSummaryItem),
-    resolutionRate: mapResolutionRate(data.resolution_rate),
-    ticketsByIssue: data.by_issue.map(
-      (item): TicketIssueCategory => ({
-        key: item.key,
-        label: item.label,
-        count: item.count,
-      })
-    ),
-    ticketsRaised: data.by_status.map(
-      (item): TicketVolumeByStatus => ({
-        status: item.status,
-        label: item.label,
-        count: item.count,
-      })
-    ),
-    recentTickets: data.recent.map(mapApiTicketToSupportTicket),
-    issueCategories:
-      data.issue_categories.length > 0
-        ? data.issue_categories
-        : DEFAULT_TICKET_ISSUE_CATEGORIES,
+    key: item.key,
+    label: item.label,
+    count: item.count,
+  }
+}
+
+export function mapApiByStatusItem(
+  item: ApiTicketByStatusItem
+): TicketVolumeByStatus {
+  return {
+    status: item.status,
+    label: item.label,
+    count: item.count,
   }
 }

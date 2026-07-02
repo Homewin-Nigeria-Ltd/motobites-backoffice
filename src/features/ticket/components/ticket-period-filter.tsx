@@ -11,9 +11,10 @@ import {
 import { Icons } from "@/components/ui/icons"
 
 const PERIOD_LABELS: Record<TicketPeriod, string> = {
-  monthly: "Monthly",
-  weekly: "Weekly",
-  daily: "Daily",
+  day: "Daily",
+  week: "Weekly",
+  month: "Monthly",
+  year: "Yearly",
 }
 
 type TicketPeriodFilterProps = {

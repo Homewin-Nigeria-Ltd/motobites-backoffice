@@ -18,7 +18,7 @@ export const ticketTypes = [
 
 export type TicketType = (typeof ticketTypes)[number]
 
-export const ticketPeriods = ["monthly", "weekly", "daily"] as const
+export const ticketPeriods = ["day", "week", "month", "year"] as const
 
 export type TicketPeriod = (typeof ticketPeriods)[number]
 
@@ -26,12 +26,14 @@ export const ticketAdminStatusOptions = ["open", "closed"] as const
 
 export type TicketAdminStatus = (typeof ticketAdminStatusOptions)[number]
 
+export type TicketTrend = "up" | "down" | "flat"
+
 export type TicketSummaryKpi = {
   key: string
   label: string
   value: number
   changePercent: number
-  trend: "up" | "down"
+  trend: TicketTrend
   variant?: "default" | "danger"
 }
 
@@ -84,16 +86,6 @@ export type SupportTicket = {
   description: string
 }
 
-export type TicketDashboardData = {
-  alert: TicketAlert | null
-  summaryKpis: TicketSummaryKpi[]
-  resolutionRate: TicketResolutionRate
-  ticketsByIssue: TicketIssueCategory[]
-  ticketsRaised: TicketVolumeByStatus[]
-  recentTickets: SupportTicket[]
-  issueCategories: TicketIssueCategoryOption[]
-}
-
 export type CreateTicketInput = {
   type: TicketType
   issueCategory: string
@@ -110,7 +102,7 @@ export type ApiCreateTicketBody = {
   order_id?: string
 }
 
-export type TicketDashboardParams = {
+export type TicketOverviewParams = {
   period?: TicketPeriod
 }
 
@@ -169,7 +161,7 @@ export type ApiTicketSummaryItem = {
   label: string
   value: number
   change_percent: number
-  trend: "up" | "down"
+  trend: TicketTrend
 }
 
 export type ApiUrgentAlert = {
@@ -181,34 +173,47 @@ export type ApiUrgentAlert = {
   message?: string
 }
 
-export type ApiTicketOverviewData = {
-  urgent_alert: ApiUrgentAlert | null
-  summary: ApiTicketSummaryItem[]
-  resolution_rate: {
-    total: number
-    within_tat: number
-    exceeded_tat: number
-  }
-  by_issue: Array<{
-    key: string
-    label: string
-    count: number
-  }>
-  by_status: Array<{
-    status: string
-    label: string
-    count: number
-  }>
-  recent: ApiTicket[]
-  issue_categories: Array<{
-    key: string
-    label: string
-  }>
+export type ApiTicketUrgentAlertResponse = {
+  success: boolean
+  data: ApiUrgentAlert | null
 }
 
-export type ApiTicketOverviewResponse = {
+export type ApiTicketResolutionRateData = {
+  total: number
+  within_tat: number
+  exceeded_tat: number
+}
+
+export type ApiTicketByIssueItem = {
+  key: string
+  label: string
+  count: number
+}
+
+export type ApiTicketByStatusItem = {
+  status: string
+  label: string
+  count: number
+}
+
+export type ApiTicketSummaryResponse = {
   success: boolean
-  data: ApiTicketOverviewData
+  data: ApiTicketSummaryItem[]
+}
+
+export type ApiTicketResolutionRateResponse = {
+  success: boolean
+  data: ApiTicketResolutionRateData
+}
+
+export type ApiTicketByIssueResponse = {
+  success: boolean
+  data: ApiTicketByIssueItem[]
+}
+
+export type ApiTicketByStatusResponse = {
+  success: boolean
+  data: ApiTicketByStatusItem[]
 }
 
 export type ApiTicketListResponse = {

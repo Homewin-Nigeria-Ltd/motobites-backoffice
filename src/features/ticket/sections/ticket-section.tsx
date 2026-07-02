@@ -11,21 +11,45 @@ import { TicketSummaryCards } from "@/features/ticket/components/ticket-summary-
 import { TicketToolbar } from "@/features/ticket/components/ticket-toolbar"
 import { TicketsRaisedChart } from "@/features/ticket/components/tickets-raised-chart"
 import { ViewTicketModal } from "@/features/ticket/components/view-ticket-modal"
-import { useTicketDashboard, useTicketList } from "@/features/ticket/hooks/use-ticket-queries"
-import type { TicketPeriod } from "@/features/ticket/types"
+import {
+  useTicketByIssue,
+  useTicketByStatus,
+  useTicketList,
+  useTicketResolutionRate,
+  useTicketSummary,
+  useTicketUrgentAlert,
+} from "@/features/ticket/hooks/use-ticket-queries"
+import type { TicketPeriod, TicketResolutionRate } from "@/features/ticket/types"
+import { DEFAULT_TICKET_ISSUE_CATEGORIES } from "@/features/ticket/utils/ticket"
 import { DataTable } from "@/components/data-table"
-import { AppLoader } from "@/components/ui/app-loader"
 import { Button } from "@/components/ui/button"
 
 const TABLE_PAGE_SIZE = 8
+const DEFAULT_PERIOD: TicketPeriod = "month"
+
+const EMPTY_RESOLUTION_RATE: TicketResolutionRate = {
+  total: 0,
+  withinTat: 0,
+  exceededTat: 0,
+}
 
 export function TicketSection() {
-  const [overviewPeriod, setOverviewPeriod] = useState<TicketPeriod>("monthly")
+  const [resolutionPeriod, setResolutionPeriod] =
+    useState<TicketPeriod>(DEFAULT_PERIOD)
+  const [byIssuePeriod, setByIssuePeriod] = useState<TicketPeriod>(DEFAULT_PERIOD)
+  const [byStatusPeriod, setByStatusPeriod] =
+    useState<TicketPeriod>(DEFAULT_PERIOD)
+
   const [createOpen, setCreateOpen] = useState(false)
   const [viewTicketId, setViewTicketId] = useState<string | null>(null)
   const [viewTicketOpen, setViewTicketOpen] = useState(false)
   const [dismissedAlert, setDismissedAlert] = useState(false)
   const [tablePage, setTablePage] = useState(1)
+
+  const handleViewTicket = (ticketId: string) => {
+    setViewTicketId(ticketId)
+    setViewTicketOpen(true)
+  }
 
   const columns = useMemo(
     () =>
@@ -38,17 +62,17 @@ export function TicketSection() {
     []
   )
 
-  const handleViewTicket = (ticketId: string) => {
-    setViewTicketId(ticketId)
-    setViewTicketOpen(true)
-  }
+  const { data: summaryKpis, isPending: isSummaryPending } = useTicketSummary()
 
-  const {
-    data: dashboard,
-    isPending: isOverviewPending,
-    isError: isOverviewError,
-    error: overviewError,
-  } = useTicketDashboard({ period: overviewPeriod })
+  const { data: resolutionRate } = useTicketResolutionRate({
+    period: resolutionPeriod,
+  })
+
+  const { data: ticketsByIssue } = useTicketByIssue({ period: byIssuePeriod })
+
+  const { data: ticketsRaised } = useTicketByStatus({ period: byStatusPeriod })
+
+  const { data: urgentAlert } = useTicketUrgentAlert()
 
   const {
     data: ticketList,
@@ -63,37 +87,13 @@ export function TicketSection() {
   const totalPages = ticketList?.meta.last_page ?? 1
   const currentPage = ticketList?.meta.current_page ?? tablePage
 
-  if (isOverviewPending && !dashboard) {
-    return (
-      <div className="flex min-h-0 flex-1 items-center justify-center bg-muted p-6">
-        <AppLoader spinnerClassName="size-8" />
-      </div>
-    )
-  }
-
-  if (isOverviewError) {
-    return (
-      <div className="flex min-h-0 flex-1 flex-col bg-muted p-4 md:p-6">
-        <div className="rounded-2xl border border-border bg-background p-6 text-sm text-destructive">
-          {overviewError instanceof Error
-            ? overviewError.message
-            : "Failed to load customer support dashboard."}
-        </div>
-      </div>
-    )
-  }
-
-  if (!dashboard) {
-    return null
-  }
-
   return (
     <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-6 overflow-x-hidden bg-muted p-4 md:gap-8 md:p-6">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center">
-        {dashboard.alert && !dismissedAlert ? (
+        {urgentAlert && !dismissedAlert ? (
           <div className="min-w-0 flex-1">
             <TicketAlertBanner
-              alert={dashboard.alert}
+              alert={urgentAlert}
               onDismiss={() => setDismissedAlert(true)}
               onViewTicket={handleViewTicket}
             />
@@ -110,28 +110,25 @@ export function TicketSection() {
         </Button>
       </div>
 
-      <TicketSummaryCards
-        kpis={dashboard.summaryKpis}
-        isLoading={isOverviewPending}
-      />
+      <TicketSummaryCards kpis={summaryKpis ?? []} isLoading={isSummaryPending} />
 
       <div className="grid min-w-0 gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]">
         <TicketResolutionChart
-          resolutionRate={dashboard.resolutionRate}
-          period={overviewPeriod}
-          onPeriodChange={setOverviewPeriod}
+          resolutionRate={resolutionRate ?? EMPTY_RESOLUTION_RATE}
+          period={resolutionPeriod}
+          onPeriodChange={setResolutionPeriod}
         />
         <TicketByIssueChart
-          ticketsByIssue={dashboard.ticketsByIssue}
-          period={overviewPeriod}
-          onPeriodChange={setOverviewPeriod}
+          ticketsByIssue={ticketsByIssue ?? []}
+          period={byIssuePeriod}
+          onPeriodChange={setByIssuePeriod}
         />
       </div>
 
       <TicketsRaisedChart
-        ticketsRaised={dashboard.ticketsRaised}
-        period={overviewPeriod}
-        onPeriodChange={setOverviewPeriod}
+        ticketsRaised={ticketsRaised ?? []}
+        period={byStatusPeriod}
+        onPeriodChange={setByStatusPeriod}
       />
 
       <section className="min-w-0">
@@ -150,7 +147,7 @@ export function TicketSection() {
       <CreateTicketDialog
         open={createOpen}
         onOpenChange={setCreateOpen}
-        issueCategories={dashboard.issueCategories}
+        issueCategories={DEFAULT_TICKET_ISSUE_CATEGORIES}
       />
 
       <ViewTicketModal

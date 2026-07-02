@@ -4,12 +4,28 @@ import { useQuery } from "@tanstack/react-query"
 
 import { staffQueries } from "@/features/staff/api/queries"
 import { ticketQueries } from "../api/queries"
-import type { TicketDashboardParams, TicketListParams } from "../types"
+import type { TicketListParams, TicketOverviewParams } from "../types"
 
 const STAFF_PAGE_SIZE = 100
 
-export function useTicketDashboard(params: TicketDashboardParams = {}) {
-  return useQuery(ticketQueries.overview(params))
+export function useTicketSummary() {
+  return useQuery(ticketQueries.overviewSummary())
+}
+
+export function useTicketResolutionRate(params: TicketOverviewParams = {}) {
+  return useQuery(ticketQueries.overviewResolutionRate(params))
+}
+
+export function useTicketByIssue(params: TicketOverviewParams = {}) {
+  return useQuery(ticketQueries.overviewByIssue(params))
+}
+
+export function useTicketByStatus(params: TicketOverviewParams = {}) {
+  return useQuery(ticketQueries.overviewByStatus(params))
+}
+
+export function useTicketUrgentAlert() {
+  return useQuery(ticketQueries.overviewUrgentAlert())
 }
 
 export function useTicketList(params: TicketListParams) {

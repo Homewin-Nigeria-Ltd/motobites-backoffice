@@ -2,10 +2,14 @@ export * from "./types"
 export { TicketSection } from "./sections/ticket-section"
 export { TicketsListSection } from "./sections/tickets-list-section"
 export {
-  useTicketDashboard,
+  useTicketByIssue,
+  useTicketByStatus,
   useTicketDetail,
   useTicketList,
+  useTicketResolutionRate,
   useTicketStaffResolvers,
+  useTicketSummary,
+  useTicketUrgentAlert,
 } from "./hooks/use-ticket-queries"
 export { ViewTicketModal } from "./components/view-ticket-modal"
 export { ticketEndpoints } from "./api/endpoints"

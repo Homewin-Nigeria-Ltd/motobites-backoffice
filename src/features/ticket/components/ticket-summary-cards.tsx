@@ -26,6 +26,7 @@ function SummaryCardSkeleton() {
 function SummaryCard({ kpi }: { kpi: TicketSummaryKpi }) {
   const isDanger = kpi.variant === "danger"
   const isUp = kpi.trend === "up"
+  const isFlat = kpi.trend === "flat"
 
   return (
     <div
@@ -60,25 +61,29 @@ function SummaryCard({ kpi }: { kpi: TicketSummaryKpi }) {
             "flex flex-wrap items-center gap-x-1 gap-y-0.5 text-xs font-medium",
             isDanger
               ? "text-white/90"
-              : isUp
-                ? "text-emerald-600"
-                : "text-destructive"
+              : isFlat
+                ? "text-muted-foreground"
+                : isUp
+                  ? "text-emerald-600"
+                  : "text-destructive"
           )}
         >
-          <Image
-            src={
-              isUp
-                ? ASSETS.illustrations.shortUpTrend
-                : ASSETS.illustrations.shortDownTrend
-            }
-            alt=""
-            width={13}
-            height={8}
-            className={cn("shrink-0", isDanger && "brightness-0 invert")}
-            aria-hidden
-          />
+          {isFlat ? null : (
+            <Image
+              src={
+                isUp
+                  ? ASSETS.illustrations.shortUpTrend
+                  : ASSETS.illustrations.shortDownTrend
+              }
+              alt=""
+              width={13}
+              height={8}
+              className={cn("shrink-0", isDanger && "brightness-0 invert")}
+              aria-hidden
+            />
+          )}
           <span>
-            {isUp ? "+" : "-"}
+            {isFlat ? "" : isUp ? "+" : "-"}
             {kpi.changePercent}%
           </span>
           <span

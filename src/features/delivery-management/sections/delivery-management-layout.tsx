@@ -24,7 +24,7 @@ export function DeliveryManagementLayout({
       <div className="border-b border-border/50 bg-background px-4 py-4 md:px-6">
         <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
           <DeliveryFilterTabs counts={counts} />
-          <div className="w-full max-w-xs shrink-0 sm:w-64">
+          <div className="w-full shrink-0 sm:w-72">
             <Input
               type="search"
               icon={{ name: "search", position: "left" }}
