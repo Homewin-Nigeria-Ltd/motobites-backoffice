@@ -176,7 +176,7 @@ export function OrderDetailsModal({
                 variant="secondary"
                 className="h-9 min-w-40 rounded-full border-0 bg-[#E8F4FC] px-4 text-sm font-medium text-[#1E6BB8]"
               >
-                {order.display_status}
+                {formatOrderStatusKey(order.status)}
               </Badge>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
