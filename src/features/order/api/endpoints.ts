@@ -16,4 +16,6 @@ export const orderEndpoints = {
     `/api/proxy/admin/order-management/orders/${orderId}/extend-prep-time`,
   receipt: (orderId: string) =>
     `/api/proxy/admin/order-management/orders/${orderId}/receipt`,
+  broadcastRider: (orderId: string) =>
+    `/api/proxy/kitchen/orders/${orderId}/broadcast-rider`,
 } as const

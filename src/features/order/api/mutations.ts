@@ -17,6 +17,10 @@ export type ExtendPrepTimeInput = {
   orderId: string
 }
 
+export type BroadcastRiderInput = {
+  orderId: string
+}
+
 function getAssignEndpoint(orderId: string, type: OrderAssigneeType) {
   switch (type) {
     case "chef":
@@ -55,5 +59,13 @@ export const orderMutations = {
           {}
         )
         .then((response) => response.data),
+  },
+
+  broadcastRider: {
+    mutationFn: ({ orderId }: BroadcastRiderInput) =>
+      api.post<OrderDetailApiResponse>(
+        orderEndpoints.broadcastRider(orderId),
+        {}
+      ),
   },
 } as const

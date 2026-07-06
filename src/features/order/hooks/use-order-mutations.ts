@@ -92,3 +92,31 @@ export function useExtendPrepTime() {
     isPending: mutation.isPending,
   }
 }
+
+export function useBroadcastRider() {
+  const queryClient = useQueryClient()
+
+  const mutation = useMutation({
+    ...orderMutations.broadcastRider,
+    onSuccess: (response, { orderId }) => {
+      if (response.data) {
+        queryClient.setQueryData(orderKeys.detail(orderId), response.data)
+      }
+
+      queryClient.invalidateQueries({ queryKey: orderKeys.all })
+      toast.success(response.message ?? "Rider broadcast sent successfully")
+    },
+    onError: (error) => {
+      const message =
+        error instanceof ApiError
+          ? error.message
+          : "Failed to broadcast rider. Please try again."
+      toast.error(message)
+    },
+  })
+
+  return {
+    broadcastRider: mutation.mutate,
+    isPending: mutation.isPending,
+  }
+}

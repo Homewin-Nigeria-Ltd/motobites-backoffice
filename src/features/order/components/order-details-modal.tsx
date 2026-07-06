@@ -7,6 +7,7 @@ import { OrderAssigneeDialog } from "@/features/order/components/order-assignee-
 import { OrderAssigneeField } from "@/features/order/components/order-assignee-field"
 import { OrderReceiptModal } from "@/features/order/components/order-receipt-modal"
 import {
+  useBroadcastRider,
   useExtendPrepTime,
   useUpdateOrderStatus,
 } from "@/features/order/hooks/use-order-mutations"
@@ -64,6 +65,7 @@ export function OrderDetailsModal({
   )
   const { updateStatus, isPending: isUpdatingStatus } = useUpdateOrderStatus()
   const { extendPrepTime, isPending: isExtendingPrepTime } = useExtendPrepTime()
+  const { broadcastRider, isPending: isBroadcastingRider } = useBroadcastRider()
   const [assigneeDialogType, setAssigneeDialogType] =
     useState<OrderAssigneeType | null>(null)
   const [receiptOpen, setReceiptOpen] = useState(false)
@@ -241,13 +243,27 @@ export function OrderDetailsModal({
         <div className={detailGrid2}>
           <div className={detailField}>
             <Label className={detailLabel}>Assigned MotoPolit (Rider)</Label>
-            <div className={detailValue}>
+            <div
+              className={cn(
+                detailValue,
+                "flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center"
+              )}
+            >
               <OrderAssigneeField
                 assignee={order.assignments.rider}
                 assignLabel="Assign MotoPilot"
                 changeLabel="Change Assigned Motopolit"
                 onChangeClick={() => setAssigneeDialogType("rider")}
               />
+              <Button
+                type="button"
+                variant="outline"
+                className="h-9 w-fit shrink-0 rounded-lg border-border bg-background px-4 font-normal shadow-none"
+                disabled={isBroadcastingRider}
+                onClick={() => broadcastRider({ orderId })}
+              >
+                {isBroadcastingRider ? "Broadcasting…" : "Broadcast Rider"}
+              </Button>
             </div>
           </div>
           <div className={detailField}>
