@@ -1,6 +1,8 @@
 import type { ApiNotification } from "@/features/notification/types"
+import { ORDER_ID_SEARCH_PARAM } from "@/features/order/utils/order-status"
 
 const ORDER_PAGE = "/order/pending"
+const ORDER_TARGET_PATTERN = /^order_management\/orders\/([^/]+)$/
 
 type NotificationCategoryConfig = {
   label: string
@@ -164,6 +166,31 @@ function isOrderManagementTarget(target: string) {
   )
 }
 
+function getOrderIdFromNotification(
+  metadata?: Record<string, unknown>,
+  target?: string,
+) {
+  const orderId = metadata?.order_id
+  if (typeof orderId === "string" && orderId.trim()) {
+    return orderId.trim()
+  }
+
+  const match = normalizeTarget(target ?? "").match(ORDER_TARGET_PATTERN)
+  return match?.[1] ?? null
+}
+
+function buildOrderPageHref(orderId?: string | null) {
+  if (!orderId) {
+    return ORDER_PAGE
+  }
+
+  return `${ORDER_PAGE}?${ORDER_ID_SEARCH_PARAM}=${encodeURIComponent(orderId)}`
+}
+
+function isReassignmentNotification(metadata?: Record<string, unknown>) {
+  return metadata?.event === "rider_reassignment_requested"
+}
+
 function getMetadataHref(metadata?: Record<string, unknown>) {
   if (!metadata) {
     return null
@@ -269,22 +296,35 @@ export function getNotificationDisplay(
   const config = CATEGORY_CONFIG[categoryKey]
 
   if (config) {
+    const isReassignment = isReassignmentNotification(item.metadata)
     const actionLabel =
-      categoryKey === "order_management" &&
-      item.metadata?.event === "rider_reassignment_requested"
+      categoryKey === "order_management" && isReassignment
         ? item.action.label
         : config.actionLabel
+
+    let href = resolveHref(
+      item.action.target,
+      item.metadata,
+      categoryKey,
+      config.href,
+    )
+
+    if (categoryKey === "order_management") {
+      const orderId = getOrderIdFromNotification(
+        item.metadata,
+        item.action.target,
+      )
+
+      if (orderId) {
+        href = buildOrderPageHref(orderId)
+      }
+    }
 
     return {
       key: categoryKey,
       label: config.label,
       actionLabel,
-      href: resolveHref(
-        item.action.target,
-        item.metadata,
-        categoryKey,
-        config.href,
-      ),
+      href,
       accent: config.accent,
     }
   }

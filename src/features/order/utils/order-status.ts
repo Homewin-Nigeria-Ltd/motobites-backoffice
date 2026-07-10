@@ -2,6 +2,8 @@ import { OrderStatus } from "@/features/order/enums/order-status"
 
 const ORDER_STATUS_VALUES = new Set<string>(Object.values(OrderStatus))
 
+export const ORDER_ID_SEARCH_PARAM = "order"
+
 export function isOrderStatus(value: string): value is OrderStatus {
   return ORDER_STATUS_VALUES.has(value)
 }
