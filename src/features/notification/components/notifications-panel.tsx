@@ -26,8 +26,13 @@ export function NotificationsPanel({
 }: {
   trigger: React.ReactNode
 }) {
+  const [open, setOpen] = React.useState(false)
   const [tab, setTab] = React.useState<NotificationFilter>("all")
   const [page, setPage] = React.useState(1)
+
+  const handleNavigate = React.useCallback(() => {
+    setOpen(false)
+  }, [])
 
   const handleTabChange = React.useCallback((value: NotificationFilter) => {
     setTab(value)
@@ -49,6 +54,8 @@ export function NotificationsPanel({
       title="Notifications"
       panel="standard"
       trigger={trigger}
+      open={open}
+      onOpenChange={setOpen}
       closeLabel="Close notifications"
       toolbar={
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
@@ -95,7 +102,7 @@ export function NotificationsPanel({
             {items.map((item, index) => (
               <React.Fragment key={item.id}>
                 {index > 0 ? <Separator className="my-4 sm:my-6" /> : null}
-                <NotificationCard item={item} />
+                <NotificationCard item={item} onNavigate={handleNavigate} />
               </React.Fragment>
             ))}
 

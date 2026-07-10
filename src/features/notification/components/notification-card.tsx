@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 
 import {
   Avatar,
@@ -10,48 +11,68 @@ import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 import type { ApiNotification } from "@/features/notification/types"
 import {
-  getNotificationActionHref,
+  getNotificationDisplay,
   getNotificationInitials,
 } from "@/features/notification/utils/notification-card"
 
-export function NotificationCard({ item }: { item: ApiNotification }) {
+export function NotificationCard({
+  item,
+  onNavigate,
+}: {
+  item: ApiNotification
+  onNavigate?: () => void
+}) {
+  const router = useRouter()
+  const display = getNotificationDisplay(item)
+
+  const handleActionClick = (
+    event: React.MouseEvent<HTMLAnchorElement>,
+  ) => {
+    event.preventDefault()
+    onNavigate?.()
+    router.push(display.href)
+  }
+
   return (
     <article className="space-y-3">
-      <div className="flex flex-col gap-1.5 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+      <div className="flex items-start justify-between gap-3">
         <Badge
           variant="secondary"
-          className="h-auto w-fit max-w-full truncate px-2.5 py-1 text-xs font-semibold uppercase tracking-wide"
+          className="h-auto max-w-[calc(100%-5rem)] truncate px-2.5 py-1 text-xs font-semibold uppercase tracking-wide"
         >
-          {item.category_label}
+          {display.label}
         </Badge>
-        <time className="text-xs leading-snug text-muted-foreground sm:shrink-0 sm:text-right">
+        <time className="shrink-0 text-xs leading-snug text-muted-foreground">
           {item.formatted_at}
         </time>
       </div>
 
-      <div className="flex min-w-0">
+      <div className="flex min-w-0 gap-3">
         <div
           className={cn(
             "w-1 shrink-0 rounded-full",
-            item.category.includes("order") ? "bg-primary" : "bg-muted-foreground/40"
+            display.accent === "primary"
+              ? "bg-primary"
+              : "bg-muted-foreground/40"
           )}
           aria-hidden
         />
-        <div className="flex min-w-0 flex-1 flex-col gap-3 py-3 pl-3 sm:flex-row sm:items-start sm:gap-3 sm:py-4 sm:pl-4">
+        <div className="flex min-w-0 flex-1 gap-3 py-1">
           <Avatar className="size-10 shrink-0">
             <AvatarFallback className="text-xs font-medium text-muted-foreground">
-              {getNotificationInitials(item.category_label)}
+              {getNotificationInitials(display.label)}
             </AvatarFallback>
           </Avatar>
-          <div className="flex min-w-0 flex-1 flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
-            <p className="min-w-0 flex-1 text-sm leading-relaxed text-muted-foreground wrap-break-word">
+          <div className="flex min-w-0 flex-1 flex-col gap-2">
+            <p className="text-sm leading-relaxed text-muted-foreground wrap-break-word">
               {item.message}
             </p>
             <Link
-              href={getNotificationActionHref(item.action.target)}
-              className="w-fit shrink-0 text-sm font-medium text-primary hover:underline sm:max-w-[11rem] sm:text-right"
+              href={display.href}
+              onClick={handleActionClick}
+              className="w-fit text-sm font-medium text-primary hover:underline"
             >
-              {item.action.label}
+              {display.actionLabel}
             </Link>
           </div>
         </div>
