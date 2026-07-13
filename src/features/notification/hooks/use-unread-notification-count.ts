@@ -2,14 +2,16 @@
 
 import { useQuery } from "@tanstack/react-query"
 
-import { notificationQueries } from "../api/queries"
+import {
+  NOTIFICATIONS_PER_PAGE,
+  notificationQueries,
+} from "../api/queries"
 
 export function useUnreadNotificationCount() {
   return useQuery({
     ...notificationQueries.list({
       filter: "all",
-      page: 1,
-      per_page: 1,
+      per_page: NOTIFICATIONS_PER_PAGE,
     }),
     select: (data) => data.meta.unread_count,
   })

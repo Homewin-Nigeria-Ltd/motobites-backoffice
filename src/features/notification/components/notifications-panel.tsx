@@ -18,10 +18,10 @@ import { NotificationCard } from "@/features/notification/components/notificatio
 import { NotificationFilterTabs } from "@/features/notification/components/notification-filter-tabs"
 import { useMarkAllNotificationsRead } from "@/features/notification/hooks/use-mark-all-notifications-read"
 import { useNotifications } from "@/features/notification/hooks/use-notifications"
+import { NOTIFICATIONS_PER_PAGE } from "@/features/notification/api/queries"
 import type { NotificationFilter } from "@/features/notification/types"
 import { Icons } from "@/components/ui/icons"
 
-const PER_PAGE = 20
 const NOTIFICATION_SETTINGS_PATH = "/settings/notifications"
 
 export function NotificationsPanel({
@@ -57,7 +57,7 @@ export function NotificationsPanel({
   const { data, isPending, isError } = useNotifications({
     filter: tab,
     page,
-    per_page: PER_PAGE,
+    per_page: NOTIFICATIONS_PER_PAGE,
   })
 
   const items = data?.data ?? []
