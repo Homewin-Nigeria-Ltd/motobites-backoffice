@@ -51,10 +51,6 @@ export function buildRiderFormData(
   formData.append("bank_name", values.bankName ?? "")
   formData.append("bank_account_name", values.bankAccountName ?? "")
 
-  if (values.branchId) {
-    formData.append("fulfillment_branch_id", values.branchId)
-  }
-
   if (values.password) {
     formData.append("password", values.password)
   }
