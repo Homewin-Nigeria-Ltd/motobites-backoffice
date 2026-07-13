@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useRouter } from "next/navigation"
 
 import { AppLoader } from "@/components/ui/app-loader"
 import { Button } from "@/components/ui/button"
@@ -15,24 +16,38 @@ import { SlideInModal } from "@/components/ui/slide-in-modal"
 import { PaginationControls } from "@/components/pagination-controls"
 import { NotificationCard } from "@/features/notification/components/notification-card"
 import { NotificationFilterTabs } from "@/features/notification/components/notification-filter-tabs"
+import { useMarkAllNotificationsRead } from "@/features/notification/hooks/use-mark-all-notifications-read"
 import { useNotifications } from "@/features/notification/hooks/use-notifications"
 import type { NotificationFilter } from "@/features/notification/types"
 import { Icons } from "@/components/ui/icons"
 
 const PER_PAGE = 20
+const NOTIFICATION_SETTINGS_PATH = "/settings/notifications"
 
 export function NotificationsPanel({
   trigger,
 }: {
   trigger: React.ReactNode
 }) {
+  const router = useRouter()
   const [open, setOpen] = React.useState(false)
   const [tab, setTab] = React.useState<NotificationFilter>("all")
   const [page, setPage] = React.useState(1)
+  const { markAllAsRead, isPending: isMarkingAllAsRead } =
+    useMarkAllNotificationsRead()
 
   const handleNavigate = React.useCallback(() => {
     setOpen(false)
   }, [])
+
+  const handleOpenNotificationSettings = React.useCallback(() => {
+    setOpen(false)
+    router.push(NOTIFICATION_SETTINGS_PATH)
+  }, [router])
+
+  const handleMarkAllAsRead = React.useCallback(() => {
+    markAllAsRead()
+  }, [markAllAsRead])
 
   const handleTabChange = React.useCallback((value: NotificationFilter) => {
     setTab(value)
@@ -76,8 +91,15 @@ export function NotificationsPanel({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem>Mark all as read</DropdownMenuItem>
-              <DropdownMenuItem>Notification settings</DropdownMenuItem>
+              <DropdownMenuItem
+                disabled={unreadCount === 0 || isMarkingAllAsRead}
+                onClick={handleMarkAllAsRead}
+              >
+                Mark all as read
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleOpenNotificationSettings}>
+                Notification settings
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

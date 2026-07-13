@@ -10,6 +10,7 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 import type { ApiNotification } from "@/features/notification/types"
+import { useMarkNotificationRead } from "@/features/notification/hooks/use-mark-notification-read"
 import {
   getNotificationDisplay,
   getNotificationInitials,
@@ -23,12 +24,18 @@ export function NotificationCard({
   onNavigate?: () => void
 }) {
   const router = useRouter()
+  const { markAsRead } = useMarkNotificationRead()
   const display = getNotificationDisplay(item)
 
   const handleActionClick = (
     event: React.MouseEvent<HTMLAnchorElement>,
   ) => {
     event.preventDefault()
+
+    if (!item.is_read) {
+      markAsRead(item.id)
+    }
+
     onNavigate?.()
     router.push(display.href)
   }

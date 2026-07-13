@@ -5,11 +5,12 @@ import {
   AvatarFallback,
   AvatarImage,
 } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
-import { NotificationsPanel } from "@/features/notification"
+import {
+  NotificationsPanel,
+  NotificationBellTrigger,
+} from "@/features/notification"
 import { Separator } from "@/components/ui/separator"
 import { SidebarTrigger } from "@/components/ui/sidebar"
-import { Icons } from "@/components/ui/icons"
 import type { AuthUser } from "@/features/auth"
 import { getUserInitials } from "@/utils/get-initials"
 
@@ -35,13 +36,7 @@ export function DashboardHeader({ user }: { user: AuthUser }) {
         </div>
       </div>
       <div className="flex shrink-0 items-center gap-1 px-3 sm:gap-2 sm:px-4">
-        <NotificationsPanel
-          trigger={
-            <Button variant="ghost" size="icon" aria-label="Notifications">
-              <Icons.notifications size={24} />
-            </Button>
-          }
-        />
+        <NotificationsPanel trigger={<NotificationBellTrigger iconSize={24} />} />
         <Avatar className="size-9">
           <AvatarImage src={user.profile_photo_url ?? undefined} alt={userName} />
           <AvatarFallback>{userInitials}</AvatarFallback>

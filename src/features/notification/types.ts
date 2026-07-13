@@ -36,3 +36,13 @@ export type NotificationsApiResponse = {
   meta: NotificationsMeta
   message?: string
 }
+
+export type MarkNotificationReadApiResponse = {
+  success: boolean
+  message?: string
+}
+
+export type MarkAllNotificationsReadApiResponse = {
+  success: boolean
+  message?: string
+}

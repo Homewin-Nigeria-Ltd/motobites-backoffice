@@ -14,11 +14,12 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
-import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { NotificationsPanel } from "@/features/notification"
+import {
+  NotificationsPanel,
+  NotificationBellTrigger,
+} from "@/features/notification"
 import { SidebarTrigger } from "@/components/ui/sidebar"
-import { Icons } from "@/components/ui/icons"
 
 const user = {
   name: "Oluwanifemi Osunsanya",
@@ -80,19 +81,7 @@ export function PageHeader({ title, description, breadcrumbs }: PageHeaderProps)
                 className="h-10 w-56 lg:w-64"
               />
             </div>
-            <NotificationsPanel
-              trigger={
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="relative"
-                  aria-label="Notifications"
-                >
-                  <Icons.notifications size={20} />
-                  <span className="absolute top-1.5 right-1.5 size-2 rounded-full bg-primary" />
-                </Button>
-              }
-            />
+            <NotificationsPanel trigger={<NotificationBellTrigger iconSize={20} />} />
             <Avatar className="size-9">
               <AvatarImage src={user.avatar} alt={user.name} />
               <AvatarFallback>OO</AvatarFallback>
