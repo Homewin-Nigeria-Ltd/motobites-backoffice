@@ -194,8 +194,17 @@ function mapApiCustomerToCustomerDetail(
     firstName: customer.first_name || split.firstName,
     lastName: customer.last_name || split.lastName,
     homeAddress: customer.home_address || "—",
+    deliveryAddress: "—",
     avatar: null,
+    joinedAtIso: null,
+    acquisitionSource: null,
     ordersCount: customer.orders_count ?? 0,
+    lifetimeValueKobo: null,
+    lifetimeValueFormatted: "—",
+    lastOrderDate: null,
+    averageOrderValueKobo: null,
+    averageOrderValueFormatted: "—",
+    preferredPaymentMethod: null,
     overdraftBalance,
     overdraftBalanceFormatted:
       customer.overdraft_balance_formatted ??
@@ -211,7 +220,12 @@ function mapApiCustomerToCustomerDetail(
 export function mapApiCustomerDetailToCustomerDetail(
   data: ApiCustomerDetailData
 ): CustomerDetail {
-  const { profile, account = {}, cnpl = {} } = data
+  const { profile, account = {} } = data
+  const cnpl = data.cnpl ?? data.chop_now_pay_later ?? {}
+  const cnplTransactions =
+    data.cnpl_transactions ??
+    data.chop_now_pay_later?.transactions ??
+    []
 
   const base = mapApiCustomerToCustomer({
     id: profile.id,
@@ -221,7 +235,7 @@ export function mapApiCustomerDetailToCustomerDetail(
     email: profile.email,
     phone: profile.phone,
     status: profile.status,
-    joined_at: profile.joined_at,
+    joined_at: profile.joined_at ?? profile.joined_at_iso ?? undefined,
     wallet_balance: account.wallet_balance,
     wallet_balance_formatted: account.wallet_balance_formatted,
     orders_count: account.orders_count,
@@ -238,8 +252,17 @@ export function mapApiCustomerDetailToCustomerDetail(
     firstName: profile.first_name || split.firstName,
     lastName: profile.last_name || split.lastName,
     homeAddress: formatHomeAddresses(profile.home_addresses),
+    deliveryAddress: profile.delivery_address?.trim() || "—",
     avatar: profile.avatar ?? null,
+    joinedAtIso: profile.joined_at_iso ?? null,
+    acquisitionSource: profile.acquisition_source ?? null,
     ordersCount: account.orders_count ?? 0,
+    lifetimeValueKobo: account.lifetime_value_kobo ?? null,
+    lifetimeValueFormatted: account.lifetime_value_formatted ?? "—",
+    lastOrderDate: account.last_order_date ?? null,
+    averageOrderValueKobo: account.average_order_value_kobo ?? null,
+    averageOrderValueFormatted: account.average_order_value_formatted ?? "—",
+    preferredPaymentMethod: account.preferred_payment_method ?? null,
     overdraftBalance,
     overdraftBalanceFormatted:
       cnpl.overdraft_balance_formatted ??
@@ -247,7 +270,7 @@ export function mapApiCustomerDetailToCustomerDetail(
     overdraftEligibility: cnpl.eligibility_limit ?? 0,
     cnplEnabled: cnpl.is_enabled ?? false,
     transactions: (data.recent_orders ?? []).map(mapApiTransaction),
-    cnplTransactions: (data.cnpl_transactions ?? []).map(mapApiCnplTransaction),
+    cnplTransactions: cnplTransactions.map(mapApiCnplTransaction),
     initials: getInitials(fullName),
   }
 }

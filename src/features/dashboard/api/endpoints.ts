@@ -1,5 +1,5 @@
-const analyticsPath = "/admin/analytics"
+const dashboardPath = "/admin/dashboard"
 
 export const dashboardEndpoints = {
-  overview: `/api/proxy${analyticsPath}/overview`,
+  overview: `/api/proxy${dashboardPath}/overview`,
 } as const

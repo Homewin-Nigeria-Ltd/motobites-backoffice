@@ -17,7 +17,7 @@ import {
 import { cn } from "@/lib/utils"
 
 type DashboardDailyTrafficCardProps = {
-  dailyTraffic: DashboardOverviewData["daily_traffic"]
+  dailyTraffic: NonNullable<DashboardOverviewData["daily_traffic"]>
 }
 
 const chartConfig = {

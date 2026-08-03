@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/chart"
 
 type DashboardOrderFrequencyCardProps = {
-  orderFrequency: DashboardOverviewData["order_frequency"]
+  orderFrequency: NonNullable<DashboardOverviewData["order_frequency"]>
 }
 
 const chartConfig = {

@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/chart"
 
 type DashboardSalesRevenueChartProps = {
-  salesRevenue: DashboardOverviewData["sales_revenue"]
+  salesRevenue: NonNullable<DashboardOverviewData["sales_revenue"]>
 }
 
 const chartConfig = {

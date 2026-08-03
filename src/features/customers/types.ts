@@ -56,8 +56,17 @@ export type CustomerDetail = Customer & {
   firstName: string
   lastName: string
   homeAddress: string
+  deliveryAddress: string
   avatar: string | null
+  joinedAtIso: string | null
+  acquisitionSource: string | null
   ordersCount: number
+  lifetimeValueKobo: number | null
+  lifetimeValueFormatted: string
+  lastOrderDate: string | null
+  averageOrderValueKobo: number | null
+  averageOrderValueFormatted: string
+  preferredPaymentMethod: string | null
   overdraftBalance: number
   overdraftBalanceFormatted: string
   overdraftEligibility: number
@@ -179,6 +188,9 @@ export type ApiCustomerProfile = {
   status?: string
   avatar?: string | null
   joined_at?: string
+  joined_at_iso?: string | null
+  delivery_address?: string | null
+  acquisition_source?: string | null
   home_addresses?: Array<string | { address?: string }>
 }
 
@@ -188,19 +200,28 @@ export type ApiCustomerAccount = {
   orders_count?: number
   today_transaction?: number
   today_transaction_formatted?: string
+  lifetime_value_kobo?: number | null
+  lifetime_value_formatted?: string | null
+  last_order_date?: string | null
+  average_order_value_kobo?: number | null
+  average_order_value_formatted?: string | null
+  preferred_payment_method?: string | null
 }
 
 export type ApiCustomerCnpl = {
   overdraft_balance?: number
   overdraft_balance_formatted?: string
   eligibility_limit?: number
+  eligibility_limit_formatted?: string
   is_enabled?: boolean
+  transactions?: ApiCustomerCnplTransaction[]
 }
 
 export type ApiCustomerDetailData = {
   profile: ApiCustomerProfile
   account?: ApiCustomerAccount
   cnpl?: ApiCustomerCnpl
+  chop_now_pay_later?: ApiCustomerCnpl
   cnpl_transactions?: ApiCustomerCnplTransaction[]
   recent_orders?: ApiCustomerTransaction[]
 }

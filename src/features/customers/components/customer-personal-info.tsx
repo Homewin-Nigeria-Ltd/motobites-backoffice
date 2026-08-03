@@ -1,4 +1,5 @@
 import type { CustomerDetail } from "@/features/customers/types"
+import { formatCustomerAcquisitionSource } from "@/features/customers/utils/acquisition-source"
 import {
   Avatar,
   AvatarFallback,
@@ -6,6 +7,7 @@ import {
 } from "@/components/ui/avatar"
 import { Icons } from "@/components/ui/icons"
 import { cn } from "@/lib/utils"
+import { formatDate } from "@/utils/date"
 
 const detailGrid =
   "grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5"
@@ -35,6 +37,18 @@ function DetailField({
   )
 }
 
+function formatJoinedDate(customer: CustomerDetail) {
+  if (customer.joinedAt && customer.joinedAt !== "—") {
+    return customer.joinedAt
+  }
+
+  if (customer.joinedAtIso) {
+    return formatDate(customer.joinedAtIso)
+  }
+
+  return "—"
+}
+
 export function CustomerPersonalInfo({ customer }: CustomerPersonalInfoProps) {
   return (
     <div className="flex flex-col items-start gap-8 py-2 md:gap-10 md:py-4">
@@ -61,10 +75,22 @@ export function CustomerPersonalInfo({ customer }: CustomerPersonalInfoProps) {
           />
         </div>
         <DetailField label="Phone Number" value={customer.phone} />
+        <DetailField label="Date Joined" value={formatJoinedDate(customer)} />
+        <DetailField
+          label="Acquisition Source"
+          value={formatCustomerAcquisitionSource(customer.acquisitionSource)}
+        />
         <div className="min-w-0 sm:col-span-2 xl:col-span-3">
           <DetailField
             label="Home Address"
             value={customer.homeAddress}
+            className="whitespace-pre-line"
+          />
+        </div>
+        <div className="min-w-0 sm:col-span-2 xl:col-span-2">
+          <DetailField
+            label="Delivery Address"
+            value={customer.deliveryAddress}
             className="whitespace-pre-line"
           />
         </div>

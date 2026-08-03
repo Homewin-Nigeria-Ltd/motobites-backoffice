@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { getInitials } from "@/utils/get-initials"
 
 type DashboardTopMotopilotCardProps = {
-  topMotopilots: DashboardOverviewData["top_motopilots"]
+  topMotopilots: NonNullable<DashboardOverviewData["top_motopilots"]>
 }
 
 export function DashboardTopMotopilotCard({
