@@ -16,10 +16,17 @@ import {
   useGooglePlaces,
   type GooglePlaceOption,
 } from "@/hooks/use-google-places"
+import {
+  parseGooglePlaceDetails,
+  type GooglePlaceDetails,
+} from "@/lib/google-place"
+
+export type { GooglePlaceDetails }
 
 export type AddressComboboxProps = {
   value: string
   onChange: (value: string) => void
+  onPlaceSelect?: (details: GooglePlaceDetails) => void
   onBlur?: () => void
   id?: string
   placeholder?: string
@@ -35,6 +42,7 @@ const DEBOUNCE_MS = 300
 export function AddressCombobox({
   value,
   onChange,
+  onPlaceSelect,
   onBlur,
   id,
   placeholder = "Search address",
@@ -110,16 +118,25 @@ export function AddressCombobox({
     const requestId = ++detailsRequestRef.current
 
     placesRef.current?.getDetails(
-      { placeId: option.placeId, fields: ["formatted_address"] },
+      {
+        placeId: option.placeId,
+        fields: ["formatted_address", "geometry", "address_components"],
+      },
       (place) => {
         if (requestId !== detailsRequestRef.current) {
           return
         }
 
-        const address = place?.formatted_address ?? option.label
+        const details = parseGooglePlaceDetails(place, option.label)
+        const address = details?.address ?? place?.formatted_address ?? option.label
+
         setDraft(null)
         onChange(address)
-      }
+
+        if (details) {
+          onPlaceSelect?.(details)
+        }
+      },
     )
   }
 

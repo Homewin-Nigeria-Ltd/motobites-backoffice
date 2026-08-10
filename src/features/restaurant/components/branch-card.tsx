@@ -2,12 +2,14 @@
 
 import type { FulfillmentBranch } from "@/features/restaurant/types"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Icons } from "@/components/ui/icons"
 import { cn } from "@/lib/utils"
 
 type BranchCardProps = {
   branch: FulfillmentBranch
+  onEdit?: (branch: FulfillmentBranch) => void
 }
 
 function StatusBadge({
@@ -32,7 +34,7 @@ function StatusBadge({
   )
 }
 
-export function BranchCard({ branch }: BranchCardProps) {
+export function BranchCard({ branch, onEdit }: BranchCardProps) {
   return (
     <Card className="gap-0 overflow-hidden py-0">
       <CardContent className="flex flex-col gap-4 p-5">
@@ -45,12 +47,25 @@ export function BranchCard({ branch }: BranchCardProps) {
               {branch.key}
             </p>
           </div>
-          <div className="flex shrink-0 flex-wrap justify-end gap-2">
-            <StatusBadge active={branch.isActive} label="Active" />
-            <StatusBadge
-              active={branch.isOpen}
-              label={branch.isOpen ? "Open" : "Closed"}
-            />
+          <div className="flex shrink-0 items-start gap-2">
+            <div className="flex flex-wrap justify-end gap-2">
+              <StatusBadge active={branch.isActive} label="Active" />
+              <StatusBadge
+                active={branch.isOpen}
+                label={branch.isOpen ? "Open" : "Closed"}
+              />
+            </div>
+            {onEdit ? (
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon-sm"
+                className="text-muted-foreground"
+                aria-label={`Edit ${branch.name}`}
+                icon={{ name: "edit", position: "left" }}
+                onClick={() => onEdit(branch)}
+              />
+            ) : null}
           </div>
         </div>
 

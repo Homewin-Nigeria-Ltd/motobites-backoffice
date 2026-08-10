@@ -232,3 +232,53 @@ export function useToggleMenuItemAvailability() {
     pendingBranchKey,
   }
 }
+
+export function useCreateFulfillmentBranch() {
+  const queryClient = useQueryClient()
+
+  const mutation = useMutation({
+    ...restaurantMutations.createFulfillmentBranch,
+    onSuccess: (result) => {
+      if (!result.success) {
+        toast.error(result.error)
+        return
+      }
+
+      queryClient.invalidateQueries({ queryKey: restaurantKeys.branches() })
+      toast.success("Branch created")
+    },
+    onError: () => {
+      toast.error("Failed to create branch. Please try again.")
+    },
+  })
+
+  return {
+    createBranch: mutation.mutateAsync,
+    isPending: mutation.isPending,
+  }
+}
+
+export function useUpdateFulfillmentBranch() {
+  const queryClient = useQueryClient()
+
+  const mutation = useMutation({
+    ...restaurantMutations.updateFulfillmentBranch,
+    onSuccess: (result) => {
+      if (!result.success) {
+        toast.error(result.error)
+        return
+      }
+
+      queryClient.invalidateQueries({ queryKey: restaurantKeys.branches() })
+      toast.success("Branch updated")
+    },
+    onError: () => {
+      toast.error("Failed to update branch. Please try again.")
+    },
+  })
+
+  return {
+    updateBranch: mutation.mutateAsync,
+    isPending: mutation.isPending,
+  }
+}

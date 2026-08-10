@@ -158,6 +158,26 @@ export type ApiFulfillmentBranchesResponse = {
   message?: string
 }
 
+export type ApiFulfillmentBranchResponse = {
+  success: boolean
+  data: ApiFulfillmentBranch
+  message?: string
+}
+
+export type CreateFulfillmentBranchInput = {
+  key: string
+  name: string
+  address: string
+  latitude: number
+  longitude: number
+  is_active: boolean
+  is_open: boolean
+}
+
+export type UpdateFulfillmentBranchInput = {
+  id: string | number
+} & CreateFulfillmentBranchInput
+
 export type FulfillmentBranch = {
   id: string
   key: string

@@ -5,6 +5,9 @@ export const restaurantServerEndpoints = {
   menuItem: (itemId: string | number) => `${menuManagementBase}/items/${itemId}`,
   menuItemAvailability: (itemId: string | number) =>
     `${menuManagementBase}/items/${itemId}/availability`,
+  fulfillmentBranches: "/admin/fulfillment-branches",
+  fulfillmentBranch: (branchId: string | number) =>
+    `/admin/fulfillment-branches/${encodeURIComponent(String(branchId))}`,
 } as const
 
 export const restaurantEndpoints = {
@@ -19,4 +22,6 @@ export const restaurantEndpoints = {
   menuItemAvailability: (itemId: string | number) =>
     `/api/proxy/admin/menu-management/items/${itemId}/availability`,
   fulfillmentBranches: "/api/proxy/admin/fulfillment-branches",
+  fulfillmentBranch: (branchId: string | number) =>
+    `/api/proxy/admin/fulfillment-branches/${encodeURIComponent(String(branchId))}`,
 } as const

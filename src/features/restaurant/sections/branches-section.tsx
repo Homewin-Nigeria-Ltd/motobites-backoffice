@@ -2,13 +2,21 @@
 
 import { useMemo, useState } from "react"
 
+import { AddBranchSheet } from "@/features/restaurant/components/add-branch-sheet"
 import { BranchCard } from "@/features/restaurant/components/branch-card"
+import { EditBranchSheet } from "@/features/restaurant/components/edit-branch-sheet"
 import { useFulfillmentBranches } from "@/features/restaurant/hooks/use-restaurant-queries"
+import type { FulfillmentBranch } from "@/features/restaurant/types"
 import { AppLoader } from "@/components/ui/app-loader"
+import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
 export function BranchesSection() {
   const [search, setSearch] = useState("")
+  const [addOpen, setAddOpen] = useState(false)
+  const [editingBranch, setEditingBranch] = useState<FulfillmentBranch | null>(
+    null,
+  )
   const { data: branches = [], isPending, isError, error } =
     useFulfillmentBranches()
 
@@ -31,15 +39,27 @@ export function BranchesSection() {
   return (
     <div className="flex min-h-0 flex-1 flex-col bg-muted">
       <div className="border-b border-border/50 bg-background px-4 py-4 md:px-6">
-        <div className="max-w-2xl">
-          <Input
-            type="search"
-            icon={{ name: "search", position: "left" }}
-            placeholder="Search branches"
-            className="h-10"
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-          />
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div className="max-w-2xl flex-1">
+            <Input
+              type="search"
+              icon={{ name: "search", position: "left" }}
+              placeholder="Search branches"
+              className="h-10"
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              type="button"
+              className="h-10 px-4"
+              icon={{ name: "add", position: "left" }}
+              onClick={() => setAddOpen(true)}
+            >
+              Add Branch
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -58,12 +78,27 @@ export function BranchesSection() {
           ) : (
             <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
               {filteredBranches.map((branch) => (
-                <BranchCard key={branch.id} branch={branch} />
+                <BranchCard
+                  key={branch.id}
+                  branch={branch}
+                  onEdit={setEditingBranch}
+                />
               ))}
             </div>
           )}
         </div>
       </div>
+
+      <AddBranchSheet open={addOpen} onOpenChange={setAddOpen} />
+      <EditBranchSheet
+        branch={editingBranch}
+        open={editingBranch !== null}
+        onOpenChange={(open) => {
+          if (!open) {
+            setEditingBranch(null)
+          }
+        }}
+      />
     </div>
   )
 }

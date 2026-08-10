@@ -6,8 +6,11 @@ import {
   toggleMenuItemAvailabilityAction,
   updateMenuItemAction,
 } from "../actions/menu-item.actions"
+import { createFulfillmentBranchAction, updateFulfillmentBranchAction } from "../actions/fulfillment-branch.actions"
 import type {
+  CreateFulfillmentBranchInput,
   KitchenMutationResponse,
+  UpdateFulfillmentBranchInput,
 } from "../types"
 import { restaurantEndpoints } from "./endpoints"
 
@@ -66,5 +69,15 @@ export const restaurantMutations = {
   toggleMenuItemAvailability: {
     mutationFn: (input: ToggleMenuItemAvailabilityInput) =>
       toggleMenuItemAvailabilityAction(input),
+  },
+
+  createFulfillmentBranch: {
+    mutationFn: (input: CreateFulfillmentBranchInput) =>
+      createFulfillmentBranchAction(input),
+  },
+
+  updateFulfillmentBranch: {
+    mutationFn: (input: UpdateFulfillmentBranchInput) =>
+      updateFulfillmentBranchAction(input),
   },
 } as const

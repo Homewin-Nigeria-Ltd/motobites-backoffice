@@ -31,6 +31,7 @@ export {
   useUpdateMenuItem,
   useDeleteMenuItem,
   useToggleMenuItemAvailability,
+  useCreateFulfillmentBranch,
 } from "./hooks/use-restaurant-mutations"
 export { MenuCatalogSection } from "./sections/menu-catalog-section"
 export { MenuDetailSection } from "./sections/menu-detail-section"
