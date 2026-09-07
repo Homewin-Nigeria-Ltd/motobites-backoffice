@@ -1,7 +1,18 @@
+import { mealPlaceholderImage } from "./placeholder-image"
+
 export function toImageSrc(url: string | null | undefined): string {
   if (!url || url.trim() === "") {
-    return "/images/placeholder-menu.jpg"
+    return mealPlaceholderImage
   }
 
-  return url.startsWith("http") ? url : `https://${url}`
+  const trimmed = url.trim()
+  if (
+    trimmed.startsWith("http://") ||
+    trimmed.startsWith("https://") ||
+    trimmed.startsWith("/")
+  ) {
+    return trimmed
+  }
+
+  return `https://${trimmed}`
 }

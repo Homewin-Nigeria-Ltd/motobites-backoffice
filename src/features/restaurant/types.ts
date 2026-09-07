@@ -223,6 +223,17 @@ export type ApiMenuKitchen = {
   id: number
   name: string
   image: string | null
+  image_url?: string | null
+  is_active?: boolean
+}
+
+export type ApiMenuItemImage = {
+  id?: number
+  image_path?: string | null
+  image_url?: string | null
+  title?: string | null
+  sort_order?: number
+  created_at?: string
 }
 
 export type ApiMenuItemTags = {
@@ -259,7 +270,12 @@ export type ApiMenuItem = {
   id: number
   name: string
   description: string | null
-  image: string | null
+  image?: string | null
+  image_url?: string | null
+  images?: ApiMenuItemImage[]
+  video_ref?: string | null
+  video_url?: string | null
+  videos?: unknown[]
   price: number
   preparation_time_minutes: number
   tags?: string[] | ApiMenuItemTags | unknown[]

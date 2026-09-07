@@ -5,6 +5,7 @@ import type {
   MenuAvailabilityRow,
   MenuVariation,
 } from "@/features/restaurant/types";
+import { getMenuItemImageUrl } from "@/features/restaurant/utils/menu-item";
 import { normalizeTimeForApi } from "@/lib/time-format";
 
 export type MenuItemFormValues = {
@@ -138,7 +139,7 @@ export function mapApiMenuItemToFormValues(
 }
 
 export function getMenuItemExistingImageUrl(item?: ApiMenuItemDetail | null) {
-  return item?.image ?? null;
+  return getMenuItemImageUrl(item);
 }
 
 export function buildMenuItemFormData(

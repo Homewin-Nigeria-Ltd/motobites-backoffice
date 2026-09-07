@@ -13,6 +13,10 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
+        hostname: "**.myhuaweicloud.com",
+      },
+      {
+        protocol: "https",
         hostname: "motobitesbackend.staging-api.motopayng.com",
       },
     ],
