@@ -9,7 +9,7 @@ Thank you for helping improve the Motobites admin dashboard. This guide covers h
 
 ## Getting started
 
-1. Clone the repository and install dependencies:
+1. Clone the repository and install dependencies as seen:
 
    ```bash
    pnpm install
