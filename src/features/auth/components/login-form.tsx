@@ -21,13 +21,14 @@ import {
 } from "@/components/ui/field"
 import { Icons } from "@/components/ui/icons"
 import { Input } from "@/components/ui/input"
+import { Spinner } from "@/components/ui/spinner"
 import { ASSETS } from "@/constants/assets"
 import { cn } from "@/lib/utils"
 import { useLogin } from "../hooks/use-login"
 import { loginSchema, type LoginInput } from "../schemas/login.schema"
 
 export function LoginForm() {
-  const { login, isPending } = useLogin()
+  const { login, isPending, isRedirecting, isLoading } = useLogin()
   const [showPassword, setShowPassword] = useState(false)
 
   const form = useForm<LoginInput>({
@@ -43,7 +44,26 @@ export function LoginForm() {
   }
 
   return (
-    <Card className="w-full max-w-lg gap-6 px-2 py-2 shadow-soft sm:px-4 sm:py-4">
+    <Card className="relative overflow-hidden w-full max-w-lg gap-6 px-2 py-2 shadow-soft sm:px-4 sm:py-4">
+      {isRedirecting && (
+        <div
+          className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-3 bg-card/85 backdrop-blur-xs p-6 text-center animate-in fade-in duration-200"
+          aria-live="polite"
+          role="status"
+        >
+          <div className="flex size-12 items-center justify-center rounded-full bg-primary/10">
+            <Spinner className="size-6 text-primary" />
+          </div>
+          <div className="space-y-1">
+            <p className="text-base font-semibold text-foreground">
+              Signed in successfully
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Loading your dashboard, please wait…
+            </p>
+          </div>
+        </div>
+      )}
       <CardHeader className="items-center gap-3 px-4 text-center sm:px-6">
         <Image
           src={ASSETS.brand.logo}
@@ -78,6 +98,7 @@ export function LoginForm() {
                     aria-invalid={fieldState.invalid}
                     placeholder="Email"
                     autoComplete="email"
+                    disabled={isLoading}
                     className="h-12 rounded-md px-4 text-base md:text-base"
                   />
                   {fieldState.invalid && (
@@ -105,14 +126,16 @@ export function LoginForm() {
                       aria-invalid={fieldState.invalid}
                       placeholder="••••••••"
                       autoComplete="current-password"
+                      disabled={isLoading}
                       className="h-12 rounded-md px-4 pr-12 text-base md:text-base"
                     />
                     <button
                       type="button"
+                      disabled={isLoading}
                       onClick={() => setShowPassword((visible) => !visible)}
                       className={cn(
                         "absolute top-1/2 right-3 -translate-y-1/2 rounded-sm text-muted-foreground transition-colors",
-                        "hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        "hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
                       )}
                       aria-label={showPassword ? "Hide password" : "Show password"}
                     >
@@ -137,10 +160,22 @@ export function LoginForm() {
           type="submit"
           form="login-form"
           size="lg"
-          className="h-12 w-full text-base font-semibold"
-          disabled={isPending}
+          className="h-12 w-full text-base font-semibold gap-2"
+          disabled={isLoading}
         >
-          {isPending ? "Signing in…" : "Sign in"}
+          {isRedirecting ? (
+            <>
+              <Spinner className="size-4" />
+              Redirecting to dashboard…
+            </>
+          ) : isPending ? (
+            <>
+              <Spinner className="size-4" />
+              Signing in…
+            </>
+          ) : (
+            "Sign in"
+          )}
         </Button>
       </CardFooter>
     </Card>
