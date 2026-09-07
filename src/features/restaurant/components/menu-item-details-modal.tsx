@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import Image from "next/image"
 import { BaseModal } from "@/components/ui/base-modal"
 import { AppLoader } from "@/components/ui/app-loader"
@@ -120,18 +121,55 @@ function MenuItemDetailsContent({
     })
   }
 
+  const images = (
+    Array.isArray(item.images) && item.images.length > 0 ? item.images : []
+  ).filter((img) => Boolean(img?.image_url || img?.image_path))
+
+  const [selectedImgIndex, setSelectedImgIndex] = useState(0)
+  const activeImageUrl =
+    images[selectedImgIndex]?.image_url ||
+    images[selectedImgIndex]?.image_path ||
+    menu.imageUrl
+
   return (
     <div className="flex flex-col gap-4">
       <div className="rounded-2xl border border-border p-4 sm:p-5">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-stretch">
-          <div className="relative mx-auto size-44 shrink-0 overflow-hidden rounded-xl bg-muted sm:mx-0">
-            <Image
-              src={toImageSrc(menu.imageUrl)}
-              alt={menu.name}
-              fill
-              className="object-cover"
-              sizes="176px"
-            />
+          <div className="flex flex-col items-center gap-2 sm:items-start">
+            <div className="relative mx-auto size-44 shrink-0 overflow-hidden rounded-xl bg-muted sm:mx-0">
+              <Image
+                src={toImageSrc(activeImageUrl)}
+                alt={menu.name}
+                fill
+                className="object-cover"
+                sizes="176px"
+              />
+            </div>
+            {images.length > 1 ? (
+              <div className="flex max-w-44 gap-1.5 overflow-x-auto pb-1">
+                {images.map((img, idx) => (
+                  <button
+                    key={img.id ?? idx}
+                    type="button"
+                    onClick={() => setSelectedImgIndex(idx)}
+                    className={cn(
+                      "relative size-10 shrink-0 overflow-hidden rounded-md border-2 transition-all",
+                      selectedImgIndex === idx
+                        ? "border-primary ring-1 ring-primary"
+                        : "border-transparent opacity-70 hover:opacity-100"
+                    )}
+                  >
+                    <Image
+                      src={toImageSrc(img.image_url || img.image_path)}
+                      alt=""
+                      fill
+                      className="object-cover"
+                      sizes="40px"
+                    />
+                  </button>
+                ))}
+              </div>
+            ) : null}
           </div>
 
           <div className="flex min-w-0 flex-1 flex-col">
