@@ -7,6 +7,7 @@ import {
   Sheet,
   SheetClose,
   SheetContent,
+  SheetDescription,
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
@@ -26,6 +27,7 @@ const panelWidth: Record<SlideInPanelSize, string> = {
 
 export type SlideInModalProps = {
   title: string
+  description?: React.ReactNode
   children: React.ReactNode
   trigger?: React.ReactNode
   open?: boolean
@@ -42,6 +44,7 @@ export type SlideInModalProps = {
 
 export function SlideInModal({
   title,
+  description,
   children,
   trigger,
   open: controlledOpen,
@@ -105,9 +108,20 @@ export function SlideInModal({
         )}
       >
         <div className="flex shrink-0 items-center justify-between px-4 pt-5 pb-3 sm:px-6 sm:pt-6 sm:pb-4">
-          <SheetTitle className="text-xl font-semibold tracking-tight text-foreground sm:text-2xl">
-            {title}
-          </SheetTitle>
+          <div className="flex min-w-0 flex-1 flex-col gap-1 pr-4">
+            <SheetTitle className="text-xl font-semibold tracking-tight text-foreground sm:text-2xl">
+              {title}
+            </SheetTitle>
+            {description ? (
+              <SheetDescription className="text-sm text-muted-foreground">
+                {description}
+              </SheetDescription>
+            ) : (
+              <SheetDescription className="sr-only">
+                {title}
+              </SheetDescription>
+            )}
+          </div>
           <SheetClose asChild>
             <Button
               variant="ghost"

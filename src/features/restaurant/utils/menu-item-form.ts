@@ -3,23 +3,34 @@ import type {
   ApiMenuItemDetail,
   ApiMenuItemTags,
   MenuAvailabilityRow,
-  MenuVariation,
 } from "@/features/restaurant/types";
 import { getMenuItemImageUrl } from "@/features/restaurant/utils/menu-item";
 import { normalizeTimeForApi } from "@/lib/time-format";
 
+export type MenuItemModifierFormValue = {
+  id: string;
+  name: string;
+  price: string;
+  type: string;
+  group_name?: string;
+  description?: string;
+  is_required?: boolean;
+};
+
 export type MenuItemFormValues = {
   name: string;
-  description: string;
+  price: string;
   preparationTimeMinutes: string;
   kitchenId: string;
-  variations: MenuVariation[];
+  description: string;
   tags: string[];
   availability: "all-day" | "custom";
   startTime: string;
   endTime: string;
   customSchedule: MenuAvailabilityRow[];
-  image: File | null;
+  images: File[];
+  videos: File[];
+  modifiers: MenuItemModifierFormValue[];
 };
 
 function isApiMenuItemTags(tags: unknown): tags is ApiMenuItemTags {
@@ -49,92 +60,58 @@ function normalizeTags(tags: unknown): string[] {
     .filter(Boolean);
 }
 
-function parseVariationRows(variations: MenuVariation[]): Array<{
-  name: string;
-  price: number;
-  preparation_time_minutes: number;
-}> {
-  return variations
-    .filter((row) => row.optionName.trim())
-    .map((row) => ({
-      name: row.optionName.trim(),
-      price: Number.parseFloat(row.price) || 0,
-      preparation_time_minutes: Number.parseInt(row.duration, 10) || 0,
-    }));
-}
-
-function getPrimaryVariation(variations: MenuVariation[]) {
-  const filled =
-    variations.find(
-      (row) => row.optionName.trim() || row.price.trim() || row.duration.trim(),
-    ) ?? variations[0];
-
-  return {
-    price: Number.parseFloat(filled?.price ?? "") || 0,
-    preparation_time_minutes: Number.parseInt(filled?.duration ?? "", 10) || 0,
-  };
-}
-
 export function createEmptyMenuItemFormValues(
   defaultKitchenId = "",
 ): MenuItemFormValues {
   return {
     name: "",
+    price: "",
     description: "",
-    preparationTimeMinutes: "",
+    preparationTimeMinutes: "20",
     kitchenId: defaultKitchenId,
-    variations: [
-      { id: "1", optionName: "", price: "", duration: "" },
-      { id: "2", optionName: "", price: "", duration: "" },
-    ],
     tags: [],
     availability: "all-day",
-    startTime: "8:00 Am",
-    endTime: "9:00 Pm",
+    startTime: "08:00",
+    endTime: "21:00",
     customSchedule: defaultMenuAvailability.map((row) => ({ ...row })),
-    image: null,
+    images: [],
+    videos: [],
+    modifiers: [],
   };
 }
 
 export function mapApiMenuItemToFormValues(
   item: ApiMenuItemDetail,
 ): MenuItemFormValues {
-  const variations =
-    item.variations?.length && item.variations.length > 0
-      ? item.variations.map((variation, index) => ({
-          id: String(variation.id ?? index + 1),
-          optionName: variation.name ?? variation.option_name ?? "",
-          price: String(variation.price ?? item.price ?? ""),
-          duration: String(
-            variation.preparation_time_minutes ??
-              item.preparation_time_minutes ??
-              "",
-          ),
-        }))
-      : [
-          {
-            id: "1",
-            optionName: item.name,
-            price: String(item.price ?? ""),
-            duration: String(item.preparation_time_minutes ?? ""),
-          },
-        ];
-
   const availabilityType =
     item.availability_type === "custom" ? "custom" : "all-day";
 
+  const modifiers: MenuItemModifierFormValue[] = (item.modifiers ?? []).map(
+    (mod, index) => ({
+      id: mod.id ? String(mod.id) : `mod-${index + 1}`,
+      name: mod.name ?? "",
+      price: String(mod.price ?? ""),
+      type: mod.type ?? "extra",
+      group_name: mod.group_name ?? "Add-ons",
+      description: mod.description ?? "",
+      is_required: Boolean(mod.is_required),
+    }),
+  );
+
   return {
     name: item.name ?? "",
+    price: String(item.price ?? ""),
     description: item.description ?? "",
-    preparationTimeMinutes: String(item.preparation_time_minutes ?? ""),
-    kitchenId: String(item.kitchen.id),
-    variations,
+    preparationTimeMinutes: String(item.preparation_time_minutes ?? "20"),
+    kitchenId: String(item.kitchen?.id ?? ""),
     tags: normalizeTags(item.tags),
     availability: availabilityType,
-    startTime: item.availability_start ?? "8:00 Am",
-    endTime: item.availability_end ?? "9:00 Pm",
+    startTime: item.availability_start ?? "08:00",
+    endTime: item.availability_end ?? "21:00",
     customSchedule: defaultMenuAvailability.map((row) => ({ ...row })),
-    image: null,
+    images: [],
+    videos: [],
+    modifiers,
   };
 }
 
@@ -147,38 +124,80 @@ export function buildMenuItemFormData(
   options: { isUpdate?: boolean } = {},
 ): FormData {
   const formData = new FormData();
-  const variationRows = parseVariationRows(values.variations);
-  const primaryVariation = getPrimaryVariation(values.variations);
+
+  if (options.isUpdate) {
+    formData.append("_method", "PUT");
+  }
 
   formData.append("name", values.name.trim());
-  formData.append("description", values.description.trim());
+  formData.append("price", String(Number.parseFloat(values.price) || 0));
   formData.append("kitchen_id", values.kitchenId);
-  formData.append("price", String(primaryVariation.price));
-  formData.append(
-    "preparation_time_minutes",
-    String(Number.parseInt(values.preparationTimeMinutes, 10) || 0),
-  );
-  formData.append("variations", JSON.stringify(variationRows));
-  formData.append("tags", JSON.stringify(values.tags));
+
+  if (values.description?.trim()) {
+    formData.append("description", values.description.trim());
+  }
+
+  if (values.preparationTimeMinutes) {
+    formData.append(
+      "preparation_time_minutes",
+      String(Number.parseInt(values.preparationTimeMinutes, 10) || 20),
+    );
+  }
+
+  if (values.tags && values.tags.length > 0) {
+    formData.append("tags", JSON.stringify(values.tags));
+  }
+
   formData.append(
     "availability_type",
     values.availability === "all-day" ? "all_day" : "custom",
   );
 
   if (values.availability === "custom") {
-    formData.append(
-      "availability_start",
-      normalizeTimeForApi(values.startTime),
-    );
-    formData.append("availability_end", normalizeTimeForApi(values.endTime));
+    if (values.startTime) {
+      formData.append(
+        "availability_start",
+        normalizeTimeForApi(values.startTime),
+      );
+    }
+    if (values.endTime) {
+      formData.append("availability_end", normalizeTimeForApi(values.endTime));
+    }
   }
 
-  if (options.isUpdate) {
-    formData.append("_method", "PUT");
+  // Modifiers (Add-ons & Options)
+  if (values.modifiers && values.modifiers.length > 0) {
+    const formattedModifiers = values.modifiers
+      .filter((m) => m.name.trim())
+      .map((m, index) => ({
+        name: m.name.trim(),
+        price: Number.parseFloat(m.price) || 0,
+        type: m.type?.trim() || "extra",
+        description: m.description?.trim() || null,
+        group_name: m.group_name?.trim() || "Add-ons",
+        is_required: Boolean(m.is_required),
+        min_select: 0,
+        max_select: 1,
+        sort_order: index,
+        is_active: true,
+      }));
+    formData.append("modifiers", JSON.stringify(formattedModifiers));
+  } else if (options.isUpdate) {
+    formData.append("modifiers", JSON.stringify([]));
   }
 
-  if (values.image) {
-    formData.append("image", values.image);
+  // Images: "for images and viddeos, i waant to use the images field(not image) and videos not video."
+  if (values.images && values.images.length > 0) {
+    values.images.forEach((file) => {
+      formData.append("images[]", file);
+    });
+  }
+
+  // Videos: "and videos not video."
+  if (values.videos && values.videos.length > 0) {
+    values.videos.forEach((file) => {
+      formData.append("videos[]", file);
+    });
   }
 
   return formData;

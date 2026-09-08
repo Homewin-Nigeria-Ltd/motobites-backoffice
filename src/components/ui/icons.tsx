@@ -76,6 +76,7 @@ import {
   UserCog,
   UserPlus,
   Users,
+  Video,
   X,
   type LucideIcon,
   type LucideProps,
@@ -176,6 +177,7 @@ export const Icons = {
   dragIndicator: fromLucide(GripVertical),
   x: fromLucide(AtSign),
   youtube: fromLucide(Play),
+  video: fromLucide(Video),
 } as const
 
 export type IconName = keyof typeof Icons
