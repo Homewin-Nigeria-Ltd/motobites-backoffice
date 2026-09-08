@@ -32,6 +32,19 @@ export const navMain: NavItem[] = [
     permission: PERMISSION_KEYS.orderManagement,
   },
   {
+    title: "POS",
+    url: "/offline-order",
+    icon: "store",
+    permission: PERMISSION_KEYS.salesDashboard,
+    items: [
+      { title: "Overview", url: "/offline-order" },
+      { title: "New Order", url: "/offline-order/new" },
+      { title: "All Orders", url: "/offline-order/all" },
+      { title: "Saved Orders", url: "/offline-order/saved" },
+      // { title: "Delete Request", url: "/offline-order/delete-request" },
+    ],
+  },
+  {
     title: "Kitchen",
     url: "/kitchen",
     icon: "kitchen",

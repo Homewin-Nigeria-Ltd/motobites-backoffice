@@ -21,6 +21,31 @@ import { Icon, Icons } from "@/components/ui/icons"
 import type { NavItem } from "@/config/sidebar"
 
 function isNavSubItemActive(pathname: string, subUrl: string) {
+  if (subUrl === "/offline-order") {
+    return pathname === "/offline-order"
+  }
+
+  if (subUrl === "/offline-order/new") {
+    return (
+      pathname === "/offline-order/new" ||
+      pathname.startsWith("/offline-order/review") ||
+      pathname.startsWith("/offline-order/payment") ||
+      pathname.startsWith("/offline-order/success")
+    )
+  }
+
+  if (subUrl === "/offline-order/all") {
+    return pathname.startsWith("/offline-order/all")
+  }
+
+  if (subUrl === "/offline-order/saved") {
+    return pathname.startsWith("/offline-order/saved")
+  }
+
+  if (subUrl === "/offline-order/delete-request") {
+    return pathname.startsWith("/offline-order/delete-request")
+  }
+
   if (pathname === subUrl) {
     return true
   }

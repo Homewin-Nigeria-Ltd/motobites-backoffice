@@ -103,36 +103,40 @@ export type RestaurantFormValues = {
   image: File | null
 }
 
-export type ApiKitchen = {
-  id: number
-  name: string
-  image: string | null
-  is_open: boolean
-}
-
 export type ApiKitchenOpeningHour = {
   day: string
   start_time: string
   end_time: string
 }
 
-export type ApiKitchenDetail = {
+export type ApiKitchenOpeningHoursStorage = Record<
+  string,
+  {
+    open: string
+    close: string
+  }
+>
+
+export type ApiKitchen = {
   id: number
+  kitchen_type_id: number | null
   name: string
   description: string | null
   tags: string[]
   image: string | null
-  is_open: boolean
-  meal_count: number
-  meal_count_label: string
+  video_ref?: string | null
+  videoRef?: string | null
+  video_url?: string | null
+  video_status?: string | null
   opening_hours: ApiKitchenOpeningHour[]
-  opening_hours_storage?: Record<
-    string,
-    {
-      open: string
-      close: string
-    }
-  >
+  opening_hours_storage?: ApiKitchenOpeningHoursStorage
+  is_open: boolean
+  is_active: boolean
+}
+
+export type ApiKitchenDetail = ApiKitchen & {
+  meal_count?: number
+  meal_count_label?: string
 }
 
 export type ApiKitchensResponse = {

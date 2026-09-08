@@ -5,6 +5,7 @@ import { getUser } from "@/lib/get-user"
 
 export const PERMISSION_KEYS = {
   orderManagement: "order_management",
+  salesDashboard: "sales_dashboard",
   kitchenWorkflow: "kitchen_workflow",
   revenueAnalytics: "revenue_analytics",
   inventoryTracking: "inventory_tracking",
@@ -24,6 +25,7 @@ export type PermissionKey =
 
 export type Permissions = {
   canAccessOrderManagement: boolean
+  canAccessSalesDashboard: boolean
   canAccessKitchenWorkflow: boolean
   canAccessRevenueAnalytics: boolean
   canAccessInventoryTracking: boolean
@@ -53,6 +55,10 @@ function buildPermissions(user: AuthUser): Permissions {
     canAccessOrderManagement: userHasPermission(
       user,
       PERMISSION_KEYS.orderManagement,
+    ),
+    canAccessSalesDashboard: userHasPermission(
+      user,
+      PERMISSION_KEYS.salesDashboard,
     ),
     canAccessKitchenWorkflow: userHasPermission(
       user,
@@ -104,6 +110,7 @@ export const getPermissions = cache(async (): Promise<Permissions> => {
 
 const permissionFlagByKey: Record<PermissionKey, keyof Permissions> = {
   [PERMISSION_KEYS.orderManagement]: "canAccessOrderManagement",
+  [PERMISSION_KEYS.salesDashboard]: "canAccessSalesDashboard",
   [PERMISSION_KEYS.kitchenWorkflow]: "canAccessKitchenWorkflow",
   [PERMISSION_KEYS.revenueAnalytics]: "canAccessRevenueAnalytics",
   [PERMISSION_KEYS.inventoryTracking]: "canAccessInventoryTracking",
