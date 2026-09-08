@@ -2,7 +2,7 @@
 
 import { useCallback, useState, useSyncExternalStore } from "react"
 
-type SetLocalStorageValue<T> = (value: T | ((previous: T) => T)) => void
+type SetSessionStorageValue<T> = (value: T | ((previous: T) => T)) => void
 
 type SnapshotCacheEntry = {
   raw: string | null
@@ -11,13 +11,13 @@ type SnapshotCacheEntry = {
 
 const snapshotCache = new Map<string, SnapshotCacheEntry>()
 
-function readLocalStorageValue<T>(key: string, initialValue: T): T {
+function readSessionStorageValue<T>(key: string, initialValue: T): T {
   if (typeof window === "undefined") {
     return initialValue
   }
 
   try {
-    const raw = window.localStorage.getItem(key)
+    const raw = window.sessionStorage.getItem(key)
     const cached = snapshotCache.get(key)
 
     if (cached && cached.raw === raw) {
@@ -37,25 +37,29 @@ function readLocalStorageValue<T>(key: string, initialValue: T): T {
   }
 }
 
-function writeLocalStorageValue<T>(key: string, value: T) {
+function writeSessionStorageValue<T>(key: string, value: T) {
   if (typeof window === "undefined") {
     return
   }
 
   try {
     const raw = JSON.stringify(value)
-    window.localStorage.setItem(key, raw)
+    window.sessionStorage.setItem(key, raw)
     snapshotCache.set(key, { raw, value })
   } catch {
     // Ignore quota errors and private browsing restrictions.
   }
 }
 
-function dispatchLocalStorageChange(key: string) {
-  window.dispatchEvent(new Event(`local-storage:${key}`))
+export function dispatchSessionStorageChange(key: string) {
+  if (typeof window === "undefined") {
+    return
+  }
+
+  window.dispatchEvent(new Event(`session-storage:${key}`))
 }
 
-function subscribeToLocalStorage(key: string, onStoreChange: () => void) {
+function subscribeToSessionStorage(key: string, onStoreChange: () => void) {
   const handleStorage = (event: StorageEvent) => {
     if (event.key === key || event.key === null) {
       snapshotCache.delete(key)
@@ -63,33 +67,33 @@ function subscribeToLocalStorage(key: string, onStoreChange: () => void) {
     }
   }
 
-  const handleLocalChange = () => {
+  const handleSessionChange = () => {
     snapshotCache.delete(key)
     onStoreChange()
   }
 
   window.addEventListener("storage", handleStorage)
-  window.addEventListener(`local-storage:${key}`, handleLocalChange)
+  window.addEventListener(`session-storage:${key}`, handleSessionChange)
 
   return () => {
     window.removeEventListener("storage", handleStorage)
-    window.removeEventListener(`local-storage:${key}`, handleLocalChange)
+    window.removeEventListener(`session-storage:${key}`, handleSessionChange)
   }
 }
 
-export function useLocalStorage<T>(
+export function useSessionStorage<T>(
   key: string,
   initialValue: T,
-): [T, SetLocalStorageValue<T>] {
+): [T, SetSessionStorageValue<T>] {
   const [initial] = useState(initialValue)
 
   const subscribe = useCallback(
-    (onStoreChange: () => void) => subscribeToLocalStorage(key, onStoreChange),
+    (onStoreChange: () => void) => subscribeToSessionStorage(key, onStoreChange),
     [key],
   )
 
   const getSnapshot = useCallback(
-    () => readLocalStorageValue(key, initial),
+    () => readSessionStorageValue(key, initial),
     [initial, key],
   )
 
@@ -97,16 +101,16 @@ export function useLocalStorage<T>(
 
   const value = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot)
 
-  const setValue = useCallback<SetLocalStorageValue<T>>(
+  const setValue = useCallback<SetSessionStorageValue<T>>(
     (next) => {
-      const current = readLocalStorageValue(key, initial)
+      const current = readSessionStorageValue(key, initial)
       const resolved =
         typeof next === "function"
           ? (next as (previous: T) => T)(current)
           : next
 
-      writeLocalStorageValue(key, resolved)
-      dispatchLocalStorageChange(key)
+      writeSessionStorageValue(key, resolved)
+      dispatchSessionStorageChange(key)
     },
     [initial, key],
   )

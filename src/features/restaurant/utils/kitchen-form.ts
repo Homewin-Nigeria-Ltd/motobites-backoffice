@@ -1,5 +1,6 @@
 import { defaultOpeningHours } from "../data/form-defaults"
 import type {
+  ApiKitchen,
   ApiKitchenDetail,
   ApiKitchenOpeningHour,
   KitchenOpeningHoursPayload,
@@ -102,7 +103,7 @@ export function apiOpeningHoursToFormRows(
   }))
 }
 
-export function mapKitchenDetailToRestaurant(kitchen: ApiKitchenDetail): Restaurant {
+export function mapKitchenToRestaurant(kitchen: ApiKitchen): Restaurant {
   return {
     id: String(kitchen.id),
     name: kitchen.name ?? "",
@@ -114,6 +115,10 @@ export function mapKitchenDetailToRestaurant(kitchen: ApiKitchenDetail): Restaur
     menus: [],
     isOpen: kitchen.is_open,
   }
+}
+
+export function mapKitchenDetailToRestaurant(kitchen: ApiKitchenDetail): Restaurant {
+  return mapKitchenToRestaurant(kitchen)
 }
 
 export function restaurantToFormValues(restaurant: Restaurant): RestaurantFormValues {

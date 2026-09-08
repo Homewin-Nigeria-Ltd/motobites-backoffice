@@ -2,7 +2,6 @@ import { queryOptions } from "@tanstack/react-query"
 
 import type {
   ApiFulfillmentBranchesResponse,
-  ApiKitchen,
   ApiKitchenDetailResponse,
   ApiKitchensResponse,
   ApiMenuGroupedResponse,
@@ -10,27 +9,12 @@ import type {
   ApiMenuItemsListResponse,
   FulfillmentBranch,
   Hub,
-  Restaurant,
 } from "../types"
 import { mapApiFulfillmentBranch } from "../utils/fulfillment-branch"
-import { mapKitchenDetailToRestaurant } from "../utils/kitchen-form"
+import { mapKitchenDetailToRestaurant, mapKitchenToRestaurant } from "../utils/kitchen-form"
 import { api } from "@/lib/api/client"
 import { restaurantEndpoints } from "./endpoints"
 import { restaurantKeys } from "./keys"
-
-function mapKitchenToRestaurant(kitchen: ApiKitchen): Restaurant {
-  return {
-    id: String(kitchen.id),
-    name: kitchen.name,
-    description: "",
-    imageUrl: kitchen.image ?? "",
-    tags: [],
-    openingHours: [],
-    hubId: String(kitchen.id),
-    menus: [],
-    isOpen: kitchen.is_open,
-  }
-}
 
 async function fetchKitchens() {
   const response = await api.get<ApiKitchensResponse>(restaurantEndpoints.kitchens)

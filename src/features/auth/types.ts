@@ -12,6 +12,12 @@ export type AuthUserPermissionsSummary = {
   grant_label: string
 }
 
+export type AuthUserAdminRole = {
+  id: number
+  slug: string
+  name: string
+}
+
 export type AuthUser = {
   id: number
   name: string
@@ -20,7 +26,7 @@ export type AuthUser = {
   role: string
   status: string
   profile_photo_url: string | null
-  admin_role?: string | null
+  admin_role?: AuthUserAdminRole | string | null
   permissions?: AuthUserPermission[]
   permission_keys?: string[]
   permissions_summary?: AuthUserPermissionsSummary
