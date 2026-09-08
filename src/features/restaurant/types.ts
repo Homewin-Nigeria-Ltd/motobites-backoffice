@@ -266,6 +266,31 @@ export type ApiMenuItemBranchAvailability = {
   unavailable_until: string | null
 }
 
+export type MenuItemModifier = {
+  id?: number | string
+  menu_item_id?: number
+  name: string
+  description?: string | null
+  type?: 'protein' | 'drink' | 'extra' | string
+  price: number
+  group_name?: string | null
+  is_required?: boolean
+  min_select?: number
+  max_select?: number
+  sort_order?: number
+  is_active?: boolean
+}
+
+export type MenuItemVideo = {
+  id?: number
+  video_ref?: string | null
+  title?: string | null
+  video_url?: string | null
+  video_status?: 'PROCESSING' | 'READY' | 'FAILED' | string | null
+  failure_reason?: string | null
+  created_at?: string
+}
+
 export type ApiMenuItem = {
   id: number
   name: string
@@ -275,7 +300,8 @@ export type ApiMenuItem = {
   images?: ApiMenuItemImage[]
   video_ref?: string | null
   video_url?: string | null
-  videos?: unknown[]
+  videos?: MenuItemVideo[]
+  modifiers?: MenuItemModifier[]
   price: number
   preparation_time_minutes: number
   tags?: string[] | ApiMenuItemTags | unknown[]

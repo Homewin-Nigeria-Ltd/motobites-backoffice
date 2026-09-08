@@ -141,6 +141,62 @@ export function useDeleteMenuItem() {
   }
 }
 
+export function useDeleteMenuItemImage() {
+  const queryClient = useQueryClient()
+
+  const mutation = useMutation({
+    ...restaurantMutations.deleteMenuItemImage,
+    onSuccess: (result, variables) => {
+      if (!result.success) {
+        toast.error(result.error)
+        return
+      }
+
+      queryClient.invalidateQueries({
+        queryKey: restaurantKeys.menuItemDetail(String(variables.itemId)),
+      })
+      queryClient.invalidateQueries({ queryKey: restaurantKeys.menuItems })
+      toast.success("Image removed")
+    },
+    onError: () => {
+      toast.error("Failed to delete image. Please try again.")
+    },
+  })
+
+  return {
+    deleteMenuItemImage: mutation.mutateAsync,
+    isPending: mutation.isPending,
+  }
+}
+
+export function useDeleteMenuItemVideo() {
+  const queryClient = useQueryClient()
+
+  const mutation = useMutation({
+    ...restaurantMutations.deleteMenuItemVideo,
+    onSuccess: (result, variables) => {
+      if (!result.success) {
+        toast.error(result.error)
+        return
+      }
+
+      queryClient.invalidateQueries({
+        queryKey: restaurantKeys.menuItemDetail(String(variables.itemId)),
+      })
+      queryClient.invalidateQueries({ queryKey: restaurantKeys.menuItems })
+      toast.success("Video removed")
+    },
+    onError: () => {
+      toast.error("Failed to delete video. Please try again.")
+    },
+  })
+
+  return {
+    deleteMenuItemVideo: mutation.mutateAsync,
+    isPending: mutation.isPending,
+  }
+}
+
 export function useToggleMenuItemAvailability() {
   const queryClient = useQueryClient()
 
