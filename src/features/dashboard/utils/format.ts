@@ -34,3 +34,9 @@ export function formatCompactCurrency(amount: number) {
 
   return formatDashboardCurrency(amount)
 }
+
+export function formatDashboardKobo(kobo: number | null | undefined): string {
+  if (typeof kobo !== "number" || isNaN(kobo)) return "₦0"
+  return formatDashboardCurrency(kobo / 100)
+}
+
