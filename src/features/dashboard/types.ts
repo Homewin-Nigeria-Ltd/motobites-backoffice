@@ -214,3 +214,78 @@ export type DashboardOverviewResponse = {
   data: DashboardOverviewData
   message?: string
 }
+
+export type OperationalBestSellingProduct = {
+  rank: number
+  product: string
+  menu_item_id: number
+  unit_price: number
+  unit_price_kobo: number
+  units: number
+  sales_kobo: number
+  sales: number
+}
+
+export type ProductCategoryPerformance = {
+  category: string
+  units: number
+  sales_kobo: number
+  sales: number
+  aov_kobo: number
+  contribution_percent: number
+  growth_percent: number
+}
+
+export type PaymentPerformanceStatus = {
+  count: number
+  amount_kobo: number
+}
+
+export type PaymentPerformanceMethod = {
+  method: string
+  successful: PaymentPerformanceStatus
+  failed: PaymentPerformanceStatus
+  pending: PaymentPerformanceStatus
+  refunded: PaymentPerformanceStatus
+}
+
+export type DiscountsPromotionsRefunds = {
+  discounted_or_promotional_orders: number
+  discounted_or_promotional_sales_kobo: number
+  discount_given_kobo: number
+  refund_count: number
+  refund_amount_kobo: number
+}
+
+export type OrderChannelReportItem = {
+  channel?: string
+  name?: string
+  units?: number
+  orders_count?: number
+  sales_kobo?: number
+  sales?: number
+  percentage?: number
+  [key: string]: unknown
+}
+
+export type OperationalReportsData = {
+  period: {
+    key: string
+    from: string
+    to: string
+  }
+  scope?: string
+  best_selling_products: OperationalBestSellingProduct[]
+  product_category_performance: ProductCategoryPerformance[]
+  order_channel_report?: OrderChannelReportItem[]
+  discounts_promotions_refunds: DiscountsPromotionsRefunds
+  payment_performance: PaymentPerformanceMethod[]
+  sales_kobo?: number
+  sales_growth_percent?: number
+}
+
+export type OperationalReportsResponse = {
+  success: boolean
+  data: OperationalReportsData
+  message?: string
+}
