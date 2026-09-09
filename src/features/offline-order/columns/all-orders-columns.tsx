@@ -7,6 +7,7 @@ import type { ApiSalesDashboardOrder } from "@/features/offline-order/types"
 import { formatOfflineOrderAmount } from "@/features/offline-order/utils/order-totals"
 import {
   getSalesDashboardOrderAssignedTo,
+  getSalesDashboardOrderDateLabel,
   getSalesDashboardOrderItemCount,
   getSalesDashboardOrderReference,
   getSalesDashboardOrderStatusLabel,
@@ -82,12 +83,25 @@ export const allOrdersColumns: ColumnDef<ApiSalesDashboardOrder>[] = [
     ),
   },
   {
-    id: "time",
-    header: () => <span className="block text-right">Time</span>,
-    cell: ({ row }) => (
-      <span className="block text-right text-muted-foreground">
-        {getSalesDashboardOrderTimeLabel(row.original)}
-      </span>
-    ),
+    id: "orderDate",
+    header: () => <span className="block text-right">Order Date</span>,
+    cell: ({ row }) => {
+      const order = row.original
+      const dateLabel = getSalesDashboardOrderDateLabel(order)
+      const timeAgo = order.time_ago?.trim()
+      const primaryLabel =
+        dateLabel ?? timeAgo ?? getSalesDashboardOrderTimeLabel(order)
+
+      return (
+        <div className="block text-right">
+          <span className="text-foreground">{primaryLabel}</span>
+          {dateLabel && timeAgo ? (
+            <span className="mt-0.5 block text-xs text-muted-foreground">
+              {timeAgo}
+            </span>
+          ) : null}
+        </div>
+      )
+    },
   },
 ]

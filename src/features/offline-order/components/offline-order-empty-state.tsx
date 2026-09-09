@@ -8,6 +8,7 @@ type OfflineOrderEmptyStateProps = {
   message: string
   backHref?: string
   backLabel?: string
+  showBackButton?: boolean
   secondaryAction?: {
     label: string
     onClick: () => void
@@ -18,6 +19,7 @@ export function OfflineOrderEmptyState({
   message,
   backHref = "/offline-order/new",
   backLabel = "Back to Menu",
+  showBackButton = true,
   secondaryAction,
 }: OfflineOrderEmptyStateProps) {
   return (
@@ -26,9 +28,11 @@ export function OfflineOrderEmptyState({
         <div className="max-w-md rounded-2xl border border-border bg-background p-8 text-center">
           <p className="text-sm text-muted-foreground">{message}</p>
           <div className="mt-4 flex flex-col gap-2">
-            <Button asChild>
-              <Link href={backHref}>{backLabel}</Link>
-            </Button>
+            {showBackButton ? (
+              <Button asChild>
+                <Link href={backHref}>{backLabel}</Link>
+              </Button>
+            ) : null}
             {secondaryAction ? (
               <Button
                 type="button"

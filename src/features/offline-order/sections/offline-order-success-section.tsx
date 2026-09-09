@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 
 import { Button } from "@/components/ui/button"
 import { Icons } from "@/components/ui/icons"
+import { OfflineOrderBackButton } from "@/features/offline-order/components/offline-order-back-button"
 import { OfflineOrderPosReceipt } from "@/features/offline-order/components/offline-order-pos-receipt"
 import { useOfflineOrderReceipt } from "@/features/offline-order/hooks/use-offline-order-storage"
 
@@ -14,14 +15,18 @@ export function OfflineOrderSuccessSection() {
 
   if (!receipt) {
     return (
-      <div className="flex min-h-0 flex-1 flex-col items-center justify-center bg-muted px-4 py-12">
-        <div className="max-w-md rounded-2xl border border-border bg-background p-8 text-center">
-          <p className="text-sm text-muted-foreground">
-            No recent offline order found.
-          </p>
-          <Button asChild className="mt-4">
-            <Link href="/offline-order/new">Start New Order</Link>
-          </Button>
+      <div className="flex min-h-0 flex-1 flex-col bg-muted">
+        <OfflineOrderBackButton href="/offline-order" label="Back to Overview" />
+
+        <div className="flex flex-1 items-center justify-center px-4 py-12">
+          <div className="max-w-md rounded-2xl border border-border bg-background p-8 text-center">
+            <p className="text-sm text-muted-foreground">
+              No recent offline order found.
+            </p>
+            <Button asChild className="mt-4">
+              <Link href="/offline-order/new">Start New Order</Link>
+            </Button>
+          </div>
         </div>
       </div>
     )
@@ -38,8 +43,10 @@ export function OfflineOrderSuccessSection() {
 
   return (
     <>
-      <div className="no-print flex min-h-0 flex-1 flex-col bg-muted px-4 py-8 md:px-6">
-        <div className="mx-auto flex w-full max-w-2xl flex-col items-center">
+      <div className="no-print flex min-h-0 flex-1 flex-col bg-muted">
+        <OfflineOrderBackButton href="/offline-order" label="Back to Overview" />
+
+        <div className="mx-auto flex w-full max-w-2xl flex-col items-center px-4 py-8 md:px-6">
           <div className="flex size-16 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
             <Icons.check size={32} />
           </div>

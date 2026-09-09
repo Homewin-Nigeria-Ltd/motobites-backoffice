@@ -183,6 +183,10 @@ export type ApiSalesDashboardOrder = {
   completed_at?: string
   saved_at?: string
   time_saved?: string
+  ordered_at?: string
+  order_date?: string
+  order_time?: string
+  time_ago?: string
   kitchen?: {
     id: number
     name: string
