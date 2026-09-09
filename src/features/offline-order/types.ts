@@ -422,10 +422,18 @@ export type OfflineOrderOrderSource =
   | "chowdeck"
   | "staff_credit"
 
+export type CreateOfflineOrderAddonPayload = {
+  id: number
+  quantity: number
+}
+
 export type CreateOfflineOrderItemPayload = {
   menu_item_id: number
   quantity: number
-  modifier_ids?: number[]
+  addons?: CreateOfflineOrderAddonPayload[]
+  add_ons?: CreateOfflineOrderAddonPayload[]
+  add_on_ids?: number[]
+  modifiers?: Record<string, unknown>[]
 }
 
 export type CreateOfflineOrderPayload = {
