@@ -1,8 +1,15 @@
 "use client"
 
-import { useCallback, useSyncExternalStore } from "react"
+import { useCallback, useState, useSyncExternalStore } from "react"
 
 type SetLocalStorageValue<T> = (value: T | ((previous: T) => T)) => void
+
+type SnapshotCacheEntry = {
+  raw: string | null
+  value: unknown
+}
+
+const snapshotCache = new Map<string, SnapshotCacheEntry>()
 
 function readLocalStorageValue<T>(key: string, initialValue: T): T {
   if (typeof window === "undefined") {
@@ -10,13 +17,21 @@ function readLocalStorageValue<T>(key: string, initialValue: T): T {
   }
 
   try {
-    const item = window.localStorage.getItem(key)
+    const raw = window.localStorage.getItem(key)
+    const cached = snapshotCache.get(key)
 
-    if (item === null) {
+    if (cached && cached.raw === raw) {
+      return cached.value as T
+    }
+
+    if (raw === null) {
+      snapshotCache.set(key, { raw: null, value: initialValue })
       return initialValue
     }
 
-    return JSON.parse(item) as T
+    const value = JSON.parse(raw) as T
+    snapshotCache.set(key, { raw, value })
+    return value
   } catch {
     return initialValue
   }
@@ -28,7 +43,9 @@ function writeLocalStorageValue<T>(key: string, value: T) {
   }
 
   try {
-    window.localStorage.setItem(key, JSON.stringify(value))
+    const raw = JSON.stringify(value)
+    window.localStorage.setItem(key, raw)
+    snapshotCache.set(key, { raw, value })
   } catch {
     // Ignore quota errors and private browsing restrictions.
   }
@@ -41,11 +58,13 @@ function dispatchLocalStorageChange(key: string) {
 function subscribeToLocalStorage(key: string, onStoreChange: () => void) {
   const handleStorage = (event: StorageEvent) => {
     if (event.key === key || event.key === null) {
+      snapshotCache.delete(key)
       onStoreChange()
     }
   }
 
   const handleLocalChange = () => {
+    snapshotCache.delete(key)
     onStoreChange()
   }
 
@@ -60,25 +79,27 @@ function subscribeToLocalStorage(key: string, onStoreChange: () => void) {
 
 export function useLocalStorage<T>(
   key: string,
-  initialValue: T
+  initialValue: T,
 ): [T, SetLocalStorageValue<T>] {
+  const [initial] = useState(initialValue)
+
   const subscribe = useCallback(
     (onStoreChange: () => void) => subscribeToLocalStorage(key, onStoreChange),
-    [key]
+    [key],
   )
 
   const getSnapshot = useCallback(
-    () => readLocalStorageValue(key, initialValue),
-    [initialValue, key]
+    () => readLocalStorageValue(key, initial),
+    [initial, key],
   )
 
-  const getServerSnapshot = useCallback(() => initialValue, [initialValue])
+  const getServerSnapshot = useCallback(() => initial, [initial])
 
   const value = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot)
 
   const setValue = useCallback<SetLocalStorageValue<T>>(
     (next) => {
-      const current = readLocalStorageValue(key, initialValue)
+      const current = readLocalStorageValue(key, initial)
       const resolved =
         typeof next === "function"
           ? (next as (previous: T) => T)(current)
@@ -87,7 +108,7 @@ export function useLocalStorage<T>(
       writeLocalStorageValue(key, resolved)
       dispatchLocalStorageChange(key)
     },
-    [initialValue, key]
+    [initial, key],
   )
 
   return [value, setValue]

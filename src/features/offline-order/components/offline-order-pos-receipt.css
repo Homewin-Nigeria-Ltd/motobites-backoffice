@@ -1,0 +1,99 @@
+.receipt-detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+  width: 100%;
+  margin-bottom: 4px;
+}
+
+.detail-label {
+  flex: 0 0 auto;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.detail-value {
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 62%;
+  text-align: right;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+}
+
+.detail-value-nowrap {
+  white-space: nowrap;
+}
+
+.receipt-item-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+  width: 100%;
+  margin-bottom: 6px;
+}
+
+.item-name {
+  flex: 1 1 0;
+  min-width: 0;
+  text-align: left;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+}
+
+.item-qty {
+  flex: 0 0 auto;
+  min-width: 1.75em;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.item-price {
+  flex: 0 0 auto;
+  min-width: 4.5em;
+  text-align: right;
+  white-space: nowrap;
+}
+
+@media print {
+  @page {
+    size: 80mm auto;
+    margin: 4mm;
+  }
+
+  html,
+  body {
+    width: 80mm;
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .pos-receipt-print-root {
+    display: block !important;
+    width: 80mm;
+    margin: 0 auto;
+    padding: 0;
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  .pos-receipt,
+  .pos-receipt * {
+    color: #000 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    font-size: 20px !important;
+    line-height: 1.4 !important;
+  }
+}

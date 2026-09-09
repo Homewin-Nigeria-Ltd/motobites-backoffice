@@ -7,6 +7,7 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
+  DialogDescription,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
@@ -25,6 +26,7 @@ const modalSizeClass: Record<BaseModalSize, string> = {
 
 export type BaseModalProps = {
   title: string
+  description?: React.ReactNode
   children: React.ReactNode
   trigger?: React.ReactNode
   open?: boolean
@@ -44,6 +46,7 @@ export type BaseModalProps = {
 
 export function BaseModal({
   title,
+  description,
   children,
   trigger,
   open: controlledOpen,
@@ -127,10 +130,21 @@ export function BaseModal({
         </DialogClose>
 
         {isDetail ? (
-          <div className="flex shrink-0 items-center border-b border-border px-4 py-4 pr-12 sm:px-6 sm:py-5 sm:pr-14">
-            <DialogTitle className="text-left text-xl font-semibold text-foreground">
-              {title}
-            </DialogTitle>
+          <div className="flex shrink-0 items-center justify-between border-b border-border px-4 py-4 pr-12 sm:px-6 sm:py-5 sm:pr-14">
+            <div className="flex min-w-0 flex-1 flex-col gap-1">
+              <DialogTitle className="text-left text-xl font-semibold text-foreground">
+                {title}
+              </DialogTitle>
+              {description ? (
+                <DialogDescription className="text-sm text-muted-foreground">
+                  {description}
+                </DialogDescription>
+              ) : (
+                <DialogDescription className="sr-only">
+                  {title}
+                </DialogDescription>
+              )}
+            </div>
           </div>
         ) : (
           <div
@@ -147,6 +161,15 @@ export function BaseModal({
             <DialogTitle className="text-lg font-semibold text-foreground">
               {title}
             </DialogTitle>
+            {description ? (
+              <DialogDescription className="mt-1 text-sm text-muted-foreground">
+                {description}
+              </DialogDescription>
+            ) : (
+              <DialogDescription className="sr-only">
+                {title}
+              </DialogDescription>
+            )}
           </div>
         )}
 

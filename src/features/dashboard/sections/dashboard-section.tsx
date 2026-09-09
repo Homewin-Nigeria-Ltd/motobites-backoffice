@@ -3,24 +3,30 @@
 import { useState } from "react"
 import type { DateRange } from "react-day-picker"
 
+import { DashboardCategoryPerformanceCard } from "@/features/dashboard/components/dashboard-category-performance-card"
 import { DashboardCustomerBehaviourCard } from "@/features/dashboard/components/dashboard-customer-behaviour-card"
 import { DashboardCustomerInformationCard } from "@/features/dashboard/components/dashboard-customer-information-card"
 import { DashboardDailyTrafficCard } from "@/features/dashboard/components/dashboard-daily-traffic-card"
+import { DashboardDiscountsRefundsCard } from "@/features/dashboard/components/dashboard-discounts-refunds-card"
 import { DashboardInventoryStatusCard } from "@/features/dashboard/components/dashboard-inventory-status-card"
 import { DashboardKpiCards } from "@/features/dashboard/components/dashboard-kpi-cards"
 import { DashboardMarketingDataCard } from "@/features/dashboard/components/dashboard-marketing-data-card"
+import { DashboardOperationalBestsellersCard } from "@/features/dashboard/components/dashboard-operational-bestsellers-card"
 import { DashboardOrderAnalyticsCard } from "@/features/dashboard/components/dashboard-order-analytics-card"
 import { DashboardOrderFrequencyCard } from "@/features/dashboard/components/dashboard-order-frequency-card"
+import { DashboardPaymentPerformanceCard } from "@/features/dashboard/components/dashboard-payment-performance-card"
 import { DashboardPeriodFilter } from "@/features/dashboard/components/dashboard-period-filter"
 import { DashboardSalesRevenueChart } from "@/features/dashboard/components/dashboard-sales-revenue-chart"
 import { DashboardSummaryCards } from "@/features/dashboard/components/dashboard-summary-cards"
 import { DashboardTopMotopilotCard } from "@/features/dashboard/components/dashboard-top-motopilot-card"
 import { DashboardTopSellingList } from "@/features/dashboard/components/dashboard-top-selling-list"
 import { DashboardPeriod } from "@/features/dashboard/enums"
+import { useDashboardOperationalReports } from "@/features/dashboard/hooks/use-dashboard-operational-reports"
 import { useDashboardOverview } from "@/features/dashboard/hooks/use-dashboard-overview"
 import { AppLoader } from "@/components/ui/app-loader"
 import { useFilterToast } from "@/hooks/use-filter-toast"
 import { cn } from "@/lib/utils"
+
 
 export function DashboardSection() {
   const [period, setPeriod] = useState(DashboardPeriod.TwentyFourHours)
@@ -28,6 +34,10 @@ export function DashboardSection() {
   const { data, isPending, isFetching, isError, error } = useDashboardOverview(
     period,
     dateRange,
+  )
+  const { data: operationalData } = useDashboardOperationalReports(
+    period,
+    dateRange
   )
 
   useFilterToast({
@@ -96,9 +106,40 @@ export function DashboardSection() {
 
       {data.kpis?.length ? <DashboardSummaryCards kpis={data.kpis} /> : null}
 
+      {operationalData?.discounts_promotions_refunds ? (
+        <DashboardDiscountsRefundsCard
+          data={operationalData.discounts_promotions_refunds}
+          salesKobo={operationalData.sales_kobo}
+          salesGrowthPercent={operationalData.sales_growth_percent}
+        />
+      ) : null}
+
+      {operationalData?.payment_performance?.length ? (
+        <DashboardPaymentPerformanceCard
+          paymentPerformance={operationalData.payment_performance}
+        />
+      ) : null}
+
+      {operationalData?.product_category_performance?.length ||
+      operationalData?.best_selling_products?.length ? (
+        <div className="grid gap-4 xl:grid-cols-2">
+          {operationalData.product_category_performance?.length ? (
+            <DashboardCategoryPerformanceCard
+              categories={operationalData.product_category_performance}
+            />
+          ) : null}
+          {operationalData.best_selling_products?.length ? (
+            <DashboardOperationalBestsellersCard
+              products={operationalData.best_selling_products}
+            />
+          ) : null}
+        </div>
+      ) : null}
+
       {data.order_analytics ? (
         <DashboardOrderAnalyticsCard orderAnalytics={data.order_analytics} />
       ) : null}
+
 
       {data.customer_information ? (
         <DashboardCustomerInformationCard

@@ -92,3 +92,31 @@ export async function toggleMenuItemAvailabilityAction({
     return toActionError(error, "Failed to update item availability")
   }
 }
+
+export async function deleteMenuItemImageAction(
+  itemId: string | number,
+  imageId: string | number
+): Promise<RestaurantActionResult> {
+  try {
+    await apiServer.delete(
+      restaurantServerEndpoints.menuItemImage(itemId, imageId)
+    )
+    return { success: true }
+  } catch (error) {
+    return toActionError(error, "Failed to delete menu item image")
+  }
+}
+
+export async function deleteMenuItemVideoAction(
+  itemId: string | number,
+  videoId: string | number
+): Promise<RestaurantActionResult> {
+  try {
+    await apiServer.delete(
+      restaurantServerEndpoints.menuItemVideo(itemId, videoId)
+    )
+    return { success: true }
+  } catch (error) {
+    return toActionError(error, "Failed to delete menu item video")
+  }
+}

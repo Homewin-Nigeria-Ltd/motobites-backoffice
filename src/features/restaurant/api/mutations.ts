@@ -3,6 +3,8 @@ import { api } from "@/lib/api/client"
 import {
   createMenuItemAction,
   deleteMenuItemAction,
+  deleteMenuItemImageAction,
+  deleteMenuItemVideoAction,
   toggleMenuItemAvailabilityAction,
   updateMenuItemAction,
 } from "../actions/menu-item.actions"
@@ -64,6 +66,26 @@ export const restaurantMutations = {
 
   deleteMenuItem: {
     mutationFn: (itemId: string) => deleteMenuItemAction(itemId),
+  },
+
+  deleteMenuItemImage: {
+    mutationFn: ({
+      itemId,
+      imageId,
+    }: {
+      itemId: string | number
+      imageId: string | number
+    }) => deleteMenuItemImageAction(itemId, imageId),
+  },
+
+  deleteMenuItemVideo: {
+    mutationFn: ({
+      itemId,
+      videoId,
+    }: {
+      itemId: string | number
+      videoId: string | number
+    }) => deleteMenuItemVideoAction(itemId, videoId),
   },
 
   toggleMenuItemAvailability: {

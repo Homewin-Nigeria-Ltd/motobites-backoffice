@@ -53,6 +53,7 @@ function SummaryCard({
         height={46}
         className="pointer-events-none absolute top-0 right-0 h-auto w-[9rem] object-contain object-top-right"
         aria-hidden
+        loading="eager"
       />
 
       <div className="relative flex items-center gap-3">

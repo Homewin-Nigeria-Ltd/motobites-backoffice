@@ -103,36 +103,40 @@ export type RestaurantFormValues = {
   image: File | null
 }
 
-export type ApiKitchen = {
-  id: number
-  name: string
-  image: string | null
-  is_open: boolean
-}
-
 export type ApiKitchenOpeningHour = {
   day: string
   start_time: string
   end_time: string
 }
 
-export type ApiKitchenDetail = {
+export type ApiKitchenOpeningHoursStorage = Record<
+  string,
+  {
+    open: string
+    close: string
+  }
+>
+
+export type ApiKitchen = {
   id: number
+  kitchen_type_id: number | null
   name: string
   description: string | null
   tags: string[]
   image: string | null
-  is_open: boolean
-  meal_count: number
-  meal_count_label: string
+  video_ref?: string | null
+  videoRef?: string | null
+  video_url?: string | null
+  video_status?: string | null
   opening_hours: ApiKitchenOpeningHour[]
-  opening_hours_storage?: Record<
-    string,
-    {
-      open: string
-      close: string
-    }
-  >
+  opening_hours_storage?: ApiKitchenOpeningHoursStorage
+  is_open: boolean
+  is_active: boolean
+}
+
+export type ApiKitchenDetail = ApiKitchen & {
+  meal_count?: number
+  meal_count_label?: string
 }
 
 export type ApiKitchensResponse = {
@@ -266,6 +270,31 @@ export type ApiMenuItemBranchAvailability = {
   unavailable_until: string | null
 }
 
+export type MenuItemModifier = {
+  id?: number | string
+  menu_item_id?: number
+  name: string
+  description?: string | null
+  type?: 'protein' | 'drink' | 'extra' | string
+  price: number
+  group_name?: string | null
+  is_required?: boolean
+  min_select?: number
+  max_select?: number
+  sort_order?: number
+  is_active?: boolean
+}
+
+export type MenuItemVideo = {
+  id?: number
+  video_ref?: string | null
+  title?: string | null
+  video_url?: string | null
+  video_status?: 'PROCESSING' | 'READY' | 'FAILED' | string | null
+  failure_reason?: string | null
+  created_at?: string
+}
+
 export type ApiMenuItem = {
   id: number
   name: string
@@ -275,7 +304,8 @@ export type ApiMenuItem = {
   images?: ApiMenuItemImage[]
   video_ref?: string | null
   video_url?: string | null
-  videos?: unknown[]
+  videos?: MenuItemVideo[]
+  modifiers?: MenuItemModifier[]
   price: number
   preparation_time_minutes: number
   tags?: string[] | ApiMenuItemTags | unknown[]
