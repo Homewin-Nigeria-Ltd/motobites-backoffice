@@ -13,6 +13,7 @@ import {
   OverviewTransactionsSkeleton,
 } from "@/features/offline-order/components/overview/offline-order-overview-skeletons"
 import { OfflineOrderOverviewStaffSection } from "@/features/offline-order/components/overview/offline-order-overview-staff-section"
+import { OfflineOrderOverviewOperationalReportsSection } from "@/features/offline-order/components/overview/offline-order-overview-operational-reports-section"
 import { OfflineOrderOverviewStatsSection } from "@/features/offline-order/components/overview/offline-order-overview-stats-section"
 import { OfflineOrderOverviewTransactionsSection } from "@/features/offline-order/components/overview/offline-order-overview-transactions-section"
 
@@ -25,6 +26,8 @@ export function OfflineOrderOverviewSection() {
         <ClientSuspense fallback={<OverviewStatsSkeleton />}>
           <OfflineOrderOverviewStatsSection />
         </ClientSuspense>
+
+        <OfflineOrderOverviewOperationalReportsSection />
 
         <div className="grid gap-4 xl:grid-cols-2">
           <ClientSuspense fallback={<OverviewOrderListSkeleton />}>

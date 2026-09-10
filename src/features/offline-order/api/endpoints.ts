@@ -15,4 +15,5 @@ export const offlineOrderEndpoints = {
   topStaff: "/api/proxy/admin/sales-dashboard/top-staff",
   recentActivity: "/api/proxy/admin/sales-dashboard/recent-activity",
   recentTransactions: "/api/proxy/admin/sales-dashboard/recent-transactions",
+  operationalReports: "/api/proxy/admin/sales-dashboard/operational-reports",
 } as const

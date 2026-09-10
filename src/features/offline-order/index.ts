@@ -72,6 +72,7 @@ export {
   useSalesDashboardMenuItems,
   useSalesDashboardOrders,
   useSalesDashboardSavedOrdersQuery,
+  useSalesDashboardOperationalReports,
   useSalesDashboardRecentActivity,
   useSalesDashboardRecentTransactions,
   useSalesDashboardStats,
