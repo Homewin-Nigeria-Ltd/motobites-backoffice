@@ -8,11 +8,13 @@ import type {
   ApiSalesDashboardMenuItemsResponse,
   ApiSalesDashboardOrdersResponse,
   ApiSalesDashboardRecentActivityResponse,
+  ApiSalesDashboardOperationalReportsResponse,
   ApiSalesDashboardRecentTransactionsResponse,
   ApiSalesDashboardSavedOrderResponse,
   ApiSalesDashboardStatsResponse,
   ApiSalesDashboardTopStaffResponse,
   SalesDashboardMenuItemsParams,
+  SalesDashboardOperationalReportsParams,
   SalesDashboardOrdersParams,
   SalesDashboardRecentTransactionsParams,
 } from "../types"
@@ -66,6 +68,14 @@ function buildRecentTransactionsQuery(
   }
 
   return query
+}
+
+function buildOperationalReportsQuery(
+  params: SalesDashboardOperationalReportsParams,
+) {
+  return {
+    period: params.period ?? "week",
+  }
 }
 
 export const offlineOrderQueries = {
@@ -188,6 +198,19 @@ export const offlineOrderQueries = {
           .get<ApiSalesDashboardRecentTransactionsResponse>(
             offlineOrderEndpoints.recentTransactions,
             buildRecentTransactionsQuery(params),
+          )
+          .then((response) => response.data),
+      staleTime: 30_000,
+    }),
+
+  operationalReports: (params: SalesDashboardOperationalReportsParams = {}) =>
+    queryOptions({
+      queryKey: offlineOrderKeys.operationalReports(params),
+      queryFn: () =>
+        api
+          .get<ApiSalesDashboardOperationalReportsResponse>(
+            offlineOrderEndpoints.operationalReports,
+            buildOperationalReportsQuery(params),
           )
           .then((response) => response.data),
       staleTime: 30_000,

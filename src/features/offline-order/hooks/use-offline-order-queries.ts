@@ -8,6 +8,7 @@ import type {
   ApproveOfflineOrderDeletionPayload,
   CreateOfflineOrderDeleteRequestPayload,
   SalesDashboardMenuItemsParams,
+  SalesDashboardOperationalReportsParams,
   SalesDashboardOrdersParams,
   SalesDashboardRecentTransactionsParams,
 } from "../types"
@@ -84,6 +85,16 @@ export function useSalesDashboardRecentTransactions(
 ) {
   return useQuery({
     ...offlineOrderQueries.recentTransactions(params),
+    enabled: options?.enabled ?? true,
+  })
+}
+
+export function useSalesDashboardOperationalReports(
+  params: SalesDashboardOperationalReportsParams = {},
+  options?: { enabled?: boolean },
+) {
+  return useQuery({
+    ...offlineOrderQueries.operationalReports(params),
     enabled: options?.enabled ?? true,
   })
 }

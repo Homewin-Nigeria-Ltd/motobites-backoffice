@@ -22,6 +22,8 @@ type SalesTransactionHistoryFiltersProps = {
   onDateRangeChange: (value: DateRange | undefined) => void
   onFiltersChange: (filters: SalesTransactionHistoryFilters) => void
   onSearchChange: (value: string) => void
+  onExport?: () => void
+  isExporting?: boolean
 }
 
 const SOURCE_OPTIONS = [
@@ -90,6 +92,8 @@ export function SalesTransactionHistoryFiltersBar({
   onDateRangeChange,
   onFiltersChange,
   onSearchChange,
+  onExport,
+  isExporting = false,
 }: SalesTransactionHistoryFiltersProps) {
   const updateFilter = <K extends keyof SalesTransactionHistoryFilters>(
     key: K,
@@ -145,9 +149,11 @@ export function SalesTransactionHistoryFiltersBar({
           itemClassName,
           "h-10 gap-1.5 px-2 text-xs",
         )}
+        disabled={isExporting}
+        onClick={onExport}
       >
         <Icon name="download" className="size-4" />
-        Export
+        {isExporting ? "Exporting..." : "Export"}
       </Button>
     </div>
   )

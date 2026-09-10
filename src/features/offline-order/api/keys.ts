@@ -1,5 +1,6 @@
 import type {
   SalesDashboardMenuItemsParams,
+  SalesDashboardOperationalReportsParams,
   SalesDashboardOrdersParams,
   SalesDashboardRecentTransactionsParams,
 } from "../types"
@@ -22,4 +23,6 @@ export const offlineOrderKeys = {
   recentActivity: () => [...offlineOrderKeys.all, "recent-activity"] as const,
   recentTransactions: (params: SalesDashboardRecentTransactionsParams = {}) =>
     [...offlineOrderKeys.all, "recent-transactions", params] as const,
+  operationalReports: (params: SalesDashboardOperationalReportsParams = {}) =>
+    [...offlineOrderKeys.all, "operational-reports", params] as const,
 }
