@@ -21,6 +21,7 @@ import { DashboardSummaryCards } from "@/features/dashboard/components/dashboard
 import { TotalDeliveriesModal } from "@/features/dashboard/components/total-deliveries-modal"
 import { OngoingOrdersModal } from "@/features/dashboard/components/ongoing-orders-modal"
 import { TotalRevenueModal } from "@/features/dashboard/components/total-revenue-modal"
+import { TotalUsersModal } from "@/features/dashboard/components/total-users-modal"
 import { DashboardTopMotopilotCard } from "@/features/dashboard/components/dashboard-top-motopilot-card"
 import { DashboardTopSellingList } from "@/features/dashboard/components/dashboard-top-selling-list"
 import { DashboardPeriod } from "@/features/dashboard/enums"
@@ -39,6 +40,8 @@ export function DashboardSection() {
   const [isOngoingOrdersModalOpen, setIsOngoingOrdersModalOpen] =
     useState(false)
   const [isTotalRevenueModalOpen, setIsTotalRevenueModalOpen] =
+    useState(false)
+  const [isTotalUsersModalOpen, setIsTotalUsersModalOpen] =
     useState(false)
   const { data, isPending, isFetching, isError, error } = useDashboardOverview(
     period,
@@ -123,6 +126,8 @@ export function DashboardSection() {
               setIsOngoingOrdersModalOpen(true)
             } else if (key === "total_revenue") {
               setIsTotalRevenueModalOpen(true)
+            } else if (key === "total_users") {
+              setIsTotalUsersModalOpen(true)
             }
           }}
         />
@@ -145,6 +150,13 @@ export function DashboardSection() {
       <TotalRevenueModal
         open={isTotalRevenueModalOpen}
         onOpenChange={setIsTotalRevenueModalOpen}
+        currentPeriod={period}
+        dateRange={dateRange}
+      />
+
+      <TotalUsersModal
+        open={isTotalUsersModalOpen}
+        onOpenChange={setIsTotalUsersModalOpen}
         currentPeriod={period}
         dateRange={dateRange}
       />

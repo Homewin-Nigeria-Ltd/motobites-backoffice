@@ -582,3 +582,108 @@ export type TotalRevenueCardResponse = {
   message?: string
 }
 
+export type UserGrowthPoint = {
+  label: string
+  day?: string
+  new_registrations: number
+  cumulative_users: number
+  value?: number
+}
+
+export type UserActivityTimelinePoint = {
+  label: string
+  day?: string
+  dau: number
+  wau: number
+  mau: number
+}
+
+export type CustomerFunnelStage = {
+  step: number
+  key: string
+  label: string
+  value: number
+  percent: number
+  color: string
+}
+
+export type CustomerSegmentationItem = {
+  key: string
+  label: string
+  value: number
+  percent: number
+  color: string
+}
+
+export type TopCustomerItem = {
+  id: number
+  name: string
+  subtitle: string
+  orders: number
+  total_spend_kobo: number
+  formatted_total_spend: string
+  aov_kobo: number
+  formatted_aov: string
+  status: string
+}
+
+export type TotalUsersCardData = {
+  card: string
+  period: {
+    key: string
+    from: string
+    to: string
+    previous_from?: string
+    previous_to?: string
+  }
+  fulfillment_branch_id?: number | null
+  headline: {
+    label: string
+    value: number
+    value_kobo?: number | null
+    formatted_value: string | number
+    change_percent: number
+    trend: DashboardTrend | string
+  }
+  summary: {
+    total_registered_users: number
+    total_registered_users_change_percent?: number
+
+    new_users: number
+    new_users_change_percent?: number
+
+    active_users: number
+    active_users_change_percent?: number
+
+    returning_users: number
+    returning_users_change_percent?: number
+
+    first_time_customers: number
+    first_time_customers_change_percent?: number
+
+    repeat_customers: number
+    repeat_customers_change_percent?: number
+
+    dormant_users: number
+    dormant_users_change_percent?: number
+
+    churn_rate_percent: number
+    churn_rate_change_percent?: number
+  }
+  user_growth: UserGrowthPoint[]
+  user_activity: {
+    dau_mau_ratio_percent: number
+    timeline: UserActivityTimelinePoint[]
+  }
+  customer_funnel: CustomerFunnelStage[]
+  customer_segmentation: CustomerSegmentationItem[]
+  top_customers: TopCustomerItem[]
+}
+
+export type TotalUsersCardResponse = {
+  success: boolean
+  data: TotalUsersCardData
+  message?: string
+}
+
+

@@ -45,7 +45,8 @@ function SummaryCard({
   const isClickable =
     (kpi.key === "total_deliveries" ||
       kpi.key === "ongoing_orders" ||
-      kpi.key === "total_revenue") &&
+      kpi.key === "total_revenue" ||
+      kpi.key === "total_users") &&
     Boolean(onClick)
 
   return (
