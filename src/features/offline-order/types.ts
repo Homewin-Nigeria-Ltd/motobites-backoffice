@@ -249,6 +249,10 @@ export type CreateOfflineOrderDeleteRequestPayload = {
   reason: string
 }
 
+export type ApproveOfflineOrderDeletionPayload = {
+  reason: string
+}
+
 export type ApiOfflineOrderDeleteRequestResponse = {
   success: boolean
   data?: ApiSalesDashboardDeleteRequest

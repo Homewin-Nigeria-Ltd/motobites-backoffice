@@ -1,7 +1,9 @@
+"use client"
+
 import Link from "next/link"
 
 import { Button } from "@/components/ui/button"
-import { Icons } from "@/components/ui/icons"
+import { Icon } from "@/components/ui/icons"
 
 type OfflineOrderBackButtonProps = {
   href: string
@@ -20,7 +22,7 @@ export function OfflineOrderBackButton({
         className="h-9 gap-1.5 px-2 text-muted-foreground hover:text-foreground"
       >
         <Link href={href}>
-          <Icons.chevronLeft size={18} />
+          <Icon name="chevronLeft" size={18} />
           {label}
         </Link>
       </Button>

@@ -131,6 +131,8 @@ export const api = {
     options?: ApiRequestOptions
   ) => request<T, B>(endpoint, { method: "PATCH", body, ...options }),
 
-  delete: <T>(endpoint: string, options?: ApiRequestOptions) =>
-    request<T>(endpoint, { method: "DELETE", ...options }),
+  delete: <T, B = unknown>(
+    endpoint: string,
+    options?: ApiRequestOptions & { body?: B },
+  ) => request<T, B>(endpoint, { method: "DELETE", ...options }),
 }
