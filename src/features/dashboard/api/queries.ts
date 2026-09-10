@@ -8,6 +8,8 @@ import type {
   DashboardOverviewResponse,
   OperationalReportsData,
   OperationalReportsResponse,
+  TotalDeliveriesCardData,
+  TotalDeliveriesCardResponse,
 } from "../types"
 import { dashboardEndpoints } from "./endpoints"
 import { dashboardKeys } from "./keys"
@@ -54,6 +56,28 @@ async function fetchDashboardOperationalReports(
   return response.data
 }
 
+async function fetchDashboardCardDetails(
+  card: string,
+  params: DashboardOverviewParams
+): Promise<TotalDeliveriesCardData> {
+  const query: Record<string, string> = { period: params.period }
+
+  if (params.from) {
+    query.from = params.from
+  }
+
+  if (params.to) {
+    query.to = params.to
+  }
+
+  const response = await api.get<TotalDeliveriesCardResponse>(
+    dashboardEndpoints.cardDetails(card),
+    query
+  )
+
+  return response.data
+}
+
 export const dashboardQueries = {
   overview: (params: DashboardOverviewParams) =>
     queryOptions({
@@ -65,6 +89,17 @@ export const dashboardQueries = {
     queryOptions({
       queryKey: dashboardKeys.operationalReports(params),
       queryFn: () => fetchDashboardOperationalReports(params),
+      placeholderData: (previous) => previous,
+    }),
+  cardDetails: (
+    card: string,
+    params: DashboardOverviewParams,
+    enabled: boolean = true
+  ) =>
+    queryOptions({
+      queryKey: dashboardKeys.cardDetails(card, params),
+      queryFn: () => fetchDashboardCardDetails(card, params),
+      enabled,
       placeholderData: (previous) => previous,
     }),
 }

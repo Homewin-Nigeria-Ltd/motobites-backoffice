@@ -16,6 +16,7 @@ const illustrationMap = {
 
 type DashboardSummaryCardsProps = {
   kpis: DashboardKpi[]
+  onCardClick?: (key: string) => void
 }
 
 function getKpiIllustration(key: string) {
@@ -33,11 +34,41 @@ function formatKpiValue(kpi: DashboardKpi) {
   return kpi.formatted_value
 }
 
-function SummaryCard({ kpi }: { kpi: DashboardKpi }) {
+function SummaryCard({
+  kpi,
+  onClick,
+}: {
+  kpi: DashboardKpi
+  onClick?: (key: string) => void
+}) {
   const isUp = kpi.trend === "up"
+  const isClickable =
+    (kpi.key === "total_deliveries" ||
+      kpi.key === "ongoing_orders" ||
+      kpi.key === "total_revenue") &&
+    Boolean(onClick)
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-border bg-background p-5">
+    <div
+      role={isClickable ? "button" : undefined}
+      tabIndex={isClickable ? 0 : undefined}
+      onClick={isClickable ? () => onClick?.(kpi.key) : undefined}
+      onKeyDown={
+        isClickable
+          ? (e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault()
+                onClick?.(kpi.key)
+              }
+            }
+          : undefined
+      }
+      className={cn(
+        "relative overflow-hidden rounded-2xl border border-border bg-background p-5",
+        isClickable &&
+          "cursor-pointer transition-all duration-200 hover:border-primary/50 hover:shadow-sm active:scale-[0.99] focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
+      )}
+    >
       <Image
         src={ASSETS.illustrations.cardCorner}
         alt=""
@@ -100,11 +131,14 @@ function SummaryCard({ kpi }: { kpi: DashboardKpi }) {
   )
 }
 
-export function DashboardSummaryCards({ kpis }: DashboardSummaryCardsProps) {
+export function DashboardSummaryCards({
+  kpis,
+  onCardClick,
+}: DashboardSummaryCardsProps) {
   return (
     <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
       {kpis.map((kpi) => (
-        <SummaryCard key={kpi.key} kpi={kpi} />
+        <SummaryCard key={kpi.key} kpi={kpi} onClick={onCardClick} />
       ))}
     </div>
   )

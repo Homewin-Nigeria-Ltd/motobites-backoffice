@@ -289,3 +289,296 @@ export type OperationalReportsResponse = {
   data: OperationalReportsData
   message?: string
 }
+
+export type DeliveryTrendPoint = {
+  label: string
+  completed: number
+  failed: number
+  cancelled: number
+}
+
+export type DeliveryStatusBreakdownItem = {
+  key: string
+  label: string
+  value: number
+  percent: number
+}
+
+export type DeliveryLocationItem = {
+  label: string
+  deliveries: number
+}
+
+export type TotalDeliveriesCardData = {
+  card: string
+  period: {
+    key: string
+    from: string
+    to: string
+    previous_from?: string
+    previous_to?: string
+  }
+  fulfillment_branch_id?: number | null
+  headline: {
+    label: string
+    value: number
+    value_kobo?: number | null
+    formatted_value: string | number
+    change_percent: number
+    trend: DashboardTrend | string
+  }
+  summary: {
+    total_deliveries: number
+    completed_deliveries: number
+    failed_deliveries: number
+    cancelled_deliveries: number
+    average_delivery_time_minutes: number
+    average_delivery_fee_kobo: number
+    formatted_average_delivery_fee: string
+    total_delivery_revenue_kobo: number
+    formatted_total_delivery_revenue: string
+    total_deliveries_change_percent?: number
+    completed_deliveries_change_percent?: number
+    failed_deliveries_change_percent?: number
+    cancelled_deliveries_change_percent?: number
+    average_delivery_time_change_percent?: number
+    on_time_delivery_percent?: number
+    on_time_delivery_change_percent?: number
+    total_delivery_revenue_change_percent?: number
+  }
+  trend: DeliveryTrendPoint[]
+  status_breakdown: DeliveryStatusBreakdownItem[]
+  by_location: DeliveryLocationItem[]
+  performance: {
+    average_prep_time_minutes?: number
+    average_rider_pickup_minutes?: number
+    average_rider_travel_minutes?: number
+    average_order_to_door_minutes?: number
+  }
+}
+
+export type TotalDeliveriesCardResponse = {
+  success: boolean
+  data: TotalDeliveriesCardData
+  message?: string
+}
+
+export type OrderOverTimePoint = {
+  label: string
+  value: number
+  previous_value?: number
+}
+
+export type OrderStatusFunnelItem = {
+  key: string
+  step: number
+  label: string
+  value: number
+  percent: number
+  color?: string
+}
+
+export type OrderFailureAnalysisItem = {
+  key: string
+  label: string
+  value: number
+  percent: number
+  trend?: "up" | "down" | string
+  color?: string
+}
+
+export type FailedOrderFollowUpItem = {
+  id: string
+  reference: string
+  customer_name: string
+  customer_phone?: string | null
+  status: string
+  status_label: string
+  created_at?: string
+  time_ago: string
+}
+
+export type OngoingOrdersCardData = {
+  card: string
+  period: {
+    key: string
+    from: string
+    to: string
+    previous_from?: string
+    previous_to?: string
+  }
+  fulfillment_branch_id?: number | null
+  headline: {
+    label: string
+    value: number
+    value_kobo?: number | null
+    formatted_value: string | number
+    change_percent: number
+    trend: DashboardTrend | string
+  }
+  summary: {
+    total_orders: number
+    total_orders_change_percent?: number
+    new_orders: number
+    new_orders_change_percent?: number
+    preparing: number
+    preparing_change_percent?: number
+    ready_for_pickup: number
+    ready_for_pickup_change_percent?: number
+    out_for_delivery: number
+    out_for_delivery_change_percent?: number
+    completed: number
+    completed_change_percent?: number
+    cancelled: number
+    cancelled_change_percent?: number
+    failed: number
+    failed_change_percent?: number
+  }
+  orders_over_time: OrderOverTimePoint[]
+  status_funnel: OrderStatusFunnelItem[]
+  failure_analysis: OrderFailureAnalysisItem[]
+  failed_orders: FailedOrderFollowUpItem[]
+}
+
+export type OngoingOrdersCardResponse = {
+  success: boolean
+  data: OngoingOrdersCardData
+  message?: string
+}
+
+export type RevenueTrendPoint = {
+  label: string
+  day?: string
+  amount_kobo: number
+  gross_revenue?: number
+  net_revenue?: number
+  gross_revenue_kobo?: number
+  net_revenue_kobo?: number
+  formatted_amount: string
+  formatted_gross?: string
+  formatted_net?: string
+}
+
+export type PaymentChannelPerformanceItem = {
+  key: string
+  label: string
+  amount_kobo: number
+  formatted_amount: string
+  percent: number
+  success_rate: number
+  color: string
+}
+
+export type ProductCategoryPerformanceItem = {
+  category: string
+  orders_count: number
+  units: number
+  sales_kobo: number
+  formatted_sales: string
+  percent: number
+  trend: "up" | "down" | string
+  color: string
+}
+
+export type OperationalSalesData = {
+  gross_sales: {
+    food_sales_kobo: number
+    formatted_food_sales: string
+    delivery_fees_kobo: number
+    formatted_delivery_fees: string
+    service_charges_kobo: number
+    formatted_service_charges: string
+    subtotal_kobo: number
+    formatted_subtotal: string
+  }
+  adjustments: {
+    discounts_kobo: number
+    formatted_discounts: string
+    refunds_kobo: number
+    formatted_refunds: string
+    chargebacks_kobo: number
+    formatted_chargebacks: string
+    subtotal_kobo: number
+    formatted_subtotal: string
+  }
+  commissions: {
+    restaurant_commission_kobo: number
+    formatted_restaurant_commission: string
+    rider_commission_kobo: number
+    formatted_rider_commission: string
+    subtotal_kobo: number
+    formatted_subtotal: string
+  }
+  net_revenue_kobo: number
+  formatted_net_revenue: string
+}
+
+export type TotalRevenueCardData = {
+  card: string
+  period: {
+    key: string
+    from: string
+    to: string
+    previous_from?: string
+    previous_to?: string
+  }
+  fulfillment_branch_id?: number | null
+  headline: {
+    label: string
+    value: number
+    value_kobo?: number | null
+    formatted_value: string | number
+    change_percent: number
+    trend: DashboardTrend | string
+  }
+  summary: {
+    total_revenue_kobo: number
+    formatted_total_revenue: string
+    total_revenue_change_percent?: number
+
+    delivery_revenue_kobo: number
+    formatted_delivery_revenue: string
+    delivery_revenue_change_percent?: number
+
+    order_revenue_kobo: number
+    formatted_order_revenue: string
+    order_revenue_change_percent?: number
+
+    commission_revenue_kobo: number
+    formatted_commission_revenue: string
+    commission_revenue_change_percent?: number
+
+    average_order_value_kobo: number
+    formatted_average_order_value: string
+    average_order_value_change_percent?: number
+
+    revenue_per_user_kobo: number
+    formatted_revenue_per_user: string
+    revenue_per_user_change_percent?: number
+
+    refund_amount_kobo: number
+    formatted_refund_amount: string
+    refund_amount_change_percent?: number
+
+    net_revenue_kobo: number
+    formatted_net_revenue: string
+    net_revenue_change_percent?: number
+  }
+  revenue_trend: RevenueTrendPoint[]
+  peak?: {
+    label: string
+    amount_kobo: number
+    formatted_amount: string
+  } | null
+  payment_channels: PaymentChannelPerformanceItem[]
+  operational_sales: OperationalSalesData
+  category_performance: ProductCategoryPerformanceItem[]
+  date_breakdown?: Record<string, unknown>
+}
+
+export type TotalRevenueCardResponse = {
+  success: boolean
+  data: TotalRevenueCardData
+  message?: string
+}
+
