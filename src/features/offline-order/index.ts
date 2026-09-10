@@ -122,6 +122,7 @@ export {
 export {
   filterSalesDashboardOrders,
   getSalesDashboardOrderAssignedTo,
+  getSalesDashboardOrderDateLabel,
   getSalesDashboardOrderItemCount,
   getSalesDashboardOrderReference,
   getSalesDashboardOrderStatusLabel,

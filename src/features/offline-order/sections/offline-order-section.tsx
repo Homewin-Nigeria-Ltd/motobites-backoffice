@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Icons } from "@/components/ui/icons"
+import { OfflineOrderBackButton } from "@/features/offline-order/components/offline-order-back-button"
 import { OfflineOrderKitchenGroup } from "@/features/offline-order/components/offline-order-kitchen-group"
 import {
   ALL_KITCHENS_TAB_VALUE,
@@ -107,6 +108,8 @@ export function OfflineOrderSection() {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col bg-muted">
+      <OfflineOrderBackButton href="/offline-order" label="Back to Overview" />
+
       {savedOrderCount > 0 ? (
         <div className="border-b border-primary/20 bg-primary/5 px-4 py-3 md:px-6">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">

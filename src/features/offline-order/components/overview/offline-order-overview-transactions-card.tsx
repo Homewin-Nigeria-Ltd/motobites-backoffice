@@ -19,7 +19,7 @@ export function OfflineOrderOverviewTransactionsCard({
           Recent Transactions
         </h3>
         <Button asChild variant="link" className="h-auto p-0 text-primary">
-          <Link href="/offline-order/new">View All</Link>
+          <Link href="/offline-order/sales-transaction/history">View All</Link>
         </Button>
       </div>
 

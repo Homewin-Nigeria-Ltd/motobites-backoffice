@@ -5,6 +5,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { offlineOrderMutations } from "../api/mutations"
 import { offlineOrderKeys } from "../api/keys"
 import type {
+  ApproveOfflineOrderDeletionPayload,
   CreateOfflineOrderDeleteRequestPayload,
   SalesDashboardMenuItemsParams,
   SalesDashboardOrdersParams,
@@ -112,4 +113,9 @@ export function useApproveOfflineOrderDeletion() {
 export type RequestOfflineOrderDeletionInput = {
   orderId: string | number
   payload: CreateOfflineOrderDeleteRequestPayload
+}
+
+export type ApproveOfflineOrderDeletionInput = {
+  orderId: string | number
+  payload: ApproveOfflineOrderDeletionPayload
 }

@@ -1,15 +1,18 @@
 import type { IconName } from "@/components/ui/icons"
 import { PERMISSION_KEYS, type PermissionKey } from "@/lib/permissions"
 
+export type NavSubItem = {
+  title: string
+  url: string
+  adminRole?: string
+}
+
 export type NavItem = {
   title: string
   url: string
   icon: IconName
   permission: PermissionKey | null
-  items?: {
-    title: string
-    url: string
-  }[]
+  items?: NavSubItem[]
 }
 
 export type SupportItem = {
@@ -38,10 +41,15 @@ export const navMain: NavItem[] = [
     permission: PERMISSION_KEYS.salesDashboard,
     items: [
       { title: "Overview", url: "/offline-order" },
+      { title: "Sales Transaction", url: "/offline-order/sales-transaction" },
       { title: "New Order", url: "/offline-order/new" },
       { title: "All Orders", url: "/offline-order/all" },
       { title: "Saved Orders", url: "/offline-order/saved" },
-      // { title: "Delete Request", url: "/offline-order/delete-request" },
+      {
+        title: "Delete Requests",
+        url: "/offline-order/delete-request",
+        adminRole: "sales-manager",
+      },
     ],
   },
   {

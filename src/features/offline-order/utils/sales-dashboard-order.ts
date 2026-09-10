@@ -64,6 +64,7 @@ function isRelativeTimeLabel(value: string) {
 
 function getOrderSortTimestamp(order: ApiSalesDashboardOrder) {
   const timestamps = [
+    order.ordered_at,
     order.saved_at,
     order.completed_at,
     order.updated_at,
@@ -84,12 +85,57 @@ function getOrderSortTimestamp(order: ApiSalesDashboardOrder) {
   return 0
 }
 
+export function getSalesDashboardOrderDateLabel(order: ApiSalesDashboardOrder) {
+  const orderDate = order.order_date?.trim()
+  const orderTime = order.order_time?.trim()
+
+  if (orderDate && orderTime) {
+    return `${orderDate} · ${orderTime}`
+  }
+
+  if (orderDate) {
+    return orderDate
+  }
+
+  if (order.ordered_at) {
+    const parsed = new Date(order.ordered_at)
+
+    if (!Number.isNaN(parsed.getTime())) {
+      const date = parsed.toLocaleDateString("en-US", {
+        month: "short",
+        day: "2-digit",
+        year: "numeric",
+      })
+      const time = parsed.toLocaleTimeString("en-GB", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+      })
+
+      return `${date} · ${time}`
+    }
+  }
+
+  return null
+}
+
 export function getSalesDashboardOrderTimeLabel(order: ApiSalesDashboardOrder) {
+  const orderDateLabel = getSalesDashboardOrderDateLabel(order)
+
+  if (orderDateLabel) {
+    return orderDateLabel
+  }
+
+  if (order.time_ago?.trim()) {
+    return order.time_ago.trim()
+  }
+
   if (order.time_saved && isRelativeTimeLabel(order.time_saved)) {
     return order.time_saved
   }
 
   const timestamp =
+    order.ordered_at ??
     order.saved_at ??
     order.completed_at ??
     order.updated_at ??
