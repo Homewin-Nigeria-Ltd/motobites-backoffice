@@ -25,3 +25,8 @@ export function isSalesManager(user: AuthUser | null | undefined) {
 export function isSalesRep(user: AuthUser | null | undefined) {
   return getAdminRoleSlug(user) === "sales-rep"
 }
+
+export function shouldShowPosDashboard(user: AuthUser | null | undefined) {
+  const role = getAdminRoleSlug(user)
+  return role === "sales-rep" || role === "sales-manager"
+}
