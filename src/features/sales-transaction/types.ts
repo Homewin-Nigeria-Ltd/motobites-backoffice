@@ -98,13 +98,16 @@ export type ApiSalesTransactionRecentListResponse = {
   message?: string
 }
 
-export type SalesTransactionListParams = {
+export type SalesTransactionExportParams = {
   date_from?: string
   date_to?: string
   source?: string
   payment_method?: string
   status?: string
   search?: string
+}
+
+export type SalesTransactionListParams = SalesTransactionExportParams & {
   page?: number
   per_page?: number
 }

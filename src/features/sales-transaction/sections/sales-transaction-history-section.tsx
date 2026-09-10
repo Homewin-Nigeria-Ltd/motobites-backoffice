@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useCallback, useMemo, useState } from "react"
 import type { DateRange } from "react-day-picker"
 
 import { DataTable } from "@/components/data-table"
@@ -16,8 +16,10 @@ import {
   buildTransactionDateQueryParams,
   getDefaultTransactionDateRangePickerValue,
 } from "@/features/sales-transaction/utils/date-range"
+import { downloadTransactionsCsv } from "@/features/sales-transaction/utils/export-transactions-csv"
 import { mapApiTransactionToHistoryRow } from "@/features/sales-transaction/utils/map-transaction-history"
 import { useDebouncedSearch } from "@/features/restaurant/hooks/use-debounced-search"
+import { toast } from "@/lib/toast"
 
 const DEFAULT_PAGE_SIZE = 20
 
@@ -35,6 +37,7 @@ export function SalesTransactionHistorySection() {
     getDefaultTransactionDateRangePickerValue(),
   )
   const [page, setPage] = useState(1)
+  const [isExporting, setIsExporting] = useState(false)
   const { value: search, setValue: setSearch, debouncedValue } =
     useDebouncedSearch("")
 
@@ -59,6 +62,25 @@ export function SalesTransactionHistorySection() {
       filters.source,
       filters.status,
       page,
+    ],
+  )
+
+  const exportParams = useMemo(
+    () => ({
+      date_from: dateFrom,
+      date_to: dateTo,
+      source: filters.source !== "all" ? filters.source : undefined,
+      payment_method: filters.method !== "all" ? filters.method : undefined,
+      status: filters.status !== "all" ? filters.status : undefined,
+      search: debouncedValue.trim() || undefined,
+    }),
+    [
+      dateFrom,
+      dateTo,
+      debouncedValue,
+      filters.method,
+      filters.source,
+      filters.status,
     ],
   )
 
@@ -100,6 +122,23 @@ export function SalesTransactionHistorySection() {
     setPage(1)
   }
 
+  const handleExport = useCallback(async () => {
+    try {
+      setIsExporting(true)
+      await downloadTransactionsCsv(exportParams)
+      toast.success("Transactions exported successfully.")
+    } catch (exportError) {
+      const message =
+        exportError instanceof Error
+          ? exportError.message
+          : "Failed to export transactions."
+
+      toast.error(message)
+    } finally {
+      setIsExporting(false)
+    }
+  }, [exportParams])
+
   return (
     <div className="flex min-h-0 flex-1 flex-col bg-muted">
       <OfflineOrderBackButton
@@ -114,6 +153,8 @@ export function SalesTransactionHistorySection() {
           onDateRangeChange={handleDateRangeChange}
           onFiltersChange={handleFiltersChange}
           onSearchChange={handleSearchChange}
+          onExport={handleExport}
+          isExporting={isExporting}
         />
 
         <SalesTransactionHistoryStats
