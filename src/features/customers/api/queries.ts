@@ -31,6 +31,10 @@ async function fetchCustomerList(
     query.search = params.search.trim()
   }
 
+  if (params.fulfillment_branch_id !== undefined && params.fulfillment_branch_id !== null) {
+    query.fulfillment_branch_id = params.fulfillment_branch_id
+  }
+
   const response = await api.get<ApiCustomerListResponse>(
     customerEndpoints.list,
     query
@@ -42,9 +46,15 @@ async function fetchCustomerList(
   }
 }
 
-async function fetchCustomerOverview(): Promise<CustomerSummaryResponse> {
+async function fetchCustomerOverview(branchId?: number | null): Promise<CustomerSummaryResponse> {
+  const query: Record<string, string | number> = {}
+  if (branchId !== undefined && branchId !== null) {
+    query.fulfillment_branch_id = branchId
+  }
+
   const response = await api.get<ApiCustomerOverviewResponse>(
-    customerEndpoints.overview
+    customerEndpoints.overview,
+    query
   )
 
   return {
@@ -65,14 +75,12 @@ export const customerQueries = {
     queryOptions({
       queryKey: customerKeys.list(params),
       queryFn: () => fetchCustomerList(params),
-      placeholderData: (previous) => previous,
     }),
 
-  overview: () =>
+  overview: (branchId?: number | null) =>
     queryOptions({
-      queryKey: customerKeys.overview(),
-      queryFn: fetchCustomerOverview,
-      staleTime: 5 * 60 * 1000,
+      queryKey: customerKeys.overview(branchId),
+      queryFn: () => fetchCustomerOverview(branchId),
     }),
 
   detail: (id: string) =>

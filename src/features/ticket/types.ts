@@ -104,11 +104,13 @@ export type ApiCreateTicketBody = {
 
 export type TicketOverviewParams = {
   period?: TicketPeriod
+  fulfillment_branch_id?: number | null
 }
 
 export type TicketListParams = {
   page: number
   per_page?: number
+  fulfillment_branch_id?: number | null
 }
 
 export type TicketListMeta = {

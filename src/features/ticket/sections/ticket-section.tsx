@@ -19,6 +19,7 @@ import {
   useTicketSummary,
   useTicketUrgentAlert,
 } from "@/features/ticket/hooks/use-ticket-queries"
+import { useBranchFilter } from "@/context/branch-context"
 import type { TicketPeriod, TicketResolutionRate } from "@/features/ticket/types"
 import { DEFAULT_TICKET_ISSUE_CATEGORIES } from "@/features/ticket/utils/ticket"
 import { DataTable } from "@/components/data-table"
@@ -34,6 +35,7 @@ const EMPTY_RESOLUTION_RATE: TicketResolutionRate = {
 }
 
 export function TicketSection() {
+  const { branchId } = useBranchFilter()
   const [resolutionPeriod, setResolutionPeriod] =
     useState<TicketPeriod>(DEFAULT_PERIOD)
   const [byIssuePeriod, setByIssuePeriod] = useState<TicketPeriod>(DEFAULT_PERIOD)
@@ -62,17 +64,28 @@ export function TicketSection() {
     []
   )
 
-  const { data: summaryKpis, isPending: isSummaryPending } = useTicketSummary()
+  const { data: summaryKpis, isPending: isSummaryPending } = useTicketSummary({
+    fulfillment_branch_id: branchId,
+  })
 
   const { data: resolutionRate } = useTicketResolutionRate({
     period: resolutionPeriod,
+    fulfillment_branch_id: branchId,
   })
 
-  const { data: ticketsByIssue } = useTicketByIssue({ period: byIssuePeriod })
+  const { data: ticketsByIssue } = useTicketByIssue({
+    period: byIssuePeriod,
+    fulfillment_branch_id: branchId,
+  })
 
-  const { data: ticketsRaised } = useTicketByStatus({ period: byStatusPeriod })
+  const { data: ticketsRaised } = useTicketByStatus({
+    period: byStatusPeriod,
+    fulfillment_branch_id: branchId,
+  })
 
-  const { data: urgentAlert } = useTicketUrgentAlert()
+  const { data: urgentAlert } = useTicketUrgentAlert({
+    fulfillment_branch_id: branchId,
+  })
 
   const {
     data: ticketList,
@@ -81,6 +94,7 @@ export function TicketSection() {
   } = useTicketList({
     page: tablePage,
     per_page: TABLE_PAGE_SIZE,
+    fulfillment_branch_id: branchId,
   })
 
   const tickets = ticketList?.items ?? []

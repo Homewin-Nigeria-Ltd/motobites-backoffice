@@ -94,6 +94,7 @@ export { OfflineOrderPaymentMethodCards } from "./components/offline-order-payme
 export { OfflineOrderPosReceipt } from "./components/offline-order-pos-receipt"
 export { OfflineOrderPreviewCard } from "./components/offline-order-preview-card"
 export { OfflineOrderStaffField } from "./components/offline-order-staff-field"
+export { OfflineOrderBranchField } from "./components/offline-order-branch-field"
 export { OfflineOrderManagerModeBanner } from "./components/offline-order-manager-mode-banner"
 export { OfflineOrderOverviewSection } from "./sections/offline-order-overview-section"
 export { OfflineOrderSection } from "./sections/offline-order-section"
