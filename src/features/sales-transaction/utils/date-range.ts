@@ -1,3 +1,8 @@
+import type {
+  SalesTransactionAnalyticsParams,
+  SalesTransactionAnalyticsPeriod,
+} from "@/features/sales-transaction/types"
+
 export function formatApiDateParam(date: Date) {
   const year = date.getFullYear()
   const month = String(date.getMonth() + 1).padStart(2, "0")
@@ -55,4 +60,18 @@ export function buildTransactionDateQueryParams(dateRange?: {
     dateFrom: formatApiDateParam(dateRange.from),
     dateTo: formatApiDateParam(dateRange.to ?? dateRange.from),
   }
+}
+
+export function buildTransactionAnalyticsParams(
+  period: SalesTransactionAnalyticsPeriod,
+  dateRange?: { from?: Date; to?: Date },
+) {
+  const params: SalesTransactionAnalyticsParams = { period }
+
+  if (dateRange?.from) {
+    params.from = formatApiDateParam(dateRange.from)
+    params.to = formatApiDateParam(dateRange.to ?? dateRange.from)
+  }
+
+  return params
 }

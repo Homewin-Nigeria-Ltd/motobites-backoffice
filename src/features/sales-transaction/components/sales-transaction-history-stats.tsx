@@ -1,10 +1,29 @@
 import { Badge } from "@/components/ui/badge"
+import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
 import type { SalesTransactionHistorySummary } from "@/features/sales-transaction/types"
 import { formatSalesTransactionAmount } from "@/features/sales-transaction/utils/format"
 
 type SalesTransactionHistoryStatsProps = {
   summary: SalesTransactionHistorySummary
+  isLoading?: boolean
+}
+
+export function SalesTransactionHistoryStatsSkeleton() {
+  return (
+    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      {Array.from({ length: 4 }).map((_, index) => (
+        <div
+          key={index}
+          className="rounded-2xl border border-border bg-background p-5"
+        >
+          <Skeleton className="h-4 w-28" />
+          <Skeleton className="mt-4 h-9 w-24" />
+          <Skeleton className="mt-2 h-4 w-36" />
+        </div>
+      ))}
+    </div>
+  )
 }
 
 type StatCardProps = {
@@ -47,7 +66,12 @@ function StatCard({
 
 export function SalesTransactionHistoryStats({
   summary,
+  isLoading = false,
 }: SalesTransactionHistoryStatsProps) {
+  if (isLoading) {
+    return <SalesTransactionHistoryStatsSkeleton />
+  }
+
   return (
     <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
       <StatCard

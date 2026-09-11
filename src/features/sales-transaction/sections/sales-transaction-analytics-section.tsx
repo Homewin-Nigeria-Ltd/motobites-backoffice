@@ -1,3 +1,8 @@
+"use client"
+
+import { useMemo, useState } from "react"
+import type { DateRange } from "react-day-picker"
+
 import { OfflineOrderBackButton } from "@/features/offline-order/components/offline-order-back-button"
 import { SalesTransactionAnalyticsStats } from "@/features/sales-transaction/components/sales-transaction-analytics-stats"
 import { SalesTransactionAnalyticsToolbar } from "@/features/sales-transaction/components/sales-transaction-analytics-toolbar"
@@ -6,15 +11,35 @@ import {
   SalesTransactionTopItemsTable,
 } from "@/features/sales-transaction/components/sales-transaction-revenue-breakdown"
 import { SalesTransactionRevenueTrendChart } from "@/features/sales-transaction/components/sales-transaction-revenue-trend-chart"
-import {
-  SALES_TRANSACTION_ANALYTICS_SUMMARY,
-  SALES_TRANSACTION_PAYMENT_METHOD_BREAKDOWN,
-  SALES_TRANSACTION_REVENUE_SOURCE_BREAKDOWN,
-  SALES_TRANSACTION_REVENUE_TREND,
-  SALES_TRANSACTION_TOP_ITEMS,
-} from "@/features/sales-transaction/constants/analytics-mock-data"
+import { useSalesTransactionAnalytics } from "@/features/sales-transaction/hooks/use-sales-transaction-queries"
+import type { SalesTransactionAnalyticsPeriod } from "@/features/sales-transaction/types"
+import { buildTransactionAnalyticsParams } from "@/features/sales-transaction/utils/date-range"
+import { emptySalesTransactionAnalyticsViewModel } from "@/features/sales-transaction/utils/map-transaction-analytics"
 
 export function SalesTransactionAnalyticsSection() {
+  const [period, setPeriod] = useState<SalesTransactionAnalyticsPeriod>("year")
+  const [dateRange, setDateRange] = useState<DateRange | undefined>()
+
+  const analyticsParams = useMemo(
+    () => buildTransactionAnalyticsParams(period, dateRange),
+    [period, dateRange],
+  )
+
+  const { data, isPending, isFetching, isError, error } =
+    useSalesTransactionAnalytics(analyticsParams)
+
+  const viewModel = data ?? emptySalesTransactionAnalyticsViewModel()
+  const isLoading = isPending || (isFetching && !data)
+
+  const handlePeriodChange = (nextPeriod: SalesTransactionAnalyticsPeriod) => {
+    setPeriod(nextPeriod)
+    setDateRange(undefined)
+  }
+
+  if (isError) {
+    throw error
+  }
+
   return (
     <div className="flex min-h-0 flex-1 flex-col bg-muted">
       <OfflineOrderBackButton
@@ -23,22 +48,36 @@ export function SalesTransactionAnalyticsSection() {
       />
 
       <div className="min-h-0 flex-1 space-y-6 overflow-y-auto p-4 md:p-6">
-        <SalesTransactionAnalyticsToolbar />
+        <SalesTransactionAnalyticsToolbar
+          period={period}
+          dateRange={dateRange}
+          onPeriodChange={handlePeriodChange}
+          onDateRangeChange={setDateRange}
+          isLoading={isLoading}
+        />
 
         <SalesTransactionAnalyticsStats
-          summary={SALES_TRANSACTION_ANALYTICS_SUMMARY}
+          summary={viewModel.summary}
+          isLoading={isLoading}
         />
 
         <SalesTransactionRevenueTrendChart
-          data={SALES_TRANSACTION_REVENUE_TREND}
+          data={viewModel.revenueTrend}
+          periodLabel={viewModel.periodLabel}
+          isLoading={isLoading}
         />
 
         <SalesTransactionRevenueBreakdown
-          sources={SALES_TRANSACTION_REVENUE_SOURCE_BREAKDOWN}
-          paymentMethods={SALES_TRANSACTION_PAYMENT_METHOD_BREAKDOWN}
+          sources={viewModel.sourceBreakdown}
+          paymentMethods={viewModel.paymentBreakdown}
+          totalRevenue={viewModel.summary.totalRevenue}
+          isLoading={isLoading}
         />
 
-        <SalesTransactionTopItemsTable items={SALES_TRANSACTION_TOP_ITEMS} />
+        <SalesTransactionTopItemsTable
+          items={viewModel.topItems}
+          isLoading={isLoading}
+        />
       </div>
     </div>
   )

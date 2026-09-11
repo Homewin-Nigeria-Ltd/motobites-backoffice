@@ -1,3 +1,4 @@
+import { resolveOfflineOrderAmount } from "@/features/offline-order/utils/order-totals"
 import type {
   ApiSalesTransaction,
   ApiSalesTransactionSummary,
@@ -56,26 +57,56 @@ export function mapApiTransactionToHistoryRow(
   }
 }
 
+export function createEmptyTransactionHistorySummary(): SalesTransactionHistorySummary {
+  return {
+    totalTransactions: 0,
+    totalTransactionsBadge: "",
+    totalTransactionsSubtitle: "Across all dining channels",
+    totalRevenue: 0,
+    totalRevenueBadge: "",
+    totalRevenueSubtitle: "Gross system revenue",
+    averageOrderValue: 0,
+    averageOrderValueBadge: "",
+    averageOrderValueSubtitle: "Average value for selected period",
+    refundedCount: 0,
+    refundedAmount: 0,
+    refundedBadge: "",
+    refundedSubtitle: "0% of gross revenue",
+  }
+}
+
 export function mapApiTransactionsSummary(
   summary: ApiSalesTransactionSummary,
 ): SalesTransactionHistorySummary {
+  const totalRevenue = resolveOfflineOrderAmount(
+    summary.total_revenue,
+    summary.total_revenue_kobo,
+  )
+  const averageOrderValue = resolveOfflineOrderAmount(
+    summary.avg_order_value,
+    summary.avg_order_value_kobo,
+  )
+  const refundedAmount = resolveOfflineOrderAmount(
+    summary.refunded_amount,
+    summary.refunded_amount_kobo,
+  )
   const refundedPercent =
-    summary.total_revenue > 0
-      ? ((summary.refunded_amount / summary.total_revenue) * 100).toFixed(2)
+    totalRevenue > 0
+      ? ((refundedAmount / totalRevenue) * 100).toFixed(2)
       : "0.00"
 
   return {
-    totalTransactions: summary.total_transactions,
+    totalTransactions: summary.total_transactions ?? 0,
     totalTransactionsBadge: "",
     totalTransactionsSubtitle: "Across all dining channels",
-    totalRevenue: summary.total_revenue,
+    totalRevenue,
     totalRevenueBadge: "",
     totalRevenueSubtitle: "Gross system revenue",
-    averageOrderValue: Math.round(summary.avg_order_value),
+    averageOrderValue: Math.round(averageOrderValue),
     averageOrderValueBadge: "",
     averageOrderValueSubtitle: "Average value for selected period",
-    refundedCount: summary.refunded_count,
-    refundedAmount: summary.refunded_amount,
+    refundedCount: summary.refunded_count ?? 0,
+    refundedAmount,
     refundedBadge: "",
     refundedSubtitle: `${refundedPercent}% of gross revenue`,
   }

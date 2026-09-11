@@ -8,6 +8,7 @@ import {
   YAxis,
 } from "recharts"
 
+import { Skeleton } from "@/components/ui/skeleton"
 import {
   ChartContainer,
   ChartLegend,
@@ -21,6 +22,8 @@ import { formatSalesTransactionAmount } from "@/features/sales-transaction/utils
 
 type SalesTransactionRevenueTrendChartProps = {
   data: SalesTransactionRevenueTrendPoint[]
+  periodLabel?: string
+  isLoading?: boolean
 }
 
 const chartConfig = {
@@ -48,18 +51,27 @@ const chartConfig = {
 
 export function SalesTransactionRevenueTrendChart({
   data,
+  periodLabel = "Selected period",
+  isLoading = false,
 }: SalesTransactionRevenueTrendChartProps) {
   return (
     <div className="rounded-2xl border border-border bg-background p-5">
       <div className="mb-4">
         <h3 className="text-base font-semibold text-foreground">
-          Revenue by Source Over Time (Aug 2025)
+          Revenue by Source Over Time ({periodLabel})
         </h3>
         <p className="mt-1 text-sm text-muted-foreground">
           Daily values grouped by order channel sources
         </p>
       </div>
 
+      {isLoading ? (
+        <Skeleton className="h-[320px] w-full rounded-xl" />
+      ) : data.length === 0 ? (
+        <div className="flex h-[320px] items-center justify-center rounded-xl bg-muted/30 text-sm text-muted-foreground">
+          No trend data for this period.
+        </div>
+      ) : (
       <ChartContainer config={chartConfig} className="aspect-auto h-[320px] w-full">
         <LineChart data={data} margin={{ left: 8, right: 12, top: 8, bottom: 0 }}>
           <CartesianGrid vertical={false} strokeDasharray="4 4" />
@@ -127,6 +139,7 @@ export function SalesTransactionRevenueTrendChart({
           />
         </LineChart>
       </ChartContainer>
+      )}
     </div>
   )
 }
