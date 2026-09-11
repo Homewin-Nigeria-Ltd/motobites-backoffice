@@ -5,8 +5,10 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { offlineOrderMutations } from "../api/mutations"
 import { offlineOrderKeys } from "../api/keys"
 import type {
+  ApproveOfflineOrderDeletionPayload,
   CreateOfflineOrderDeleteRequestPayload,
   SalesDashboardMenuItemsParams,
+  SalesDashboardOperationalReportsParams,
   SalesDashboardOrdersParams,
   SalesDashboardRecentTransactionsParams,
 } from "../types"
@@ -56,9 +58,12 @@ export function useSalesDashboardDeleteRequests(
   })
 }
 
-export function useSalesDashboardStats(options?: { enabled?: boolean }) {
+export function useSalesDashboardStats(
+  branchId?: number | null,
+  options?: { enabled?: boolean }
+) {
   return useQuery({
-    ...offlineOrderQueries.stats(),
+    ...offlineOrderQueries.stats(branchId),
     enabled: options?.enabled ?? true,
   })
 }
@@ -83,6 +88,16 @@ export function useSalesDashboardRecentTransactions(
 ) {
   return useQuery({
     ...offlineOrderQueries.recentTransactions(params),
+    enabled: options?.enabled ?? true,
+  })
+}
+
+export function useSalesDashboardOperationalReports(
+  params: SalesDashboardOperationalReportsParams = {},
+  options?: { enabled?: boolean },
+) {
+  return useQuery({
+    ...offlineOrderQueries.operationalReports(params),
     enabled: options?.enabled ?? true,
   })
 }
@@ -112,4 +127,9 @@ export function useApproveOfflineOrderDeletion() {
 export type RequestOfflineOrderDeletionInput = {
   orderId: string | number
   payload: CreateOfflineOrderDeleteRequestPayload
+}
+
+export type ApproveOfflineOrderDeletionInput = {
+  orderId: string | number
+  payload: ApproveOfflineOrderDeletionPayload
 }

@@ -9,9 +9,13 @@ import { buildDashboardOverviewParams } from "../utils/period"
 
 export function useDashboardOperationalReports(
   period: DashboardPeriod,
-  dateRange?: DateRange
+  dateRange?: DateRange,
+  fulfillmentBranchId?: number | null
 ) {
-  const params = buildDashboardOverviewParams(period, dateRange)
+  const params = {
+    ...buildDashboardOverviewParams(period, dateRange),
+    fulfillment_branch_id: fulfillmentBranchId,
+  }
 
   return useQuery(dashboardQueries.operationalReports(params))
 }

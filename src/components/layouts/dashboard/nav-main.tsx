@@ -18,6 +18,7 @@ import {
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar"
 import { Icon, Icons } from "@/components/ui/icons"
+import { useBranchFilter } from "@/context/branch-context"
 import type { NavItem } from "@/config/sidebar"
 
 function isNavSubItemActive(pathname: string, subUrl: string) {
@@ -90,6 +91,8 @@ export function NavMain({
   items: NavItem[]
 }) {
   const pathname = usePathname()
+  const { formatBranchUrl } = useBranchFilter()
+
   return (
     <SidebarGroup>
       <SidebarMenu>
@@ -124,7 +127,7 @@ export function NavMain({
                       return (
                       <SidebarMenuSubItem key={subItem.title}>
                         <SidebarMenuSubButton asChild isActive={isSubActive}>
-                          <Link href={subItem.url}>
+                          <Link href={formatBranchUrl(subItem.url)}>
                             <span>{subItem.title}</span>
                           </Link>
                         </SidebarMenuSubButton>
@@ -142,7 +145,7 @@ export function NavMain({
                 tooltip={item.title}
                 isActive={isActive}
               >
-                <Link href={item.url}>
+                <Link href={formatBranchUrl(item.url)}>
                   {item.icon ? <Icon name={item.icon} size={24} /> : null}
                   <span>{item.title}</span>
                 </Link>

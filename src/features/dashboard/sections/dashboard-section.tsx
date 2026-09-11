@@ -18,26 +18,42 @@ import { DashboardPaymentPerformanceCard } from "@/features/dashboard/components
 import { DashboardPeriodFilter } from "@/features/dashboard/components/dashboard-period-filter"
 import { DashboardSalesRevenueChart } from "@/features/dashboard/components/dashboard-sales-revenue-chart"
 import { DashboardSummaryCards } from "@/features/dashboard/components/dashboard-summary-cards"
+import { TotalDeliveriesModal } from "@/features/dashboard/components/total-deliveries-modal"
+import { OngoingOrdersModal } from "@/features/dashboard/components/ongoing-orders-modal"
+import { TotalRevenueModal } from "@/features/dashboard/components/total-revenue-modal"
+import { TotalUsersModal } from "@/features/dashboard/components/total-users-modal"
 import { DashboardTopMotopilotCard } from "@/features/dashboard/components/dashboard-top-motopilot-card"
 import { DashboardTopSellingList } from "@/features/dashboard/components/dashboard-top-selling-list"
 import { DashboardPeriod } from "@/features/dashboard/enums"
 import { useDashboardOperationalReports } from "@/features/dashboard/hooks/use-dashboard-operational-reports"
 import { useDashboardOverview } from "@/features/dashboard/hooks/use-dashboard-overview"
+import { useBranchFilter } from "@/context/branch-context"
 import { AppLoader } from "@/components/ui/app-loader"
 import { useFilterToast } from "@/hooks/use-filter-toast"
 import { cn } from "@/lib/utils"
 
 
 export function DashboardSection() {
+  const { branchId } = useBranchFilter()
   const [period, setPeriod] = useState(DashboardPeriod.TwentyFourHours)
   const [dateRange, setDateRange] = useState<DateRange | undefined>()
+  const [isTotalDeliveriesModalOpen, setIsTotalDeliveriesModalOpen] =
+    useState(false)
+  const [isOngoingOrdersModalOpen, setIsOngoingOrdersModalOpen] =
+    useState(false)
+  const [isTotalRevenueModalOpen, setIsTotalRevenueModalOpen] =
+    useState(false)
+  const [isTotalUsersModalOpen, setIsTotalUsersModalOpen] =
+    useState(false)
   const { data, isPending, isFetching, isError, error } = useDashboardOverview(
     period,
     dateRange,
+    branchId
   )
   const { data: operationalData } = useDashboardOperationalReports(
     period,
-    dateRange
+    dateRange,
+    branchId
   )
 
   useFilterToast({
@@ -104,7 +120,54 @@ export function DashboardSection() {
         onDateRangeChange={handleDateRangeChange}
       />
 
-      {data.kpis?.length ? <DashboardSummaryCards kpis={data.kpis} /> : null}
+      {data.kpis?.length ? (
+        <DashboardSummaryCards
+          kpis={data.kpis}
+          onCardClick={(key) => {
+            if (key === "total_deliveries") {
+              setIsTotalDeliveriesModalOpen(true)
+            } else if (key === "ongoing_orders") {
+              setIsOngoingOrdersModalOpen(true)
+            } else if (key === "total_revenue") {
+              setIsTotalRevenueModalOpen(true)
+            } else if (key === "total_users") {
+              setIsTotalUsersModalOpen(true)
+            }
+          }}
+        />
+      ) : null}
+
+      <TotalDeliveriesModal
+        open={isTotalDeliveriesModalOpen}
+        onOpenChange={setIsTotalDeliveriesModalOpen}
+        currentPeriod={period}
+        dateRange={dateRange}
+        fulfillmentBranchId={branchId}
+      />
+
+      <OngoingOrdersModal
+        open={isOngoingOrdersModalOpen}
+        onOpenChange={setIsOngoingOrdersModalOpen}
+        currentPeriod={period}
+        dateRange={dateRange}
+        fulfillmentBranchId={branchId}
+      />
+
+      <TotalRevenueModal
+        open={isTotalRevenueModalOpen}
+        onOpenChange={setIsTotalRevenueModalOpen}
+        currentPeriod={period}
+        dateRange={dateRange}
+        fulfillmentBranchId={branchId}
+      />
+
+      <TotalUsersModal
+        open={isTotalUsersModalOpen}
+        onOpenChange={setIsTotalUsersModalOpen}
+        currentPeriod={period}
+        dateRange={dateRange}
+        fulfillmentBranchId={branchId}
+      />
 
       {operationalData?.discounts_promotions_refunds ? (
         <DashboardDiscountsRefundsCard

@@ -13,12 +13,14 @@ import {
   useGiftcards,
   usePromotionOffers,
 } from "@/features/promotions/hooks/use-promotion-queries"
+import { useBranchFilter } from "@/context/branch-context"
 import type { OfferTab } from "@/features/promotions/types"
 import { filterOffers } from "@/features/promotions/utils/promotions"
 import { AppLoader } from "@/components/ui/app-loader"
 
 export function PromotionDiscountSection() {
   const router = useRouter()
+  const { branchId } = useBranchFilter()
   const [tab, setTab] = useState<OfferTab>("all")
   const [search, setSearch] = useState("")
   const {
@@ -27,7 +29,7 @@ export function PromotionDiscountSection() {
     isError,
     error,
     isFetching,
-  } = usePromotionOffers({ tab })
+  } = usePromotionOffers({ tab, fulfillment_branch_id: branchId })
   const {
     data: giftcards = [],
     isPending: isGiftcardsPending,

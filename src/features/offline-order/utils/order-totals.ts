@@ -7,8 +7,24 @@ export function calculateOfflineOrderTotals(subtotal: number) {
   return { subtotal, serviceFee, total }
 }
 
-export function formatOfflineOrderAmount(amount: number) {
-  return `₦${amount.toLocaleString()}`
+export function formatOfflineOrderAmount(amount?: number | null) {
+  const value = amount ?? 0
+  return `₦${value.toLocaleString()}`
+}
+
+export function resolveOfflineOrderAmount(
+  amount?: number | null,
+  amountKobo?: number | null,
+) {
+  if (typeof amount === "number" && Number.isFinite(amount)) {
+    return amount
+  }
+
+  if (typeof amountKobo === "number" && Number.isFinite(amountKobo)) {
+    return amountKobo / 100
+  }
+
+  return 0
 }
 
 export function generateOfflineOrderNumber() {

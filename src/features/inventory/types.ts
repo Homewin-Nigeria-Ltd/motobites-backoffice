@@ -73,6 +73,7 @@ export type InventoryListParams = {
   search?: string
   category?: string
   stock_level?: string
+  fulfillment_branch_id?: number | null
 }
 
 export type InventoryListMeta = {

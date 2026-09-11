@@ -90,6 +90,7 @@ export type CustomerListParams = {
   per_page?: number
   search?: string
   tab?: CustomerTab
+  fulfillment_branch_id?: number | null
 }
 
 export type CustomerListMeta = {

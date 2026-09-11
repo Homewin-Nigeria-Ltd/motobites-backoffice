@@ -19,7 +19,7 @@ function getDeleteRequestReason(request: ApiSalesDashboardDeleteRequest) {
 }
 
 type CreateDeleteRequestColumnsOptions = {
-  onApprove: (orderId: string) => void
+  onApprove: (request: ApiSalesDashboardDeleteRequest) => void
 }
 
 export function createDeleteRequestColumns({
@@ -80,7 +80,7 @@ export function createDeleteRequestColumns({
             type="button"
             variant="outline"
             className="border-destructive text-destructive hover:bg-destructive/5"
-            onClick={() => onApprove(String(row.original.order_id))}
+            onClick={() => onApprove(row.original)}
           >
             Approve Deletion
           </Button>

@@ -6,6 +6,7 @@ import type {
   ApiOfflineOrderResponse,
   ApiSalesDashboardSavedOrderMutationResponse,
   ApiSalesDashboardSavedOrderResponse,
+  ApproveOfflineOrderDeletionPayload,
   CreateOfflineOrderDeleteRequestPayload,
   CreateOfflineOrderPayload,
   SaveOfflineOrderPayload,
@@ -34,9 +35,16 @@ export const offlineOrderMutations = {
       ),
   },
   approveDeletion: {
-    mutationFn: (orderId: string | number) =>
-      api.delete<ApiOfflineOrderCancelResponse>(
+    mutationFn: ({
+      orderId,
+      payload,
+    }: {
+      orderId: string | number
+      payload: ApproveOfflineOrderDeletionPayload
+    }) =>
+      api.delete<ApiOfflineOrderCancelResponse, ApproveOfflineOrderDeletionPayload>(
         offlineOrderEndpoints.order(orderId),
+        { body: payload },
       ),
   },
   saveOrder: {

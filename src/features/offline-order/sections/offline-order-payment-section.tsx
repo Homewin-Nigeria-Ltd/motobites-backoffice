@@ -1,6 +1,5 @@
 "use client"
 
-import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
@@ -10,6 +9,9 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useSession } from "@/features/auth"
+import { OfflineOrderBackButton } from "@/features/offline-order/components/offline-order-back-button"
+import { useBranchFilter } from "@/context/branch-context"
+import { OfflineOrderBranchField } from "@/features/offline-order/components/offline-order-branch-field"
 import { OfflineOrderEmptyState } from "@/features/offline-order/components/offline-order-empty-state"
 import { OfflineOrderPaymentMethodCards } from "@/features/offline-order/components/offline-order-payment-method-cards"
 import { OfflineOrderPreviewCard } from "@/features/offline-order/components/offline-order-preview-card"
@@ -28,6 +30,7 @@ import { toast } from "@/lib/toast"
 export function OfflineOrderPaymentSection() {
   const router = useRouter()
   const { data: session } = useSession()
+  const { branchId: contextBranchId, selectedBranch: contextBranch, activeBranches } = useBranchFilter()
   const user = session?.user
   const { items, selectedCount, subtotal, clearCart, isHydrated } =
     useOfflineOrderCart()
@@ -37,6 +40,7 @@ export function OfflineOrderPaymentSection() {
     setCustomerPhone,
     setPaymentMethod,
     setTakenBy,
+    setBranch,
     resetCheckout,
   } = useOfflineOrderCheckout()
   const { savedOrderCount } = useSalesDashboardSavedOrders()
@@ -54,9 +58,22 @@ export function OfflineOrderPaymentSection() {
     setTakenBy(String(user.id), user.name)
   }, [checkout.takenById, setTakenBy, user])
 
+  useEffect(() => {
+    if (checkout.branchId) {
+      return
+    }
+
+    if (contextBranchId) {
+      setBranch(contextBranchId, contextBranch?.name)
+    } else if (activeBranches.length > 0) {
+      setBranch(Number(activeBranches[0].id), activeBranches[0].name)
+    }
+  }, [checkout.branchId, contextBranchId, contextBranch?.name, activeBranches, setBranch])
+
   if (isLeaving || !isHydrated) {
     return (
       <div className="flex min-h-0 flex-1 flex-col bg-muted">
+        <OfflineOrderBackButton href="/offline-order/review" label="Back to Review" />
         <AppLoader />
       </div>
     )
@@ -64,17 +81,21 @@ export function OfflineOrderPaymentSection() {
 
   if (selectedCount === 0) {
     return (
-      <OfflineOrderEmptyState
-        message="No items selected yet. Add menu items to continue."
-        secondaryAction={
-          savedOrderCount > 0
-            ? {
+      <div className="flex min-h-0 flex-1 flex-col bg-muted">
+        <OfflineOrderBackButton href="/offline-order/review" label="Back to Review" />
+        <OfflineOrderEmptyState
+          message="No items selected yet. Add menu items to continue."
+          showBackButton={false}
+          secondaryAction={
+            savedOrderCount > 0
+              ? {
                 label: "View Saved Orders",
                 onClick: () => router.push("/offline-order/saved"),
               }
-            : undefined
-        }
-      />
+              : undefined
+          }
+        />
+      </div>
     )
   }
 
@@ -113,6 +134,8 @@ export function OfflineOrderPaymentSection() {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col bg-muted">
+      <OfflineOrderBackButton href="/offline-order/review" label="Back to Review" />
+
       <div className="grid min-h-0 flex-1 gap-6 p-4 md:p-6 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div className="space-y-6">
           <section className="space-y-4 rounded-2xl border border-border bg-background p-5">
@@ -159,6 +182,17 @@ export function OfflineOrderPaymentSection() {
               currentUserId={user?.id}
               currentUserName={user?.name}
               onAssign={setTakenBy}
+            />
+          </section>
+
+          <section className="space-y-3">
+            <h2 className="text-base font-semibold text-foreground">
+              Fulfillment Branch
+            </h2>
+            <OfflineOrderBranchField
+              selectedBranchId={checkout.branchId ?? null}
+              selectedBranchName={checkout.branchName}
+              onSelectBranch={setBranch}
             />
           </section>
 
@@ -226,10 +260,6 @@ export function OfflineOrderPaymentSection() {
             You can save this order and serve another customer, then return to
             complete it.
           </div>
-
-          <Button asChild variant="ghost" className="w-full">
-            <Link href="/offline-order/review">Back to Review</Link>
-          </Button>
         </div>
       </div>
     </div>

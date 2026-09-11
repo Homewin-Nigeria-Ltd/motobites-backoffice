@@ -24,6 +24,8 @@ const defaultCheckout: OfflineOrderCheckoutDraft = {
   paymentMethod: "cash",
   takenById: "",
   takenByName: "",
+  branchId: null,
+  branchName: "",
   managerVerificationNotes: "",
 }
 
@@ -79,6 +81,12 @@ export function useOfflineOrderCheckout() {
     [updateCheckout],
   )
 
+  const setBranch = useCallback(
+    (branchId: number | null, branchName?: string | null) =>
+      updateCheckout({ branchId, branchName: branchName ?? "" }),
+    [updateCheckout],
+  )
+
   const setManagerVerificationNotes = useCallback(
     (managerVerificationNotes: string) =>
       updateCheckout({ managerVerificationNotes }),
@@ -96,6 +104,7 @@ export function useOfflineOrderCheckout() {
     setOrderSource,
     setPaymentMethod,
     setTakenBy,
+    setBranch,
     setManagerVerificationNotes,
     resetCheckout,
   }

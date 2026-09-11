@@ -8,6 +8,8 @@ import type {
   DashboardOverviewResponse,
   OperationalReportsData,
   OperationalReportsResponse,
+  TotalDeliveriesCardData,
+  TotalDeliveriesCardResponse,
 } from "../types"
 import { dashboardEndpoints } from "./endpoints"
 import { dashboardKeys } from "./keys"
@@ -23,6 +25,10 @@ async function fetchDashboardOverview(
 
   if (params.to) {
     query.to = params.to
+  }
+
+  if (params.fulfillment_branch_id !== undefined && params.fulfillment_branch_id !== null) {
+    query.fulfillment_branch_id = String(params.fulfillment_branch_id)
   }
 
   const response = await api.get<DashboardOverviewResponse>(
@@ -46,8 +52,38 @@ async function fetchDashboardOperationalReports(
     query.to = params.to
   }
 
+  if (params.fulfillment_branch_id !== undefined && params.fulfillment_branch_id !== null) {
+    query.fulfillment_branch_id = String(params.fulfillment_branch_id)
+  }
+
   const response = await api.get<OperationalReportsResponse>(
     dashboardEndpoints.operationalReports,
+    query
+  )
+
+  return response.data
+}
+
+async function fetchDashboardCardDetails(
+  card: string,
+  params: DashboardOverviewParams
+): Promise<TotalDeliveriesCardData> {
+  const query: Record<string, string> = { period: params.period }
+
+  if (params.from) {
+    query.from = params.from
+  }
+
+  if (params.to) {
+    query.to = params.to
+  }
+
+  if (params.fulfillment_branch_id !== undefined && params.fulfillment_branch_id !== null) {
+    query.fulfillment_branch_id = String(params.fulfillment_branch_id)
+  }
+
+  const response = await api.get<TotalDeliveriesCardResponse>(
+    dashboardEndpoints.cardDetails(card),
     query
   )
 
@@ -65,6 +101,17 @@ export const dashboardQueries = {
     queryOptions({
       queryKey: dashboardKeys.operationalReports(params),
       queryFn: () => fetchDashboardOperationalReports(params),
+      placeholderData: (previous) => previous,
+    }),
+  cardDetails: (
+    card: string,
+    params: DashboardOverviewParams,
+    enabled: boolean = true
+  ) =>
+    queryOptions({
+      queryKey: dashboardKeys.cardDetails(card, params),
+      queryFn: () => fetchDashboardCardDetails(card, params),
+      enabled,
       placeholderData: (previous) => previous,
     }),
 }

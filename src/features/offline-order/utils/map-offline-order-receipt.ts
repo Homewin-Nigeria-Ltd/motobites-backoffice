@@ -45,6 +45,7 @@ export function mapOfflineOrderReceipt({
       ? normalizePaymentMethodFromApi(apiOrder.payment_method)
       : checkout.paymentMethod,
     takenByName,
+    branchName: checkout.branchName || null,
     subtotal,
     serviceFee,
     total,

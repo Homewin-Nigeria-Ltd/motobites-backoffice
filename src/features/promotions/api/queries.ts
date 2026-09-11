@@ -24,6 +24,10 @@ async function fetchOffers(params: OfferListParams = {}): Promise<Offer[]> {
     tab: params.tab ?? "all",
   }
 
+  if (params.fulfillment_branch_id !== undefined && params.fulfillment_branch_id !== null) {
+    query.fulfillment_branch_id = String(params.fulfillment_branch_id)
+  }
+
   const response = await api.get<ApiOffersResponse>(
     promotionEndpoints.offers,
     query

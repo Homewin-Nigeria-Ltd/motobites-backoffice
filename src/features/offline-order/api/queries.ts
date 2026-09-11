@@ -8,11 +8,13 @@ import type {
   ApiSalesDashboardMenuItemsResponse,
   ApiSalesDashboardOrdersResponse,
   ApiSalesDashboardRecentActivityResponse,
+  ApiSalesDashboardOperationalReportsResponse,
   ApiSalesDashboardRecentTransactionsResponse,
   ApiSalesDashboardSavedOrderResponse,
   ApiSalesDashboardStatsResponse,
   ApiSalesDashboardTopStaffResponse,
   SalesDashboardMenuItemsParams,
+  SalesDashboardOperationalReportsParams,
   SalesDashboardOrdersParams,
   SalesDashboardRecentTransactionsParams,
 } from "../types"
@@ -43,6 +45,10 @@ function buildOrdersQuery(params: SalesDashboardOrdersParams) {
     query.search = params.search
   }
 
+  if (params.fulfillment_branch_id !== undefined && params.fulfillment_branch_id !== null) {
+    query.fulfillment_branch_id = params.fulfillment_branch_id
+  }
+
   return query
 }
 
@@ -65,7 +71,19 @@ function buildRecentTransactionsQuery(
     query.date_to = params.date_to
   }
 
+  if (params.fulfillment_branch_id !== undefined && params.fulfillment_branch_id !== null) {
+    query.fulfillment_branch_id = params.fulfillment_branch_id
+  }
+
   return query
+}
+
+function buildOperationalReportsQuery(
+  params: SalesDashboardOperationalReportsParams,
+) {
+  return {
+    period: params.period ?? "week",
+  }
 }
 
 export const offlineOrderQueries = {
@@ -148,13 +166,21 @@ export const offlineOrderQueries = {
       staleTime: 30_000,
     }),
 
-  stats: () =>
+  stats: (branchId?: number | null) =>
     queryOptions({
-      queryKey: offlineOrderKeys.stats(),
-      queryFn: () =>
-        api
-          .get<ApiSalesDashboardStatsResponse>(offlineOrderEndpoints.stats)
-          .then((response) => response.data),
+      queryKey: offlineOrderKeys.stats(branchId),
+      queryFn: () => {
+        const query: Record<string, string | number> = {}
+        if (branchId !== undefined && branchId !== null) {
+          query.fulfillment_branch_id = branchId
+        }
+        return api
+          .get<ApiSalesDashboardStatsResponse>(
+            offlineOrderEndpoints.stats,
+            Object.keys(query).length > 0 ? query : undefined
+          )
+          .then((response) => response.data)
+      },
       staleTime: 30_000,
     }),
 
@@ -188,6 +214,19 @@ export const offlineOrderQueries = {
           .get<ApiSalesDashboardRecentTransactionsResponse>(
             offlineOrderEndpoints.recentTransactions,
             buildRecentTransactionsQuery(params),
+          )
+          .then((response) => response.data),
+      staleTime: 30_000,
+    }),
+
+  operationalReports: (params: SalesDashboardOperationalReportsParams = {}) =>
+    queryOptions({
+      queryKey: offlineOrderKeys.operationalReports(params),
+      queryFn: () =>
+        api
+          .get<ApiSalesDashboardOperationalReportsResponse>(
+            offlineOrderEndpoints.operationalReports,
+            buildOperationalReportsQuery(params),
           )
           .then((response) => response.data),
       staleTime: 30_000,

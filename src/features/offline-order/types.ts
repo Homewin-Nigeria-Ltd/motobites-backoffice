@@ -37,6 +37,7 @@ export type SalesDashboardOrdersParams = {
   search?: string
   per_page?: number
   page?: number
+  fulfillment_branch_id?: number | null
 }
 
 export type SalesDashboardRecentTransactionsParams = {
@@ -44,6 +45,7 @@ export type SalesDashboardRecentTransactionsParams = {
   payment_method?: string
   date_from?: string
   date_to?: string
+  fulfillment_branch_id?: number | null
 }
 
 export type ApiSalesDashboardKitchenOpeningHoursDay = {
@@ -183,6 +185,10 @@ export type ApiSalesDashboardOrder = {
   completed_at?: string
   saved_at?: string
   time_saved?: string
+  ordered_at?: string
+  order_date?: string
+  order_time?: string
+  time_ago?: string
   kitchen?: {
     id: number
     name: string
@@ -242,6 +248,10 @@ export type ApiSalesDashboardDeleteRequestsResponse = {
 }
 
 export type CreateOfflineOrderDeleteRequestPayload = {
+  reason: string
+}
+
+export type ApproveOfflineOrderDeletionPayload = {
   reason: string
 }
 
@@ -344,6 +354,92 @@ export type ApiSalesDashboardRecentTransactionsResponse = {
   message?: string
 }
 
+export type SalesDashboardOperationalReportsPeriod =
+  | "day"
+  | "week"
+  | "month"
+  | "year"
+
+export type SalesDashboardOperationalReportsParams = {
+  period?: SalesDashboardOperationalReportsPeriod
+}
+
+export type ApiSalesDashboardOperationalReportPeriod = {
+  key: string
+  from: string
+  to: string
+}
+
+export type ApiSalesDashboardBestSellingProduct = {
+  rank: number
+  product: string
+  menu_item_id: number
+  unit_price: number
+  unit_price_kobo: number
+  units: number
+  sales_kobo: number
+  sales: number
+}
+
+export type ApiSalesDashboardProductCategoryPerformance = {
+  category: string
+  units: number
+  sales_kobo: number
+  sales: number
+  aov_kobo: number
+  contribution_percent: number
+  growth_percent: number
+}
+
+export type ApiSalesDashboardOrderChannelReport = {
+  kitchen_id: number
+  kitchen: string
+  channel: string
+  orders: number
+  sales_kobo: number
+  sales: number
+}
+
+export type ApiSalesDashboardDiscountsPromotionsRefunds = {
+  discounted_or_promotional_orders: number
+  discounted_or_promotional_sales_kobo: number
+  discount_given_kobo: number
+  refund_count: number
+  refund_amount_kobo: number
+}
+
+export type ApiSalesDashboardPaymentPerformanceStatus = {
+  count: number
+  amount_kobo: number
+}
+
+export type ApiSalesDashboardPaymentPerformance = {
+  method: string
+  successful: ApiSalesDashboardPaymentPerformanceStatus
+  failed: ApiSalesDashboardPaymentPerformanceStatus
+  pending: ApiSalesDashboardPaymentPerformanceStatus
+  refunded: ApiSalesDashboardPaymentPerformanceStatus
+}
+
+export type ApiSalesDashboardOperationalReports = {
+  period: ApiSalesDashboardOperationalReportPeriod
+  scope: string
+  best_selling_products: ApiSalesDashboardBestSellingProduct[]
+  product_category_performance: ApiSalesDashboardProductCategoryPerformance[]
+  order_channel_report: ApiSalesDashboardOrderChannelReport[]
+  discounts_promotions_refunds: ApiSalesDashboardDiscountsPromotionsRefunds
+  payment_performance: ApiSalesDashboardPaymentPerformance[]
+  sales_kobo: number
+  sales: number
+  sales_growth_percent: number
+}
+
+export type ApiSalesDashboardOperationalReportsResponse = {
+  success: boolean
+  data: ApiSalesDashboardOperationalReports
+  message?: string
+}
+
 export type OfflineOrderOverviewSummary = {
   activeOrders: number
   activeOrdersBadge: string
@@ -442,6 +538,8 @@ export type CreateOfflineOrderPayload = {
   customer_phone?: string
   payment_method: OfflineOrderPaymentMethod
   order_source: OfflineOrderOrderSource
+  fulfillment_branch_id?: number | null
+  branch_id?: number | null
   notes?: string
 }
 
@@ -451,6 +549,8 @@ export type SaveOfflineOrderPayload = {
   customer_phone?: string
   order_source: OfflineOrderOrderSource
   payment_method: OfflineOrderPaymentMethod
+  fulfillment_branch_id?: number | null
+  branch_id?: number | null
   notes?: string
 }
 
@@ -492,6 +592,8 @@ export type OfflineOrderCheckoutDraft = {
   paymentMethod: OfflineOrderPaymentMethod
   takenById: string
   takenByName: string
+  branchId?: number | null
+  branchName?: string | null
   managerVerificationNotes: string
 }
 
@@ -513,6 +615,7 @@ export type OfflineOrderReceipt = {
   customerPhone: string
   paymentMethod: OfflineOrderPaymentMethod
   takenByName: string
+  branchName?: string | null
   subtotal: number
   serviceFee: number
   total: number

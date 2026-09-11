@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 
+import { useBranchFilter } from "@/context/branch-context"
 import { orderQueries } from "../api/queries"
 import type { OrderAssigneeType, OrderTab } from "../types"
 
@@ -23,6 +24,7 @@ type UseOrdersParams = {
   per_page?: number
   page?: number
   search?: string
+  fulfillment_branch_id?: number | null
 }
 
 export function useOrders({
@@ -30,7 +32,11 @@ export function useOrders({
   per_page = 20,
   page = 1,
   search,
+  fulfillment_branch_id,
 }: UseOrdersParams) {
+  const { branchId: contextBranchId } = useBranchFilter()
+  const activeBranchId =
+    fulfillment_branch_id !== undefined ? fulfillment_branch_id : contextBranchId
   const queryTab = tab === "performance" ? "pending" : tab
   const trimmedSearch = search?.trim()
 
@@ -40,6 +46,8 @@ export function useOrders({
       per_page,
       page,
       search: trimmedSearch || undefined,
+      fulfillment_branch_id: activeBranchId,
+      branch_id: activeBranchId,
     }),
     enabled: tab !== "performance",
   })
@@ -52,8 +60,11 @@ export function useOrderDetail(orderId: string | null, enabled = true) {
   })
 }
 
-export function useOrderTabCounts() {
-  const query = useQuery(orderQueries.tabCounts())
+export function useOrderTabCounts(fulfillment_branch_id?: number | null) {
+  const { branchId: contextBranchId } = useBranchFilter()
+  const activeBranchId =
+    fulfillment_branch_id !== undefined ? fulfillment_branch_id : contextBranchId
+  const query = useQuery(orderQueries.tabCounts(activeBranchId))
 
   const counts: Record<OrderTab, number> = query.data
     ? {
@@ -113,9 +124,17 @@ export function useOrderSearchInput() {
   return { value, setValue }
 }
 
-export function useOrderAssignees(type: OrderAssigneeType, enabled = true) {
+export function useOrderAssignees(
+  type: OrderAssigneeType,
+  enabled = true,
+  fulfillment_branch_id?: number | null
+) {
+  const { branchId: contextBranchId } = useBranchFilter()
+  const activeBranchId =
+    fulfillment_branch_id !== undefined ? fulfillment_branch_id : contextBranchId
+
   return useQuery({
-    ...orderQueries.assignees(type),
+    ...orderQueries.assignees(type, activeBranchId),
     enabled,
   })
 }

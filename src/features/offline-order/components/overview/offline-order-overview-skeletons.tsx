@@ -67,3 +67,22 @@ export function OverviewTransactionsSkeleton() {
     </div>
   )
 }
+
+export function OverviewOperationalReportsSkeleton() {
+  return (
+    <div className="rounded-2xl border border-border bg-background p-5">
+      <Skeleton className="mb-2 h-5 w-44" />
+      <Skeleton className="mb-5 h-4 w-72" />
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {Array.from({ length: 4 }).map((_, index) => (
+          <Skeleton key={index} className="h-24 w-full rounded-xl" />
+        ))}
+      </div>
+      <div className="mt-5 grid gap-4 xl:grid-cols-2">
+        {Array.from({ length: 4 }).map((_, index) => (
+          <Skeleton key={index} className="h-40 w-full rounded-xl" />
+        ))}
+      </div>
+    </div>
+  )
+}

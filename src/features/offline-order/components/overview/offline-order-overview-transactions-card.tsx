@@ -19,7 +19,7 @@ export function OfflineOrderOverviewTransactionsCard({
           Recent Transactions
         </h3>
         <Button asChild variant="link" className="h-auto p-0 text-primary">
-          <Link href="/offline-order/new">View All</Link>
+          <Link href="/offline-order/sales-transaction/history">View All</Link>
         </Button>
       </div>
 
@@ -33,10 +33,14 @@ export function OfflineOrderOverviewTransactionsCard({
 
       <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:justify-end">
         <Button asChild variant="link" className="h-auto p-0 text-primary">
-          <Link href="/order">Go to Transaction Management →</Link>
+          <Link href="/offline-order/sales-transaction/history">
+            Go to Transaction History →
+          </Link>
         </Button>
         <Button asChild variant="link" className="h-auto p-0 text-primary">
-          <Link href="/revenue-analytics">View Transaction Analytics →</Link>
+          <Link href="/offline-order/sales-transaction/analytics">
+            View Transaction Analytics →
+          </Link>
         </Button>
       </div>
     </div>
