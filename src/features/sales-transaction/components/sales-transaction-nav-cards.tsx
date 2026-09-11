@@ -3,12 +3,17 @@ import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
 import { Icon } from "@/components/ui/icons"
 import { cn } from "@/lib/utils"
-import type { SalesTransactionHistoryPreviewRow } from "@/features/sales-transaction/types"
+import type {
+  SalesTransactionAnalyticsPreview,
+  SalesTransactionHistoryPreviewRow,
+} from "@/features/sales-transaction/types"
 import { formatSalesTransactionAmount } from "@/features/sales-transaction/utils/format"
+import { getSalesTransactionSourceBadgeClass } from "@/features/sales-transaction/utils/source-badge"
 import { getSalesTransactionStatusBadgeClass } from "@/features/sales-transaction/utils/status-badge"
 
 type SalesTransactionNavCardsProps = {
   historyPreview: SalesTransactionHistoryPreviewRow[]
+  analyticsPreview?: SalesTransactionAnalyticsPreview | null
   isLoading?: boolean
 }
 
@@ -91,7 +96,13 @@ function TransactionHistoryCard({
   )
 }
 
-function TransactionAnalyticsCard() {
+function TransactionAnalyticsCard({
+  analyticsPreview,
+  isLoading = false,
+}: {
+  analyticsPreview?: SalesTransactionAnalyticsPreview | null
+  isLoading?: boolean
+}) {
   return (
     <div className="flex h-full flex-col rounded-2xl border border-border bg-background p-5">
       <div className="flex items-start gap-3">
@@ -109,21 +120,50 @@ function TransactionAnalyticsCard() {
         </div>
       </div>
 
-      <div className="mt-5 flex flex-1 items-end rounded-xl bg-muted/50 p-4">
-        <svg
-          viewBox="0 0 240 80"
-          className="h-20 w-full text-primary"
-          aria-hidden="true"
-        >
-          <polyline
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="3"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            points="0,60 30,45 60,52 90,28 120,38 150,18 180,30 210,12 240,22"
-          />
-        </svg>
+      <div className="mt-5 flex flex-1 flex-col justify-end rounded-xl bg-muted/50 p-4">
+        {isLoading ? (
+          <div className="space-y-3">
+            {Array.from({ length: 4 }).map((_, index) => (
+              <div key={index} className="space-y-2">
+                <div className="h-3 w-24 animate-pulse rounded bg-muted" />
+                <div className="h-2 w-full animate-pulse rounded-full bg-muted" />
+              </div>
+            ))}
+          </div>
+        ) : analyticsPreview?.sources.length ? (
+          <div className="space-y-3">
+            <p className="text-xs text-muted-foreground">
+              Revenue by source · {analyticsPreview.date}
+            </p>
+            {analyticsPreview.sources.map((source) => (
+              <div key={source.source}>
+                <div className="mb-1 flex items-center justify-between gap-2 text-xs">
+                  <Badge
+                    className={cn(
+                      "border-0 px-2 py-0.5 font-medium",
+                      getSalesTransactionSourceBadgeClass(source.source),
+                    )}
+                  >
+                    {source.sourceLabel}
+                  </Badge>
+                  <span className="font-medium text-foreground">
+                    {formatSalesTransactionAmount(source.revenue)}
+                  </span>
+                </div>
+                <div className="h-2 overflow-hidden rounded-full bg-background">
+                  <div
+                    className="h-full rounded-full bg-primary"
+                    style={{ width: `${Math.max(source.percent, 4)}%` }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="py-6 text-center text-sm text-muted-foreground">
+            No analytics preview available yet.
+          </p>
+        )}
       </div>
 
       <Link
@@ -138,6 +178,7 @@ function TransactionAnalyticsCard() {
 
 export function SalesTransactionNavCards({
   historyPreview,
+  analyticsPreview,
   isLoading = false,
 }: SalesTransactionNavCardsProps) {
   return (
@@ -146,7 +187,10 @@ export function SalesTransactionNavCards({
         historyPreview={historyPreview}
         isLoading={isLoading}
       />
-      <TransactionAnalyticsCard />
+      <TransactionAnalyticsCard
+        analyticsPreview={analyticsPreview}
+        isLoading={isLoading}
+      />
     </div>
   )
 }

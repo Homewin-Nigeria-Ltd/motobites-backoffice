@@ -1,28 +1,69 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
-import { Icon } from "@/components/ui/icons"
-import { SALES_TRANSACTION_ANALYTICS_PERIOD } from "@/features/sales-transaction/constants/analytics-mock-data"
+import type { DateRange } from "react-day-picker"
 
-export function SalesTransactionAnalyticsToolbar() {
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { DashboardDateRangePicker } from "@/features/dashboard/components/dashboard-date-range-picker"
+import type { SalesTransactionAnalyticsPeriod } from "@/features/sales-transaction/types"
+
+const PERIOD_OPTIONS: Array<{
+  value: SalesTransactionAnalyticsPeriod
+  label: string
+}> = [
+  { value: "24h", label: "Last 24 hours" },
+  { value: "week", label: "This Week" },
+  { value: "3months", label: "Last 3 months" },
+  { value: "year", label: "This Year" },
+]
+
+type SalesTransactionAnalyticsToolbarProps = {
+  period: SalesTransactionAnalyticsPeriod
+  dateRange?: DateRange
+  onPeriodChange: (period: SalesTransactionAnalyticsPeriod) => void
+  onDateRangeChange: (dateRange: DateRange | undefined) => void
+  isLoading?: boolean
+}
+
+export function SalesTransactionAnalyticsToolbar({
+  period,
+  dateRange,
+  onPeriodChange,
+  onDateRangeChange,
+  isLoading = false,
+}: SalesTransactionAnalyticsToolbarProps) {
   return (
-    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-      <Button
-        type="button"
-        variant="outline"
-        className="h-10 w-fit gap-2 px-3 text-sm font-normal text-foreground"
-      >
-        <span className="text-muted-foreground">Analysis Period:</span>
-        {SALES_TRANSACTION_ANALYTICS_PERIOD}
-        <Icon name="chevronDown" className="size-4 opacity-70" />
-      </Button>
+    <div className="flex w-full items-center gap-3">
+      <DashboardDateRangePicker
+        value={dateRange}
+        onChange={onDateRangeChange}
+      />
 
-      <p className="flex items-center gap-2 text-sm text-muted-foreground">
-        <span className="flex size-4 items-center justify-center rounded-full border border-border text-[10px]">
-          ↻
-        </span>
-        Auto-updates live
-      </p>
+      <div className="ml-auto shrink-0">
+        <Select
+          value={period}
+          onValueChange={(value) =>
+            onPeriodChange(value as SalesTransactionAnalyticsPeriod)
+          }
+          disabled={isLoading}
+        >
+          <SelectTrigger className="h-10 w-[11.5rem] border-border bg-background">
+            <SelectValue placeholder="Select period" />
+          </SelectTrigger>
+          <SelectContent align="end">
+            {PERIOD_OPTIONS.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
     </div>
   )
 }

@@ -1,16 +1,35 @@
 import { Badge } from "@/components/ui/badge"
+import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
 import type { SalesTransactionAnalyticsSummary } from "@/features/sales-transaction/types"
 import { formatSalesTransactionAmount } from "@/features/sales-transaction/utils/format"
 
 type SalesTransactionAnalyticsStatsProps = {
   summary: SalesTransactionAnalyticsSummary
+  isLoading?: boolean
+}
+
+export function SalesTransactionAnalyticsStatsSkeleton() {
+  return (
+    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      {Array.from({ length: 4 }).map((_, index) => (
+        <div
+          key={index}
+          className="rounded-2xl border border-border bg-background p-5"
+        >
+          <Skeleton className="h-4 w-28" />
+          <Skeleton className="mt-4 h-9 w-24" />
+          <Skeleton className="mt-2 h-4 w-36" />
+        </div>
+      ))}
+    </div>
+  )
 }
 
 type StatCardProps = {
   label: string
   value: string
-  badge: string
+  badge?: string
   subtitle: string
 }
 
@@ -19,9 +38,11 @@ function StatCard({ label, value, badge, subtitle }: StatCardProps) {
     <div className="rounded-2xl border border-border bg-background p-5">
       <div className="flex items-start justify-between gap-3">
         <p className="text-sm font-medium text-muted-foreground">{label}</p>
-        <Badge className="border-0 bg-emerald-100 px-2 py-0.5 text-[11px] font-medium text-emerald-700">
-          {badge}
-        </Badge>
+        {badge ? (
+          <Badge className="border-0 bg-emerald-100 px-2 py-0.5 text-[11px] font-medium text-emerald-700">
+            {badge}
+          </Badge>
+        ) : null}
       </div>
       <p className="mt-4 text-3xl font-semibold tracking-tight text-foreground">
         {value}
@@ -33,7 +54,12 @@ function StatCard({ label, value, badge, subtitle }: StatCardProps) {
 
 export function SalesTransactionAnalyticsStats({
   summary,
+  isLoading = false,
 }: SalesTransactionAnalyticsStatsProps) {
+  if (isLoading) {
+    return <SalesTransactionAnalyticsStatsSkeleton />
+  }
+
   return (
     <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
       <StatCard

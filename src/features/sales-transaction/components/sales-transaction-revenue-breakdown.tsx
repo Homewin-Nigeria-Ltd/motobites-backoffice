@@ -3,6 +3,7 @@
 import { Cell, Pie, PieChart } from "recharts"
 
 import { Badge } from "@/components/ui/badge"
+import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
 import {
   ChartContainer,
@@ -20,6 +21,8 @@ import { getSalesTransactionSourceBadgeClass } from "@/features/sales-transactio
 type SalesTransactionRevenueBreakdownProps = {
   sources: SalesTransactionRevenueSourceBreakdown[]
   paymentMethods: SalesTransactionPaymentMethodBreakdown[]
+  totalRevenue?: number
+  isLoading?: boolean
 }
 
 function buildSourceChartConfig(sources: SalesTransactionRevenueSourceBreakdown[]) {
@@ -35,7 +38,18 @@ function buildSourceChartConfig(sources: SalesTransactionRevenueSourceBreakdown[
 export function SalesTransactionRevenueBreakdown({
   sources,
   paymentMethods,
+  totalRevenue = 0,
+  isLoading = false,
 }: SalesTransactionRevenueBreakdownProps) {
+  if (isLoading) {
+    return (
+      <div className="grid gap-4 xl:grid-cols-2">
+        <Skeleton className="h-80 w-full rounded-2xl" />
+        <Skeleton className="h-80 w-full rounded-2xl" />
+      </div>
+    )
+  }
+
   const chartData = sources.map((source) => ({
     key: source.key,
     name: source.label,
@@ -93,7 +107,9 @@ export function SalesTransactionRevenueBreakdown({
             <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
               Total
             </p>
-            <p className="text-lg font-semibold text-foreground">₦2.45M</p>
+            <p className="text-lg font-semibold text-foreground">
+              {formatSalesTransactionAmount(totalRevenue)}
+            </p>
           </div>
         </div>
 
@@ -152,6 +168,7 @@ export function SalesTransactionRevenueBreakdown({
 
 export function SalesTransactionTopItemsTable({
   items,
+  isLoading = false,
 }: {
   items: Array<{
     rank: number
@@ -161,6 +178,7 @@ export function SalesTransactionTopItemsTable({
     unitsSold: number
     revenue: number
   }>
+  isLoading?: boolean
 }) {
   return (
     <div className="rounded-2xl border border-border bg-background p-5">
@@ -168,6 +186,13 @@ export function SalesTransactionTopItemsTable({
         Top Performing Items by Channel Source
       </h3>
 
+      {isLoading ? (
+        <Skeleton className="h-56 w-full rounded-xl" />
+      ) : items.length === 0 ? (
+        <p className="py-8 text-center text-sm text-muted-foreground">
+          No top items for this period.
+        </p>
+      ) : (
       <div className="overflow-x-auto">
         <table className="w-full min-w-[42rem] text-sm">
           <thead>
@@ -209,6 +234,7 @@ export function SalesTransactionTopItemsTable({
           </tbody>
         </table>
       </div>
+      )}
     </div>
   )
 }
