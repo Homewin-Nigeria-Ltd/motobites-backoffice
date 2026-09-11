@@ -10,9 +10,13 @@ import { revenueAnalyticsQueries } from "../api/queries"
 
 export function useRevenueAnalytics(
   period: DashboardPeriod,
-  dateRange?: DateRange
+  dateRange?: DateRange,
+  fulfillmentBranchId?: number | null
 ) {
-  const params = buildDashboardOverviewParams(period, dateRange)
+  const params = {
+    ...buildDashboardOverviewParams(period, dateRange),
+    fulfillment_branch_id: fulfillmentBranchId,
+  }
 
   return useQuery(revenueAnalyticsQueries.overview(params))
 }

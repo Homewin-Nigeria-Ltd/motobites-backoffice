@@ -27,6 +27,10 @@ async function fetchDashboardOverview(
     query.to = params.to
   }
 
+  if (params.fulfillment_branch_id !== undefined && params.fulfillment_branch_id !== null) {
+    query.fulfillment_branch_id = String(params.fulfillment_branch_id)
+  }
+
   const response = await api.get<DashboardOverviewResponse>(
     dashboardEndpoints.overview,
     query
@@ -46,6 +50,10 @@ async function fetchDashboardOperationalReports(
 
   if (params.to) {
     query.to = params.to
+  }
+
+  if (params.fulfillment_branch_id !== undefined && params.fulfillment_branch_id !== null) {
+    query.fulfillment_branch_id = String(params.fulfillment_branch_id)
   }
 
   const response = await api.get<OperationalReportsResponse>(
@@ -68,6 +76,10 @@ async function fetchDashboardCardDetails(
 
   if (params.to) {
     query.to = params.to
+  }
+
+  if (params.fulfillment_branch_id !== undefined && params.fulfillment_branch_id !== null) {
+    query.fulfillment_branch_id = String(params.fulfillment_branch_id)
   }
 
   const response = await api.get<TotalDeliveriesCardResponse>(

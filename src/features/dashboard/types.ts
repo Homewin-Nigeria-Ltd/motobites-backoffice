@@ -8,6 +8,7 @@ export type DashboardOverviewParams = {
   period: DashboardPeriod
   from?: string
   to?: string
+  fulfillment_branch_id?: number | null
 }
 
 export type DashboardKpi = {

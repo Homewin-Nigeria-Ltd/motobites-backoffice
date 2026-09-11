@@ -80,16 +80,20 @@ export function TotalDeliveriesModal({
   onOpenChange,
   currentPeriod = DashboardPeriod.TwentyFourHours,
   dateRange,
+  fulfillmentBranchId,
 }: TotalDeliveriesModalProps) {
-  const [selectedInterval, setSelectedInterval] =
-    React.useState<TrendInterval>(() => mapPeriodToInterval(currentPeriod))
+  const [internalInterval, setInternalInterval] =
+    React.useState<TrendInterval | null>(null)
 
-  // Update selected interval when modal is opened with a different dashboard period
-  React.useEffect(() => {
-    if (open) {
-      setSelectedInterval(mapPeriodToInterval(currentPeriod))
+  const selectedInterval =
+    internalInterval ?? mapPeriodToInterval(currentPeriod)
+
+  const handleOpenChange = (nextOpen: boolean) => {
+    if (!nextOpen) {
+      setInternalInterval(null)
     }
-  }, [open, currentPeriod])
+    onOpenChange(nextOpen)
+  }
 
   const fromString = dateRange?.from?.toISOString()
   const toString = dateRange?.to?.toISOString()
@@ -100,8 +104,9 @@ export function TotalDeliveriesModal({
       period: currentPeriod,
       from: fromString,
       to: toString,
+      fulfillment_branch_id: fulfillmentBranchId,
     }
-  }, [currentPeriod, fromString, toString])
+  }, [currentPeriod, fromString, toString, fulfillmentBranchId])
 
   const {
     data: apiData,
@@ -132,7 +137,7 @@ export function TotalDeliveriesModal({
   const summary = apiData?.summary
   const headline = apiData?.headline
   const performance = apiData?.performance
-  const locations = apiData?.by_location ?? []
+  const locations = React.useMemo(() => apiData?.by_location ?? [], [apiData?.by_location])
   const statusBreakdown = apiData?.status_breakdown ?? []
 
   const trendSeries = isCustomTrend
@@ -174,7 +179,7 @@ export function TotalDeliveriesModal({
   }, [performance])
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent
         showCloseButton={false}
         className="w-full max-w-5xl max-h-[92vh] overflow-y-auto p-0 border-border bg-background rounded-3xl gap-0 shadow-2xl"
@@ -245,7 +250,7 @@ export function TotalDeliveriesModal({
             {/* Custom Circular Close Button */}
             <button
               type="button"
-              onClick={() => onOpenChange(false)}
+              onClick={() => handleOpenChange(false)}
               className="size-8 rounded-full border border-border bg-background flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/80 transition-colors shadow-xs"
               aria-label="Close modal"
             >
@@ -584,7 +589,7 @@ export function TotalDeliveriesModal({
                             <button
                               key={tab}
                               type="button"
-                              onClick={() => setSelectedInterval(tab)}
+                              onClick={() => setInternalInterval(tab)}
                               className={cn(
                                 "px-2.5 py-1 text-xs font-medium rounded-md capitalize transition-all",
                                 isActive

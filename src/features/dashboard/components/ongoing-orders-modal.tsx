@@ -21,17 +21,7 @@ import { DashboardPeriod } from "../enums"
 import { dashboardQueries } from "../api/queries"
 import { formatCompactCount, formatDashboardCount } from "../utils/format"
 import { cn } from "@/lib/utils"
-import {
-  Package,
-  TrendingDown,
-  TrendingUp,
-  ArrowUp,
-  ArrowDown,
-  AlertCircle,
-  RefreshCw,
-  X,
-  ExternalLink,
-} from "lucide-react"
+import { Icons } from "@/components/ui/icons"
 import type { OngoingOrdersCardData } from "../types"
 
 type OngoingOrdersModalProps = {
@@ -80,18 +70,14 @@ export function OngoingOrdersModal({
   dateRange,
   fulfillmentBranchId,
 }: OngoingOrdersModalProps) {
-  const [selectedPeriod, setSelectedPeriod] =
-    React.useState<DashboardPeriod>(currentPeriod)
-  const [selectedInterval, setSelectedInterval] = React.useState<TrendInterval>(
-    () => mapPeriodToInterval(currentPeriod)
-  )
+  const [internalPeriod, setInternalPeriod] =
+    React.useState<DashboardPeriod | null>(null)
+  const [internalInterval, setInternalInterval] =
+    React.useState<TrendInterval | null>(null)
 
-  React.useEffect(() => {
-    if (open) {
-      setSelectedPeriod(currentPeriod)
-      setSelectedInterval(mapPeriodToInterval(currentPeriod))
-    }
-  }, [open, currentPeriod])
+  const selectedPeriod = internalPeriod ?? currentPeriod
+  const selectedInterval =
+    internalInterval ?? mapPeriodToInterval(currentPeriod)
 
   const fromString = dateRange?.from?.toISOString()
   const toString = dateRange?.to?.toISOString()
@@ -101,8 +87,9 @@ export function OngoingOrdersModal({
       period: selectedPeriod,
       from: fromString,
       to: toString,
+      fulfillment_branch_id: fulfillmentBranchId,
     }
-  }, [selectedPeriod, fromString, toString])
+  }, [selectedPeriod, fromString, toString, fulfillmentBranchId])
 
   const { data, isLoading, isError, error, refetch } = useQuery(
     dashboardQueries.cardDetails("ongoing_orders", queryParams, open)
@@ -111,13 +98,21 @@ export function OngoingOrdersModal({
   const cardData = data as OngoingOrdersCardData | undefined
 
   const handlePeriodTabChange = (period: DashboardPeriod) => {
-    setSelectedPeriod(period)
-    setSelectedInterval(mapPeriodToInterval(period))
+    setInternalPeriod(period)
+    setInternalInterval(mapPeriodToInterval(period))
   }
 
   const handleIntervalChange = (interval: TrendInterval) => {
-    setSelectedInterval(interval)
-    setSelectedPeriod(mapIntervalToPeriod(interval))
+    setInternalInterval(interval)
+    setInternalPeriod(mapIntervalToPeriod(interval))
+  }
+
+  const handleOpenChange = (nextOpen: boolean) => {
+    if (!nextOpen) {
+      setInternalPeriod(null)
+      setInternalInterval(null)
+    }
+    onOpenChange(nextOpen)
   }
 
   const headlineValue = cardData?.summary?.total_orders ?? cardData?.headline?.value ?? 0
@@ -125,19 +120,20 @@ export function OngoingOrdersModal({
   const isHeadlinePositive = headlineChange >= 0
 
   // Peak orders calculation for the over-time chart
+  const ordersOverTime = cardData?.orders_over_time
   const peakPoint = React.useMemo(() => {
-    if (!cardData?.orders_over_time?.length) return null
-    let max = cardData.orders_over_time[0]
-    for (const pt of cardData.orders_over_time) {
+    if (!ordersOverTime || ordersOverTime.length === 0) return null
+    let max = ordersOverTime[0]
+    for (const pt of ordersOverTime) {
       if (pt.value > max.value) {
         max = pt
       }
     }
     return max.value > 0 ? max : null
-  }, [cardData?.orders_over_time])
+  }, [ordersOverTime])
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent
         showCloseButton={false}
         className="max-h-[94vh] w-full max-w-5xl overflow-y-auto rounded-3xl border border-border bg-background p-6 shadow-2xl sm:p-8"
@@ -151,7 +147,7 @@ export function OngoingOrdersModal({
         <div className="flex flex-col gap-4 border-b border-border/60 pb-6 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-start gap-4">
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-orange-200/70 bg-orange-50 text-orange-600 shadow-xs dark:border-orange-900/50 dark:bg-orange-950/40 dark:text-orange-400">
-              <Package className="h-6 w-6" />
+              <Icons.delivery className="h-6 w-6" />
             </div>
 
             <div>
@@ -171,9 +167,9 @@ export function OngoingOrdersModal({
                   )}
                 >
                   {isHeadlinePositive ? (
-                    <TrendingUp className="h-3 w-3" />
+                    <Icons.arrowUpRight className="h-3 w-3" />
                   ) : (
-                    <TrendingDown className="h-3 w-3" />
+                    <Icons.arrowDownRight className="h-3 w-3" />
                   )}
                   {Math.abs(headlineChange).toFixed(1)}%
                 </span>
@@ -211,7 +207,7 @@ export function OngoingOrdersModal({
               className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-border bg-background text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
               aria-label="Close modal"
             >
-              <X className="h-4 w-4" />
+              <Icons.close className="h-4 w-4" />
             </button>
           </div>
         </div>
@@ -220,7 +216,7 @@ export function OngoingOrdersModal({
         {isError && (
           <div className="my-4 flex items-center justify-between rounded-2xl border border-destructive/20 bg-destructive/5 p-4 text-sm text-destructive">
             <div className="flex items-center gap-3">
-              <AlertCircle className="h-5 w-5 shrink-0" />
+              <Icons.alert className="h-5 w-5 shrink-0" />
               <span>
                 {error instanceof Error
                   ? error.message
@@ -233,7 +229,7 @@ export function OngoingOrdersModal({
               onClick={() => refetch()}
               className="gap-1.5 border-destructive/30 hover:bg-destructive/10"
             >
-              <RefreshCw className="h-3.5 w-3.5" />
+              <Icons.rotateCcw className="h-3.5 w-3.5" />
               Try Again
             </Button>
           </div>
@@ -500,9 +496,9 @@ export function OngoingOrdersModal({
                               ({percent.toFixed(1)}%)
                             </span>
                             {isTrendUp ? (
-                              <ArrowUp className="h-3.5 w-3.5 text-rose-500" />
+                              <Icons.arrowUpRight className="h-3.5 w-3.5 text-rose-500" />
                             ) : (
-                              <ArrowDown className="h-3.5 w-3.5 text-emerald-500" />
+                              <Icons.arrowDownRight className="h-3.5 w-3.5 text-emerald-500" />
                             )}
                           </div>
                         </div>
@@ -586,7 +582,7 @@ export function OngoingOrdersModal({
                         className="inline-flex items-center gap-1.5 text-xs font-semibold text-orange-600 hover:text-orange-700 hover:underline dark:text-orange-400"
                       >
                         View All Failed Orders
-                        <ExternalLink className="h-3 w-3" />
+                        <Icons.link className="h-3 w-3" />
                       </a>
                     </div>
                   </div>

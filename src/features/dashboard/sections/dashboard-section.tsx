@@ -27,12 +27,14 @@ import { DashboardTopSellingList } from "@/features/dashboard/components/dashboa
 import { DashboardPeriod } from "@/features/dashboard/enums"
 import { useDashboardOperationalReports } from "@/features/dashboard/hooks/use-dashboard-operational-reports"
 import { useDashboardOverview } from "@/features/dashboard/hooks/use-dashboard-overview"
+import { useBranchFilter } from "@/context/branch-context"
 import { AppLoader } from "@/components/ui/app-loader"
 import { useFilterToast } from "@/hooks/use-filter-toast"
 import { cn } from "@/lib/utils"
 
 
 export function DashboardSection() {
+  const { branchId } = useBranchFilter()
   const [period, setPeriod] = useState(DashboardPeriod.TwentyFourHours)
   const [dateRange, setDateRange] = useState<DateRange | undefined>()
   const [isTotalDeliveriesModalOpen, setIsTotalDeliveriesModalOpen] =
@@ -46,10 +48,12 @@ export function DashboardSection() {
   const { data, isPending, isFetching, isError, error } = useDashboardOverview(
     period,
     dateRange,
+    branchId
   )
   const { data: operationalData } = useDashboardOperationalReports(
     period,
-    dateRange
+    dateRange,
+    branchId
   )
 
   useFilterToast({
@@ -138,6 +142,7 @@ export function DashboardSection() {
         onOpenChange={setIsTotalDeliveriesModalOpen}
         currentPeriod={period}
         dateRange={dateRange}
+        fulfillmentBranchId={branchId}
       />
 
       <OngoingOrdersModal
@@ -145,6 +150,7 @@ export function DashboardSection() {
         onOpenChange={setIsOngoingOrdersModalOpen}
         currentPeriod={period}
         dateRange={dateRange}
+        fulfillmentBranchId={branchId}
       />
 
       <TotalRevenueModal
@@ -152,6 +158,7 @@ export function DashboardSection() {
         onOpenChange={setIsTotalRevenueModalOpen}
         currentPeriod={period}
         dateRange={dateRange}
+        fulfillmentBranchId={branchId}
       />
 
       <TotalUsersModal
@@ -159,6 +166,7 @@ export function DashboardSection() {
         onOpenChange={setIsTotalUsersModalOpen}
         currentPeriod={period}
         dateRange={dateRange}
+        fulfillmentBranchId={branchId}
       />
 
       {operationalData?.discounts_promotions_refunds ? (

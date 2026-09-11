@@ -36,6 +36,11 @@ export function buildOfflineOrderPayload(
   items: OfflineOrderCartItem[],
   checkout: OfflineOrderCheckoutDraft,
 ): CreateOfflineOrderPayload {
+  const customerName = checkout.customerName.trim()
+  const customerPhone = checkout.customerPhone.trim()
+  const notes = checkout.managerVerificationNotes.trim()
+  const branchId = checkout.branchId ? Number(checkout.branchId) : undefined
+
   return {
     items: items.map(buildOrderItemPayload),
     customer_name: checkout.customerName.trim(),
@@ -43,6 +48,8 @@ export function buildOfflineOrderPayload(
     payment_method: checkout.paymentMethod,
     order_source: checkout.orderSource,
     notes: checkout.managerVerificationNotes.trim(),
+    ...(branchId ? { fulfillment_branch_id: branchId, branch_id: branchId } : {}),
+    ...(notes ? { notes } : {}),
   }
 }
 

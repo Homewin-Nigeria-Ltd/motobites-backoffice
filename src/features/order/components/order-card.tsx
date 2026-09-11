@@ -35,16 +35,27 @@ export function OrderCard({ order, onViewDetails }: OrderCardProps) {
         />
       </div>
       <CardContent className="flex flex-col gap-3 pt-4">
-        <Badge
-          variant="secondary"
-          className="w-fit rounded-full border-0 bg-secondary px-3 py-1 text-xs font-medium text-primary"
-        >
-          Order {order.order_number}
-        </Badge>
+        <div className="flex items-center justify-between gap-2">
+          <Badge
+            variant="secondary"
+            className="w-fit rounded-full border-0 bg-secondary px-3 py-1 text-xs font-medium text-primary"
+          >
+            Order {order.order_number}
+          </Badge>
+          {order.fulfillment_branch?.name ? (
+            <span className="flex items-center gap-1 text-xs font-medium text-muted-foreground truncate">
+              <Icons.mapPin className="size-3 shrink-0 text-primary" />
+              <span className="truncate">{order.fulfillment_branch.name}</span>
+            </span>
+          ) : null}
+        </div>
         <h3 className="text-base font-semibold text-foreground">{order.item_name}</h3>
         <div className="space-y-1.5">
           <DetailRow label="Customer Name" value={order.customer_name} />
           <DetailRow label="Delivery Address" value={order.delivery_address} />
+          {order.fulfillment_branch?.name ? (
+            <DetailRow label="Branch" value={order.fulfillment_branch.name} />
+          ) : null}
         </div>
         <div className="grid grid-cols-2 gap-3 pt-1">
           <DetailRow label="Payment Method" value={order.payment_method} />

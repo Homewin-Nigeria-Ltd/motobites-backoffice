@@ -18,6 +18,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { DataTable } from "@/components/data-table"
 import { createAllOrdersColumns } from "@/features/offline-order/columns/all-orders-columns"
 import { OfflineOrderSearchToolbar } from "@/features/offline-order/components/offline-order-search-toolbar"
+<<<<<<< HEAD
 import { useSession } from "@/features/auth/hooks/use-session"
 import {
   useRequestOfflineOrderDeletion,
@@ -27,14 +28,22 @@ import { isSalesRep } from "@/features/offline-order/utils/admin-role"
 import { getSalesDashboardOrderReference } from "@/features/offline-order/utils/sales-dashboard-order"
 import { ApiError } from "@/lib/api/client"
 import { toast } from "@/lib/toast"
+=======
+import { useSalesDashboardOrders } from "@/features/offline-order/hooks/use-offline-order-queries"
+import { useBranchFilter } from "@/context/branch-context"
+>>>>>>> e5a94f7 (feat: global branch filter, pos branch origin, order management branch visibility, and husky hook fixes)
 
 const DEFAULT_PAGE_SIZE = 10
 
 export function OfflineOrderAllOrdersSection() {
+<<<<<<< HEAD
   const { data: session } = useSession()
   const user = session?.user
   const canRequestDeletion = isSalesRep(user)
 
+=======
+  const { branchId } = useBranchFilter()
+>>>>>>> e5a94f7 (feat: global branch filter, pos branch origin, order management branch visibility, and husky hook fixes)
   const [search, setSearch] = useState("")
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -47,6 +56,7 @@ export function OfflineOrderAllOrdersSection() {
     search: search.trim() || undefined,
     page: pagination.pageIndex + 1,
     per_page: pagination.pageSize,
+    fulfillment_branch_id: branchId ?? undefined,
   })
 
   const requestDeletion = useRequestOfflineOrderDeletion()

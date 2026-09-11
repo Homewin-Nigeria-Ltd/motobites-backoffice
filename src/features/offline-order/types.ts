@@ -37,6 +37,7 @@ export type SalesDashboardOrdersParams = {
   search?: string
   per_page?: number
   page?: number
+  fulfillment_branch_id?: number | null
 }
 
 export type SalesDashboardRecentTransactionsParams = {
@@ -44,6 +45,7 @@ export type SalesDashboardRecentTransactionsParams = {
   payment_method?: string
   date_from?: string
   date_to?: string
+  fulfillment_branch_id?: number | null
 }
 
 export type ApiSalesDashboardKitchenOpeningHoursDay = {
@@ -536,6 +538,8 @@ export type CreateOfflineOrderPayload = {
   customer_phone?: string
   payment_method: OfflineOrderPaymentMethod
   order_source: OfflineOrderOrderSource
+  fulfillment_branch_id?: number | null
+  branch_id?: number | null
   notes?: string
 }
 
@@ -545,6 +549,8 @@ export type SaveOfflineOrderPayload = {
   customer_phone?: string
   order_source: OfflineOrderOrderSource
   payment_method: OfflineOrderPaymentMethod
+  fulfillment_branch_id?: number | null
+  branch_id?: number | null
   notes?: string
 }
 
@@ -586,6 +592,8 @@ export type OfflineOrderCheckoutDraft = {
   paymentMethod: OfflineOrderPaymentMethod
   takenById: string
   takenByName: string
+  branchId?: number | null
+  branchName?: string | null
   managerVerificationNotes: string
 }
 
@@ -607,6 +615,7 @@ export type OfflineOrderReceipt = {
   customerPhone: string
   paymentMethod: OfflineOrderPaymentMethod
   takenByName: string
+  branchName?: string | null
   subtotal: number
   serviceFee: number
   total: number
