@@ -18,6 +18,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { DataTable } from "@/components/data-table"
 import { createAllOrdersColumns } from "@/features/offline-order/columns/all-orders-columns"
 import { OfflineOrderSearchToolbar } from "@/features/offline-order/components/offline-order-search-toolbar"
+import { useBranchFilter } from "@/context/branch-context"
 import { useSession } from "@/features/auth/hooks/use-session"
 import {
   useRequestOfflineOrderDeletion,
