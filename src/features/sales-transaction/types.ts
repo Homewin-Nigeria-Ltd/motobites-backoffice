@@ -9,6 +9,66 @@ export type SalesTransactionSummary = {
   activeStaffBadge: string
 }
 
+export type ApiSalesTransactionManagementMetricCount = {
+  count: number
+}
+
+export type ApiSalesTransactionManagementMetricRevenue = {
+  amount?: number
+  amount_kobo?: number
+}
+
+export type ApiSalesTransactionManagementQuickAction = {
+  method: string
+  path: string
+}
+
+export type ApiSalesTransactionManagementQuickActions = {
+  create_offline_order?: ApiSalesTransactionManagementQuickAction
+  export_report?: ApiSalesTransactionManagementQuickAction
+  view_saved_orders?: ApiSalesTransactionManagementQuickAction
+}
+
+export type ApiSalesTransactionAnalyticsPreviewSource = {
+  source: string
+  revenue_kobo: number
+  revenue?: number
+}
+
+export type ApiSalesTransactionAnalyticsPreviewDay = {
+  date: string
+  sources: ApiSalesTransactionAnalyticsPreviewSource[]
+}
+
+export type SalesTransactionAnalyticsPreviewSourceRow = {
+  source: string
+  sourceLabel: string
+  revenue: number
+  percent: number
+}
+
+export type SalesTransactionAnalyticsPreview = {
+  date: string
+  sources: SalesTransactionAnalyticsPreviewSourceRow[]
+}
+
+export type ApiSalesTransactionManagement = {
+  today_transactions: ApiSalesTransactionManagementMetricCount
+  today_revenue: ApiSalesTransactionManagementMetricRevenue
+  pending_orders: ApiSalesTransactionManagementMetricCount
+  active_staff: ApiSalesTransactionManagementMetricCount
+  transaction_history_preview: ApiSalesTransactionRecent[]
+  transaction_analytics_preview: ApiSalesTransactionAnalyticsPreviewDay[]
+  recent_transactions: ApiSalesTransactionRecent[]
+  quick_actions?: ApiSalesTransactionManagementQuickActions
+}
+
+export type ApiSalesTransactionManagementResponse = {
+  success: boolean
+  data: ApiSalesTransactionManagement
+  message?: string
+}
+
 export type SalesTransactionRow = {
   id: string
   transactionNumber: string
@@ -174,6 +234,91 @@ export type ApiSalesTransactionListResponse = {
   message?: string
 }
 
+export type SalesTransactionAnalyticsPeriod =
+  | "24h"
+  | "week"
+  | "3months"
+  | "year"
+
+export type SalesTransactionAnalyticsParams = {
+  period?: SalesTransactionAnalyticsPeriod
+  from?: string
+  to?: string
+}
+
+export type ApiSalesTransactionAnalyticsPeriod = {
+  key: string
+  from: string
+  to: string
+}
+
+export type ApiSalesTransactionAnalyticsMetricRevenue = {
+  amount?: number
+  amount_kobo?: number
+}
+
+export type ApiSalesTransactionAnalyticsMetricCount = {
+  count: number
+}
+
+export type ApiSalesTransactionAnalyticsCompletionRate = {
+  percent: number
+  completed_count: number
+  transaction_count: number
+}
+
+export type ApiSalesTransactionAnalyticsKpis = {
+  total_revenue: ApiSalesTransactionAnalyticsMetricRevenue
+  transaction_count: ApiSalesTransactionAnalyticsMetricCount
+  average_order_value: ApiSalesTransactionAnalyticsMetricRevenue
+  completion_rate: ApiSalesTransactionAnalyticsCompletionRate
+}
+
+export type ApiSalesTransactionAnalyticsSourceMetric = {
+  source: string
+  revenue_kobo: number
+  revenue?: number
+  percent?: number
+}
+
+export type ApiSalesTransactionAnalyticsRevenueOverTime = {
+  date: string
+  sources: ApiSalesTransactionAnalyticsSourceMetric[]
+}
+
+export type ApiSalesTransactionAnalyticsPaymentMethod = {
+  method: string
+  revenue_kobo: number
+  revenue?: number
+  transaction_count: number
+  percent: number
+}
+
+export type ApiSalesTransactionAnalyticsTopItem = {
+  rank: number
+  menu_item_id: number
+  item: string
+  primary_channel: string
+  units_sold: number
+  revenue_kobo: number
+  revenue?: number
+}
+
+export type ApiSalesTransactionAnalytics = {
+  period: ApiSalesTransactionAnalyticsPeriod
+  kpis: ApiSalesTransactionAnalyticsKpis
+  revenue_by_source_over_time: ApiSalesTransactionAnalyticsRevenueOverTime[]
+  revenue_by_source: ApiSalesTransactionAnalyticsSourceMetric[]
+  payment_method_breakdown: ApiSalesTransactionAnalyticsPaymentMethod[]
+  top_performing_items_by_channel_source: ApiSalesTransactionAnalyticsTopItem[]
+}
+
+export type ApiSalesTransactionAnalyticsResponse = {
+  success: boolean
+  data: ApiSalesTransactionAnalytics
+  message?: string
+}
+
 export type SalesTransactionAnalyticsSummary = {
   totalRevenue: number
   totalRevenueBadge: string
@@ -220,4 +365,13 @@ export type SalesTransactionTopItemRow = {
   sourceLabel: string
   unitsSold: number
   revenue: number
+}
+
+export type SalesTransactionAnalyticsViewModel = {
+  periodLabel: string
+  summary: SalesTransactionAnalyticsSummary
+  revenueTrend: SalesTransactionRevenueTrendPoint[]
+  sourceBreakdown: SalesTransactionRevenueSourceBreakdown[]
+  paymentBreakdown: SalesTransactionPaymentMethodBreakdown[]
+  topItems: SalesTransactionTopItemRow[]
 }

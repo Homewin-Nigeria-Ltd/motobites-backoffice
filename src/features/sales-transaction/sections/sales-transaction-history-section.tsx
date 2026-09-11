@@ -11,13 +11,16 @@ import { salesTransactionHistoryColumns } from "@/features/sales-transaction/col
 import { SalesTransactionHistoryFiltersBar } from "@/features/sales-transaction/components/sales-transaction-history-filters"
 import { SalesTransactionHistoryStats } from "@/features/sales-transaction/components/sales-transaction-history-stats"
 import type { SalesTransactionHistoryFilters } from "@/features/sales-transaction/types"
-import { SALES_TRANSACTION_HISTORY_SUMMARY } from "@/features/sales-transaction/constants/history-mock-data"
 import {
   buildTransactionDateQueryParams,
   getDefaultTransactionDateRangePickerValue,
 } from "@/features/sales-transaction/utils/date-range"
 import { downloadTransactionsCsv } from "@/features/sales-transaction/utils/export-transactions-csv"
-import { mapApiTransactionToHistoryRow } from "@/features/sales-transaction/utils/map-transaction-history"
+import {
+  createEmptyTransactionHistorySummary,
+  mapApiTransactionToHistoryRow,
+  mapApiTransactionsSummary,
+} from "@/features/sales-transaction/utils/map-transaction-history"
 import { useDebouncedSearch } from "@/features/restaurant/hooks/use-debounced-search"
 import { toast } from "@/lib/toast"
 
@@ -87,10 +90,11 @@ export function SalesTransactionHistorySection() {
   const { data, isPending, isFetching, isError, error } =
     useSalesTransactions(queryParams)
 
-  const rows = useMemo(
-    () => (data?.data ?? []).map(mapApiTransactionToHistoryRow),
-    [data?.data],
-  )
+  const rows = (data?.data ?? []).map(mapApiTransactionToHistoryRow)
+
+  const summary = data?.meta.summary
+    ? mapApiTransactionsSummary(data.meta.summary)
+    : createEmptyTransactionHistorySummary()
 
   const totalRecords = data?.meta.total ?? 0
   const totalPages = data?.meta.last_page ?? 1
@@ -101,6 +105,9 @@ export function SalesTransactionHistorySection() {
     rows.length === 0 ? 0 : (currentPage - 1) * perPage + 1
   const rangeEnd =
     rows.length === 0 ? 0 : rangeStart + rows.length - 1
+
+  const isSummaryLoading =
+    isPending || (isFetching && !data?.meta.summary)
 
   if (isError) {
     throw error
@@ -158,7 +165,8 @@ export function SalesTransactionHistorySection() {
         />
 
         <SalesTransactionHistoryStats
-          summary={SALES_TRANSACTION_HISTORY_SUMMARY}
+          summary={summary}
+          isLoading={isSummaryLoading}
         />
 
         <div className="overflow-hidden rounded-2xl border border-border bg-background">

@@ -12,6 +12,8 @@ export type {
 } from "./types"
 export {
   useSalesRecentTransactions,
+  useSalesTransactionAnalytics,
+  useSalesTransactionManagement,
   useSalesTransactions,
 } from "./hooks/use-sales-transaction-queries"
 export { SalesTransactionSection } from "./sections/sales-transaction-section"
