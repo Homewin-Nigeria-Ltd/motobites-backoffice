@@ -1,37 +1,56 @@
 "use client"
 
-import { useState } from "react"
+import { useMemo, useState } from "react"
+import type { DateRange } from "react-day-picker"
 
 import { OfflineOrderOverviewOperationalReportsCard } from "@/features/offline-order/components/overview/offline-order-overview-operational-reports-card"
-import { OverviewOperationalReportsSkeleton } from "@/features/offline-order/components/overview/offline-order-overview-skeletons"
 import { useSalesDashboardOperationalReports } from "@/features/offline-order/hooks/use-offline-order-queries"
 import type { SalesDashboardOperationalReportsPeriod } from "@/features/offline-order/types"
+import { buildOperationalReportsParams } from "@/features/offline-order/utils/operational-reports-params"
 
 export function OfflineOrderOverviewOperationalReportsSection() {
   const [period, setPeriod] =
-    useState<SalesDashboardOperationalReportsPeriod>("week")
+    useState<SalesDashboardOperationalReportsPeriod>("today")
+  const [dateRange, setDateRange] = useState<DateRange | undefined>()
+
+  const queryParams = useMemo(
+    () => buildOperationalReportsParams(period, dateRange),
+    [period, dateRange],
+  )
+
+  const isCustomPeriodReady =
+    period !== "custom" || Boolean(dateRange?.from)
 
   const { data, isPending, isFetching, isError, error } =
-    useSalesDashboardOperationalReports({ period })
+    useSalesDashboardOperationalReports(queryParams, {
+      enabled: isCustomPeriodReady,
+    })
+
+  const handlePeriodChange = (
+    nextPeriod: SalesDashboardOperationalReportsPeriod,
+  ) => {
+    setPeriod(nextPeriod)
+
+    if (nextPeriod !== "custom") {
+      setDateRange(undefined)
+    }
+  }
 
   if (isError) {
     throw error
   }
 
-  if (isPending && !data) {
-    return <OverviewOperationalReportsSkeleton />
-  }
-
-  if (!data) {
-    return null
-  }
+  const isLoading =
+    !isCustomPeriodReady || isPending || (isFetching && !data)
 
   return (
     <OfflineOrderOverviewOperationalReportsCard
       report={data}
       period={period}
-      onPeriodChange={setPeriod}
-      isLoading={isFetching}
+      dateRange={dateRange}
+      onPeriodChange={handlePeriodChange}
+      onDateRangeChange={setDateRange}
+      isLoading={isLoading}
     />
   )
 }
