@@ -43,44 +43,69 @@ function BranchProviderInner({ children }: { children: ReactNode }) {
 
   // Parse branch from searchParams
   const param = searchParams?.get("branch_id") ?? searchParams?.get("fulfillment_branch_id")
-  const urlBranchId =
-    param && param !== "all" && !Number.isNaN(Number(param)) ? Number(param) : null
 
   // Fallback to localStorage if searchParams does not specify a branch
   const [storedBranchId, setStoredBranchId] = useState<number | null>(() => {
     if (typeof window === "undefined") return null
     const saved = localStorage.getItem(STORAGE_KEY)
-    if (saved === "all") {
+    if (saved === "all" || !saved) {
       return null
     }
-    if (saved && !Number.isNaN(Number(saved))) {
+    if (!Number.isNaN(Number(saved))) {
       return Number(saved)
     }
     return null
   })
 
-  const branchId = urlBranchId ?? storedBranchId
+  // BranchId resolution:
+  // 1. If param is explicitly "all", branchId is null (All Branches)
+  // 2. If param is a valid number, branchId is that number
+  // 3. If param is not specified (bare URL), fall back to storedBranchId
+  const branchId = useMemo(() => {
+    if (param === "all") return null
+    if (param && !Number.isNaN(Number(param))) return Number(param)
+    return storedBranchId
+  }, [param, storedBranchId])
 
   // Synchronize localStorage or push stored branch to URL if URL doesn't specify one
   useEffect(() => {
-    if (urlBranchId !== null) {
+    if (param === "all") {
       try {
-        localStorage.setItem(STORAGE_KEY, String(urlBranchId))
+        localStorage.setItem(STORAGE_KEY, "all")
       } catch {
         // ignore localStorage errors
       }
-    } else {
-      const saved = typeof window !== "undefined" ? localStorage.getItem(STORAGE_KEY) : null
-      // Only push storedBranchId to URL if the user hasn't explicitly selected "all"
-      if (saved !== "all" && storedBranchId !== null) {
-        const nextParams = new URLSearchParams(searchParams ? searchParams.toString() : "")
-        nextParams.set("branch_id", String(storedBranchId))
-        const nextQuery = nextParams.toString()
-        const targetUrl = nextQuery ? `${pathname}?${nextQuery}` : pathname
-        router.replace(targetUrl, { scroll: false })
-      }
+      return
     }
-  }, [urlBranchId, storedBranchId, searchParams, pathname, router])
+
+    const numericUrlId =
+      param && !Number.isNaN(Number(param)) ? Number(param) : null
+
+    if (numericUrlId !== null) {
+      try {
+        localStorage.setItem(STORAGE_KEY, String(numericUrlId))
+      } catch {
+        // ignore localStorage errors
+      }
+      return
+    }
+
+    // URL has neither branch_id nor fulfillment_branch_id (bare URL)
+    const saved = typeof window !== "undefined" ? localStorage.getItem(STORAGE_KEY) : null
+    if (saved === "all") {
+      const nextParams = new URLSearchParams(searchParams ? searchParams.toString() : "")
+      nextParams.set("branch_id", "all")
+      const nextQuery = nextParams.toString()
+      const targetUrl = nextQuery ? `${pathname}?${nextQuery}` : pathname
+      router.replace(targetUrl, { scroll: false })
+    } else if (saved && !Number.isNaN(Number(saved))) {
+      const nextParams = new URLSearchParams(searchParams ? searchParams.toString() : "")
+      nextParams.set("branch_id", saved)
+      const nextQuery = nextParams.toString()
+      const targetUrl = nextQuery ? `${pathname}?${nextQuery}` : pathname
+      router.replace(targetUrl, { scroll: false })
+    }
+  }, [param, searchParams, pathname, router])
 
   const setBranchId = useCallback(
     (id: number | string | null) => {
@@ -104,7 +129,7 @@ function BranchProviderInner({ children }: { children: ReactNode }) {
         nextParams.set("branch_id", String(numericId))
         nextParams.delete("fulfillment_branch_id")
       } else {
-        nextParams.delete("branch_id")
+        nextParams.set("branch_id", "all")
         nextParams.delete("fulfillment_branch_id")
       }
 
@@ -128,15 +153,23 @@ function BranchProviderInner({ children }: { children: ReactNode }) {
 
   const formatBranchUrl = useCallback(
     (url: string) => {
-      if (!branchId) return url
       if (/^https?:\/\//.test(url) || url.includes("branch_id=")) return url
 
       const [path, query] = url.split("?")
       const params = new URLSearchParams(query || "")
-      params.set("branch_id", String(branchId))
-      return `${path}?${params.toString()}`
+
+      if (branchId !== null) {
+        params.set("branch_id", String(branchId))
+      } else if (param === "all") {
+        params.set("branch_id", "all")
+      } else {
+        return url
+      }
+
+      const nextQuery = params.toString()
+      return nextQuery ? `${path}?${nextQuery}` : path
     },
-    [branchId]
+    [branchId, param]
   )
 
   const value = useMemo<BranchContextValue>(
