@@ -61,7 +61,7 @@ export function GiftcardCard({ giftcard }: GiftcardCardProps) {
         <div className="pointer-events-none absolute inset-0">
           <Image
             src={toImageSrc(giftcard.imageUrl)}
-            alt={giftcard.title}
+            alt={giftcard.name || giftcard.title}
             fill
             className="object-cover object-center"
             sizes="(max-width: 768px) 100vw, 400px"
@@ -101,7 +101,7 @@ export function GiftcardCard({ giftcard }: GiftcardCardProps) {
           )}
         >
           <p className="text-sm font-medium uppercase tracking-[0.08em]">
-            {giftcard.categoryLabel || giftcard.title}
+            {giftcard.name || giftcard.title}
           </p>
           <p className="mt-2 text-2xl font-semibold leading-none tracking-tight">
             {displayAmount}

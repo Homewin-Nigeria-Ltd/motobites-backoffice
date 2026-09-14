@@ -10,15 +10,18 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+import { cn } from "@/lib/utils"
 
 type DashboardDateRangePickerProps = {
   value?: DateRange
   onChange: (value: DateRange | undefined) => void
+  className?: string
 }
 
 export function DashboardDateRangePicker({
   value,
   onChange,
+  className,
 }: DashboardDateRangePickerProps) {
   return (
     <Popover>
@@ -28,6 +31,7 @@ export function DashboardDateRangePicker({
           variant="secondary"
           size="lg"
           icon={{ name: "calendar", position: "left", size: 16 }}
+          className={cn("w-full min-w-0 justify-start font-normal", className)}
         >
           {value?.from ? (
             value.to ? (
