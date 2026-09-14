@@ -1,13 +1,14 @@
 import type {
   ApiSalesDashboardOrder,
   ApiSalesDashboardOrderItem,
+  OfflineOrderCartAddon,
   OfflineOrderCartItem,
   OfflineOrderCheckoutDraft,
   OfflineOrderOverviewOrderRow,
   OfflineOrderSavedSort,
 } from "../types"
 import { formatTimeSaved } from "./saved-order"
-import { buildCartLineId } from "./cart-line"
+import { buildCartLineId, getCartItemUnitPrice } from "./cart-line"
 import {
   normalizeOrderSourceFromApi,
   normalizePaymentMethodFromApi,
@@ -206,13 +207,78 @@ export function mapSalesDashboardOrderToOverviewRow(
 }
 
 
-function getItemUnitPrice(item: ApiSalesDashboardOrderItem) {
+type SavedOrderItemModifier = {
+  id?: number
+  name?: string
+  group_name?: string
+  price?: number
+  additional_price?: number
+  price_kobo?: number
+}
+
+function resolveSavedOrderModifierPrice(modifier: SavedOrderItemModifier) {
+  if (
+    typeof modifier.additional_price === "number" &&
+    modifier.additional_price > 0
+  ) {
+    return modifier.additional_price
+  }
+
+  if (typeof modifier.price === "number") {
+    return modifier.price
+  }
+
+  if (typeof modifier.price_kobo === "number") {
+    return modifier.price_kobo / 100
+  }
+
+  return 0
+}
+
+function mapOrderItemModifiersToAddons(
+  item: ApiSalesDashboardOrderItem,
+): OfflineOrderCartAddon[] {
+  const sources = [...(item.modifiers ?? []), ...(item.addons ?? [])]
+
+  return sources
+    .map((entry) => {
+      if (!entry || typeof entry !== "object") {
+        return null
+      }
+
+      const modifier = entry as SavedOrderItemModifier
+      const id = modifier.id
+      const name = modifier.name?.trim()
+
+      if (!id || !name) {
+        return null
+      }
+
+      return {
+        id,
+        name,
+        price: resolveSavedOrderModifierPrice(modifier),
+        groupName: modifier.group_name?.trim() || "Add-ons",
+      }
+    })
+    .filter((addon): addon is OfflineOrderCartAddon => addon !== null)
+}
+
+function getItemBasePrice(
+  item: ApiSalesDashboardOrderItem,
+  addons: OfflineOrderCartAddon[],
+) {
+  const addonTotal = addons.reduce((sum, addon) => sum + addon.price, 0)
+
   if (typeof item.unit_price === "number") {
     return item.unit_price
   }
 
   if (typeof item.unit_price === "string") {
-    return Number(item.unit_price)
+    const parsed = Number(item.unit_price)
+    if (!Number.isNaN(parsed)) {
+      return parsed
+    }
   }
 
   if (typeof item.price === "number") {
@@ -220,7 +286,7 @@ function getItemUnitPrice(item: ApiSalesDashboardOrderItem) {
   }
 
   if (typeof item.subtotal === "number" && item.quantity > 0) {
-    return item.subtotal / item.quantity
+    return Math.max(0, item.subtotal / item.quantity - addonTotal)
   }
 
   return 0
@@ -235,19 +301,21 @@ export function mapSalesDashboardOrderItemsToCart(
 
   return order.items.map((item, index) => {
     const itemId = String(item.menu_item_id ?? item.id ?? index)
-    const price = getItemUnitPrice(item)
+    const addons = mapOrderItemModifiersToAddons(item)
+    const basePrice = getItemBasePrice(item, addons)
+    const addonIds = addons.map((addon) => addon.id)
 
     return {
-      lineId: buildCartLineId(itemId, []),
+      lineId: buildCartLineId(itemId, addonIds),
       itemId,
       name: item.name,
-      basePrice: price,
-      price,
+      basePrice,
+      price: getCartItemUnitPrice(basePrice, addons),
       image: item.image ?? null,
       kitchenId: String(item.kitchen_id ?? order.kitchen?.id ?? ""),
       kitchenName: item.kitchen_name ?? order.kitchen?.name ?? "",
       quantity: item.quantity,
-      addons: [],
+      addons,
     }
   })
 }
