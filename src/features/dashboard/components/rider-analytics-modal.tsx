@@ -146,20 +146,16 @@ export function RiderAnalyticsModal({
 
   // Max riders across delivery bands for bar scale
   const maxBandRiders = React.useMemo(() => {
-    if (!analytics?.deliveries_per_rider?.length) return 1
+    if (!analytics?.deliveries_per_rider?.length) return 0
     return Math.max(
-      1,
+      0,
       ...analytics.deliveries_per_rider.map((b) => b.riders)
     )
   }, [analytics])
 
   // Fallback / Normalized values
   const activeCount = analytics?.headline?.active_riders_currently ?? 0
-  const headlineChange =
-    analytics?.headline?.change_percent !== null &&
-    analytics?.headline?.change_percent !== undefined
-      ? analytics.headline.change_percent
-      : 8
+  const headlineChange = analytics?.headline?.change_percent ?? 0
 
   const kpis = analytics?.kpis
   const changes = analytics?.changes
@@ -181,7 +177,7 @@ export function RiderAnalyticsModal({
   const areaOrdersWaiting = capacity?.area_orders_waiting ?? ordersWaiting
   const areaAvailableRiders = capacity?.area_available_riders ?? availableInCapacity
   const isAlert = capacity ? capacity.is_alert : false
-  const alertWaitMinutes = capacity?.estimated_wait_minutes ?? 25
+  const alertWaitMinutes = capacity?.estimated_wait_minutes ?? 0
 
   // Delivery bands list
   const deliveryBands: RiderAnalyticsDeliveryBand[] = React.useMemo(() => {
@@ -202,13 +198,7 @@ export function RiderAnalyticsModal({
     if (analytics?.availability_by_area?.length) {
       return analytics.availability_by_area.slice(0, 5)
     }
-    return [
-      { area: "Lekki", orders_waiting: 4, available_riders: 1 },
-      { area: "Surulere", orders_waiting: 6, available_riders: 0 },
-      { area: "Ikeja", orders_waiting: 2, available_riders: 1 },
-      { area: "Yaba", orders_waiting: 1, available_riders: 0 },
-      { area: "Victoria Island", orders_waiting: 2, available_riders: 1 },
-    ]
+    return []
   }, [analytics])
 
   // Top riders list
@@ -619,23 +609,11 @@ export function RiderAnalyticsModal({
                       const config =
                         DELIVERY_BAND_CONFIG[band.key] ??
                         DELIVERY_BAND_CONFIG.average
-                      const count =
-                        band.riders > 0
-                          ? band.riders
-                          : band.key === "top_performers"
-                            ? 45
-                            : band.key === "high"
-                              ? 128
-                              : band.key === "average"
-                                ? 312
-                                : band.key === "below_average"
-                                  ? 248
-                                  : 114
-
-                      const percent = Math.min(
-                        100,
-                        Math.max(8, (count / (maxBandRiders || 350)) * 100)
-                      )
+                      const count = band.riders ?? 0
+                      const percent =
+                        maxBandRiders > 0
+                          ? Math.min(100, Math.round((count / maxBandRiders) * 100))
+                          : 0
 
                       return (
                         <div key={band.key} className="space-y-1.5">
@@ -674,56 +652,62 @@ export function RiderAnalyticsModal({
                   </h3>
                   <p className="mt-1 flex items-center gap-2 text-xs">
                     <span className="font-semibold text-rose-600">
-                      Orders Waiting: {ordersWaiting || 15}
+                      Orders Waiting: {ordersWaiting}
                     </span>
                     <span className="text-muted-foreground">|</span>
                     <span className="font-semibold text-emerald-600">
-                      Available Riders: {availableInCapacity || 3}
+                      Available Riders: {availableInCapacity}
                     </span>
                   </p>
                 </div>
 
                 <div className="mt-4 space-y-2.5">
-                  {areaList.map((areaItem, idx) => {
-                    const isCritical = areaItem.available_riders === 0
-                    return (
-                      <div
-                        key={areaItem.area || idx}
-                        className={cn(
-                          "flex items-center justify-between rounded-xl border p-3.5 transition-colors",
-                          isCritical
-                            ? "border-rose-100 bg-rose-50/40 dark:border-rose-900/30 dark:bg-rose-950/10"
-                            : "border-amber-100 bg-amber-50/30 dark:border-amber-900/30 dark:bg-amber-950/10"
-                        )}
-                      >
-                        <span className="text-sm font-semibold text-foreground">
-                          {areaItem.area}
-                        </span>
-
-                        <div className="flex items-center gap-2">
-                          <span
-                            className={cn(
-                              "text-xs font-semibold",
-                              isCritical ? "text-rose-600" : "text-amber-600"
-                            )}
-                          >
-                            {areaItem.orders_waiting} order
-                            {areaItem.orders_waiting === 1 ? "" : "s"} /{" "}
-                            {areaItem.available_riders} rider
-                            {areaItem.available_riders === 1 ? "" : "s"}
+                  {areaList.length > 0 ? (
+                    areaList.map((areaItem, idx) => {
+                      const isCritical = areaItem.available_riders === 0
+                      return (
+                        <div
+                          key={areaItem.area || idx}
+                          className={cn(
+                            "flex items-center justify-between rounded-xl border p-3.5 transition-colors",
+                            isCritical
+                              ? "border-rose-100 bg-rose-50/40 dark:border-rose-900/30 dark:bg-rose-950/10"
+                              : "border-amber-100 bg-amber-50/30 dark:border-amber-900/30 dark:bg-amber-950/10"
+                          )}
+                        >
+                          <span className="text-sm font-semibold text-foreground">
+                            {areaItem.area}
                           </span>
 
-                          {isCritical ? (
-                            <span className="flex size-3.5 items-center justify-center rounded-full bg-rose-500 shadow-2xs">
-                              <span className="size-1.5 rounded-full bg-white" />
+                          <div className="flex items-center gap-2">
+                            <span
+                              className={cn(
+                                "text-xs font-semibold",
+                                isCritical ? "text-rose-600" : "text-amber-600"
+                              )}
+                            >
+                              {areaItem.orders_waiting} order
+                              {areaItem.orders_waiting === 1 ? "" : "s"} /{" "}
+                              {areaItem.available_riders} rider
+                              {areaItem.available_riders === 1 ? "" : "s"}
                             </span>
-                          ) : (
-                            <Icons.alert className="size-3.5 text-amber-500" />
-                          )}
+
+                            {isCritical ? (
+                              <span className="flex size-3.5 items-center justify-center rounded-full bg-rose-500 shadow-2xs">
+                                <span className="size-1.5 rounded-full bg-white" />
+                              </span>
+                            ) : (
+                              <Icons.alert className="size-3.5 text-amber-500" />
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    )
-                  })}
+                      )
+                    })
+                  ) : (
+                    <p className="py-4 text-center text-xs text-muted-foreground">
+                      No area availability data available.
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -754,87 +738,40 @@ export function RiderAnalyticsModal({
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-border/40">
-                        {(topRidersList.length > 0
-                          ? topRidersList
-                          : [
-                              {
-                                rider_id: 1,
-                                name: "Chukwu A.",
-                                deliveries: 24,
-                                average_delivery_time_minutes: 22,
-                                acceptance_rate_percent: 98,
-                                rating: 5,
-                                earnings_kobo: 1840000,
-                              },
-                              {
-                                rider_id: 2,
-                                name: "Bola K.",
-                                deliveries: 22,
-                                average_delivery_time_minutes: 24,
-                                acceptance_rate_percent: 96,
-                                rating: 5,
-                                earnings_kobo: 1680000,
-                              },
-                              {
-                                rider_id: 3,
-                                name: "Adekunle M.",
-                                deliveries: 21,
-                                average_delivery_time_minutes: 25,
-                                acceptance_rate_percent: 95,
-                                rating: 5,
-                                earnings_kobo: 1620000,
-                              },
-                              {
-                                rider_id: 4,
-                                name: "Tunde O.",
-                                deliveries: 19,
-                                average_delivery_time_minutes: 26,
-                                acceptance_rate_percent: 94,
-                                rating: 4,
-                                earnings_kobo: 1460000,
-                              },
-                              {
-                                rider_id: 5,
-                                name: "Segun B.",
-                                deliveries: 18,
-                                average_delivery_time_minutes: 27,
-                                acceptance_rate_percent: 93,
-                                rating: 4,
-                                earnings_kobo: 1380000,
-                              },
-                              {
-                                rider_id: 6,
-                                name: "Emeka N.",
-                                deliveries: 17,
-                                average_delivery_time_minutes: 28,
-                                acceptance_rate_percent: 91,
-                                rating: 4,
-                                earnings_kobo: 1240000,
-                              },
-                            ]
-                        ).map((rider) => (
-                          <tr key={rider.rider_id} className="group">
-                            <td className="py-2.5 font-medium text-foreground">
-                              {formatRiderDisplayName(rider.name)}
-                            </td>
-                            <td className="py-2.5 text-center text-muted-foreground">
-                              {rider.deliveries}
-                            </td>
-                            <td className="py-2.5 text-center text-muted-foreground">
-                              {Math.round(rider.average_delivery_time_minutes)}{" "}
-                              mins
-                            </td>
-                            <td className="py-2.5 text-center font-medium text-emerald-600">
-                              {Math.round(rider.acceptance_rate_percent)}%
-                            </td>
-                            <td className="py-2.5 text-right font-semibold text-amber-500">
-                              ₦
-                              {formatDashboardCount(
-                                Math.round(rider.earnings_kobo / 100)
-                              )}
+                        {topRidersList.length > 0 ? (
+                          topRidersList.map((rider) => (
+                            <tr key={rider.rider_id} className="group">
+                              <td className="py-2.5 font-medium text-foreground">
+                                {formatRiderDisplayName(rider.name)}
+                              </td>
+                              <td className="py-2.5 text-center text-muted-foreground">
+                                {rider.deliveries}
+                              </td>
+                              <td className="py-2.5 text-center text-muted-foreground">
+                                {Math.round(rider.average_delivery_time_minutes)}{" "}
+                                mins
+                              </td>
+                              <td className="py-2.5 text-center font-medium text-emerald-600">
+                                {Math.round(rider.acceptance_rate_percent)}%
+                              </td>
+                              <td className="py-2.5 text-right font-semibold text-amber-500">
+                                ₦
+                                {formatDashboardCount(
+                                  Math.round(rider.earnings_kobo / 100)
+                                )}
+                              </td>
+                            </tr>
+                          ))
+                        ) : (
+                          <tr>
+                            <td
+                              colSpan={5}
+                              className="py-8 text-center text-xs text-muted-foreground"
+                            >
+                              No rider performance data available for this period.
                             </td>
                           </tr>
-                        ))}
+                        )}
                       </tbody>
                     </table>
                   </div>
