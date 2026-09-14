@@ -27,7 +27,7 @@ export function DashboardPeriodFilter({
     <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
       <div className="-mx-4 flex gap-2 overflow-x-auto overscroll-x-contain px-4 [-webkit-overflow-scrolling:touch] md:mx-0 md:flex-wrap md:overflow-visible md:px-0">
         {DASHBOARD_PERIOD_OPTIONS.map((option) => {
-          const isActive = value === option.value
+          const isActive = !dateRange?.from && value === option.value
 
           return (
             <Button
