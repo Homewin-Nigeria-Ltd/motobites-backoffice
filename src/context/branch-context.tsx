@@ -43,12 +43,16 @@ function BranchProviderInner({ children }: { children: ReactNode }) {
 
   // Parse branch from searchParams
   const param = searchParams?.get("branch_id") ?? searchParams?.get("fulfillment_branch_id")
-  const urlBranchId = param && !Number.isNaN(Number(param)) ? Number(param) : null
+  const urlBranchId =
+    param && param !== "all" && !Number.isNaN(Number(param)) ? Number(param) : null
 
   // Fallback to localStorage if searchParams does not specify a branch
   const [storedBranchId, setStoredBranchId] = useState<number | null>(() => {
     if (typeof window === "undefined") return null
     const saved = localStorage.getItem(STORAGE_KEY)
+    if (saved === "all") {
+      return null
+    }
     if (saved && !Number.isNaN(Number(saved))) {
       return Number(saved)
     }
@@ -65,19 +69,23 @@ function BranchProviderInner({ children }: { children: ReactNode }) {
       } catch {
         // ignore localStorage errors
       }
-    } else if (storedBranchId !== null) {
-      const nextParams = new URLSearchParams(searchParams ? searchParams.toString() : "")
-      nextParams.set("branch_id", String(storedBranchId))
-      const nextQuery = nextParams.toString()
-      const targetUrl = nextQuery ? `${pathname}?${nextQuery}` : pathname
-      router.replace(targetUrl, { scroll: false })
+    } else {
+      const saved = typeof window !== "undefined" ? localStorage.getItem(STORAGE_KEY) : null
+      // Only push storedBranchId to URL if the user hasn't explicitly selected "all"
+      if (saved !== "all" && storedBranchId !== null) {
+        const nextParams = new URLSearchParams(searchParams ? searchParams.toString() : "")
+        nextParams.set("branch_id", String(storedBranchId))
+        const nextQuery = nextParams.toString()
+        const targetUrl = nextQuery ? `${pathname}?${nextQuery}` : pathname
+        router.replace(targetUrl, { scroll: false })
+      }
     }
   }, [urlBranchId, storedBranchId, searchParams, pathname, router])
 
   const setBranchId = useCallback(
     (id: number | string | null) => {
       const numericId =
-        id !== null && id !== "" && !Number.isNaN(Number(id)) ? Number(id) : null
+        id !== null && id !== "" && id !== "all" && !Number.isNaN(Number(id)) ? Number(id) : null
 
       setStoredBranchId(numericId)
 
@@ -85,7 +93,7 @@ function BranchProviderInner({ children }: { children: ReactNode }) {
         if (numericId !== null) {
           localStorage.setItem(STORAGE_KEY, String(numericId))
         } else {
-          localStorage.removeItem(STORAGE_KEY)
+          localStorage.setItem(STORAGE_KEY, "all")
         }
       } catch {
         // ignore localStorage errors
@@ -102,6 +110,10 @@ function BranchProviderInner({ children }: { children: ReactNode }) {
 
       const nextQuery = nextParams.toString()
       const targetUrl = nextQuery ? `${pathname}?${nextQuery}` : pathname
+
+      if (typeof window !== "undefined") {
+        window.history.replaceState(null, "", targetUrl)
+      }
       router.replace(targetUrl, { scroll: false })
     },
     [pathname, router, searchParams]

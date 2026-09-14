@@ -1,5 +1,7 @@
 "use client"
 
+import { useState } from "react"
+import { RiderAnalyticsModal } from "@/features/dashboard"
 import { DeliveryOrderFrequencyCard } from "../components/delivery-order-frequency-card"
 import { DeliverySummaryCards } from "../components/delivery-summary-cards"
 import { DeliveryZoneCoverageCard } from "../components/delivery-zone-coverage-card"
@@ -22,6 +24,8 @@ function DeliveryOverviewDashboard({
 }: {
   ordersContent?: React.ReactNode
 }) {
+  const [isRiderAnalyticsModalOpen, setIsRiderAnalyticsModalOpen] =
+    useState(false)
   const { data, isPending, isError, error } = useDeliveryDashboard()
 
   return (
@@ -37,6 +41,16 @@ function DeliveryOverviewDashboard({
           <DeliverySummaryCards
             kpis={data?.summaryKpis ?? []}
             isLoading={isPending}
+            onCardClick={(key) => {
+              if (key === "active_riders") {
+                setIsRiderAnalyticsModalOpen(true)
+              }
+            }}
+          />
+
+          <RiderAnalyticsModal
+            open={isRiderAnalyticsModalOpen}
+            onOpenChange={setIsRiderAnalyticsModalOpen}
           />
 
           <div className="grid gap-6 xl:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">

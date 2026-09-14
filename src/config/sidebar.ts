@@ -69,6 +69,12 @@ export const navMain: NavItem[] = [
     permission: PERMISSION_KEYS.revenueAnalytics,
   },
   {
+    title: "BNPL Analytics",
+    url: "/dashboard/bnpl-analytics",
+    icon: "creditCard",
+    permission: null,
+  },
+  {
     title: "Inventory Management",
     url: "/inventory",
     icon: "inventory",

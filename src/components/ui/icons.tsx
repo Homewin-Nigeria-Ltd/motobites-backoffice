@@ -2,9 +2,13 @@
 
 import type { ComponentType, SVGAttributes } from "react"
 import {
+  Activity,
+  AlertCircle,
   AlertTriangle,
+  ArrowDown,
   ArrowDownRight,
   ArrowRight,
+  ArrowUp,
   ArrowUpRight,
   AtSign,
   Banknote,
@@ -26,6 +30,7 @@ import {
   CircleHelp,
   ClipboardList,
   CreditCard,
+  DollarSign,
   Download,
   Ellipsis,
   Eye,
@@ -110,16 +115,23 @@ function fromLucide(LucideIcon: LucideIcon): IconComponent {
 }
 
 export const Icons = {
+  activity: fromLucide(Activity),
   alert: fromLucide(AlertTriangle),
+  alertCircle: fromLucide(AlertCircle),
   account: fromLucide(UserCircle),
   add: fromLucide(Plus),
+  arrowDown: fromLucide(ArrowDown),
   arrowDownRight: fromLucide(ArrowDownRight),
   arrowForward: fromLucide(ArrowRight),
-  arrowUp: fromLucide(ChevronUp),
+  arrowUp: fromLucide(ArrowUp),
   arrowUpRight: fromLucide(ArrowUpRight),
   banknote: fromLucide(Banknote),
+  barChart: fromLucide(BarChart3),
+  barChart2: fromLucide(BarChart3),
+  barChart3: fromLucide(BarChart3),
   book: fromLucide(BookOpen),
   calendar: fromLucide(Calendar),
+  dollarSign: fromLucide(DollarSign),
 
   camera: fromLucide(Camera),
   cart: fromLucide(ShoppingCart),
@@ -129,6 +141,7 @@ export const Icons = {
   chevronDown: fromLucide(ChevronDown),
   chevronLeft: fromLucide(ChevronLeft),
   chevronRight: fromLucide(ChevronRight),
+  chevronUp: fromLucide(ChevronUp),
   circleHelp: fromLucide(CircleHelp),
   close: fromLucide(X),
   creditCard: fromLucide(CreditCard),
