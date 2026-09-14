@@ -687,4 +687,213 @@ export type TotalUsersCardResponse = {
   message?: string
 }
 
+export type RiderAnalyticsHourlyActivity = {
+  hour: string
+  online_supply: number
+  demand_volume: number
+}
+
+export type RiderAnalyticsDeliveryBand = {
+  key: string
+  riders: number
+}
+
+export type RiderAnalyticsAreaAvailability = {
+  area: string
+  orders_waiting: number
+  available_riders: number
+}
+
+export type RiderAnalyticsTopRider = {
+  rider_id: string | number
+  name: string
+  deliveries: number
+  average_delivery_time_minutes: number
+  acceptance_rate_percent: number
+  rating: number
+  earnings_kobo: number
+}
+
+export type RiderAnalyticsData = {
+  period: {
+    key: string
+    from: string
+    to: string
+  }
+  fulfillment_branch_id?: number | null
+  headline: {
+    active_riders_currently: number
+    change_percent: number | null
+  }
+  kpis: {
+    total_riders: number
+    online_riders: number
+    riders_on_delivery: number
+    available_riders: number
+    average_deliveries_per_rider: number
+    average_delivery_time_minutes: number
+    rider_acceptance_rate_percent: number
+    rider_cancellation_rate_percent: number
+    rider_rating: number
+  }
+  changes: {
+    online_riders_percent: number | null
+    average_delivery_time_percent: number | null
+    average_deliveries_per_rider_percent?: number | null
+    rider_acceptance_rate_percent?: number | null
+    rider_cancellation_rate_percent?: number | null
+    rider_rating_change?: number | null
+  }
+  capacity_alert: {
+    orders_waiting: number
+    available_riders: number
+    is_alert: boolean
+    area?: string | null
+    area_orders_waiting?: number
+    area_available_riders?: number
+    estimated_wait_minutes?: number
+    message?: string
+  }
+  activity_hourly: RiderAnalyticsHourlyActivity[]
+  deliveries_per_rider: RiderAnalyticsDeliveryBand[]
+  availability_by_area: RiderAnalyticsAreaAvailability[]
+  top_riders: RiderAnalyticsTopRider[]
+}
+
+export type RiderAnalyticsResponse = {
+  success: boolean
+  data: RiderAnalyticsData
+  message?: string
+}
+
+export type BnplAttentionItem = {
+  key: string
+  title: string
+  severity: "critical" | "warning" | "positive"
+  count: number
+}
+
+export type BnplKpis = {
+  amount_repaid_kobo: number
+  repayment_rate_percent: number
+  active_bnpl_customers: number
+  default_rate_percent: number
+  delinquency_rate_percent: number
+  average_bnpl_order_value_kobo: number
+  bnpl_revenue_kobo: number
+  net_credit_loss_kobo: number
+  total_bnpl_orders: number
+  bnpl_gmv_kobo: number
+  amount_financed_kobo: number
+  outstanding_balance_kobo: number
+}
+
+export type BnplVolumeTrendPoint = {
+  date: string
+  orders: number
+  amount_financed: number
+  repayments: number
+  outstanding_par: number
+}
+
+export type BnplFunnelStep = {
+  key: string
+  label: string
+  count: number
+  percent: number
+  drop_percent: number | null
+}
+
+export type BnplRepaymentKpis = {
+  due_today_kobo: number
+  collected_today_kobo: number
+  overdue_kobo: number
+  recovered_kobo: number
+  success_rate_percent: number
+  failed_attempts: number
+  avg_days_to_repay: number
+}
+
+export type BnplRepaymentStatusItem = {
+  key: string
+  label: string
+  customers: number
+  percent: number
+}
+
+export type BnplPortfolioHealth = {
+  total_outstanding_kobo: number
+  par_1_percent: number
+  par_7_percent: number
+  par_30_percent: number
+}
+
+export type BnplProductCategory = {
+  category: string
+  orders: number
+  gmv_kobo: number
+  percent: number
+}
+
+export type BnplCustomerSegment = {
+  key: string
+  customers: number
+}
+
+export type BnplCollectionsQueueItem = {
+  key: string
+  label: string
+  count: number
+  severity: "critical" | "warning" | "info" | "neutral"
+}
+
+export type BnplProfitabilitySummary = {
+  revenue_streams: {
+    interest_revenue_kobo: number
+    service_processing_fees_kobo: number
+    late_fees_collected_kobo: number
+    total_gross_revenue_kobo: number
+  }
+  losses_and_operational_costs: {
+    payment_processing_costs_kobo: number
+    collection_operational_costs_kobo: number
+    credit_losses_write_offs_kobo: number
+    indirect_general_operations_kobo: number
+    total_operating_costs_kobo: number
+  }
+  net_bnpl_contribution_kobo: number
+  contribution_margin_percent: number
+}
+
+export type BnplAnalyticsData = {
+  period: {
+    key: string
+    from: string
+    to: string
+  }
+  fulfillment_branch_id?: number | null
+  scope?: {
+    portfolio: string
+    branch_filter_applied_to_portfolio: boolean
+  }
+  needs_attention: BnplAttentionItem[]
+  kpis: BnplKpis
+  volume_trend: BnplVolumeTrendPoint[]
+  conversion_funnel: BnplFunnelStep[]
+  repayment_kpis: BnplRepaymentKpis
+  repayment_status_breakdown: BnplRepaymentStatusItem[]
+  portfolio_health: BnplPortfolioHealth
+  product_categories: BnplProductCategory[]
+  customer_segmentation: BnplCustomerSegment[]
+  collections_queue: BnplCollectionsQueueItem[]
+  financial_profitability: BnplProfitabilitySummary
+}
+
+export type BnplAnalyticsResponse = {
+  success: boolean
+  data: BnplAnalyticsData
+  message?: string
+}
+
+
 

@@ -12,6 +12,8 @@ const illustrationMap = {
   ongoing_orders: ASSETS.illustrations.orders,
   total_users: ASSETS.illustrations.users,
   total_revenue: ASSETS.illustrations.wallet,
+  active_riders: ASSETS.illustrations.riderInTransit,
+  bnpl: ASSETS.illustrations.wallet,
 } as const
 
 type DashboardSummaryCardsProps = {
@@ -46,7 +48,9 @@ function SummaryCard({
     (kpi.key === "total_deliveries" ||
       kpi.key === "ongoing_orders" ||
       kpi.key === "total_revenue" ||
-      kpi.key === "total_users") &&
+      kpi.key === "total_users" ||
+      kpi.key === "active_riders" ||
+      kpi.key === "bnpl") &&
     Boolean(onClick)
 
   return (
@@ -136,8 +140,19 @@ export function DashboardSummaryCards({
   kpis,
   onCardClick,
 }: DashboardSummaryCardsProps) {
+  const colCount = kpis.length
+
   return (
-    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div
+      className={cn(
+        "grid gap-4 sm:grid-cols-2",
+        colCount >= 6
+          ? "lg:grid-cols-3 2xl:grid-cols-6"
+          : colCount >= 5
+            ? "lg:grid-cols-3 xl:grid-cols-5"
+            : "xl:grid-cols-4"
+      )}
+    >
       {kpis.map((kpi) => (
         <SummaryCard key={kpi.key} kpi={kpi} onClick={onCardClick} />
       ))}
