@@ -6,7 +6,6 @@ import {
   useContext,
   useEffect,
   useMemo,
-  useState,
   Suspense,
   type ReactNode,
 } from "react"
@@ -44,75 +43,33 @@ function BranchProviderInner({ children }: { children: ReactNode }) {
   // Parse branch from searchParams
   const param = searchParams?.get("branch_id") ?? searchParams?.get("fulfillment_branch_id")
 
-  // Fallback to localStorage if searchParams does not specify a branch
-  const [storedBranchId, setStoredBranchId] = useState<number | null>(() => {
-    if (typeof window === "undefined") return null
-    const saved = localStorage.getItem(STORAGE_KEY)
-    if (saved === "all" || !saved) {
-      return null
-    }
-    if (!Number.isNaN(Number(saved))) {
-      return Number(saved)
+  // BranchId resolution:
+  // - If a valid numeric branch is in the URL => select that branch
+  // - Otherwise (bare URL, "all", or unspecified) => All Branches (null)
+  const branchId = useMemo(() => {
+    if (param && param !== "all" && !Number.isNaN(Number(param))) {
+      return Number(param)
     }
     return null
-  })
+  }, [param])
 
-  // BranchId resolution:
-  // 1. If param is explicitly "all", branchId is null (All Branches)
-  // 2. If param is a valid number, branchId is that number
-  // 3. If param is not specified (bare URL), fall back to storedBranchId
-  const branchId = useMemo(() => {
-    if (param === "all") return null
-    if (param && !Number.isNaN(Number(param))) return Number(param)
-    return storedBranchId
-  }, [param, storedBranchId])
-
-  // Synchronize localStorage or push stored branch to URL if URL doesn't specify one
+  // Synchronize localStorage with the active branch
   useEffect(() => {
-    if (param === "all") {
-      try {
+    try {
+      if (branchId !== null) {
+        localStorage.setItem(STORAGE_KEY, String(branchId))
+      } else {
         localStorage.setItem(STORAGE_KEY, "all")
-      } catch {
-        // ignore localStorage errors
       }
-      return
+    } catch {
+      // ignore localStorage errors
     }
-
-    const numericUrlId =
-      param && !Number.isNaN(Number(param)) ? Number(param) : null
-
-    if (numericUrlId !== null) {
-      try {
-        localStorage.setItem(STORAGE_KEY, String(numericUrlId))
-      } catch {
-        // ignore localStorage errors
-      }
-      return
-    }
-
-    // URL has neither branch_id nor fulfillment_branch_id (bare URL)
-    const saved = typeof window !== "undefined" ? localStorage.getItem(STORAGE_KEY) : null
-    if (saved === "all") {
-      const nextParams = new URLSearchParams(searchParams ? searchParams.toString() : "")
-      nextParams.set("branch_id", "all")
-      const nextQuery = nextParams.toString()
-      const targetUrl = nextQuery ? `${pathname}?${nextQuery}` : pathname
-      router.replace(targetUrl, { scroll: false })
-    } else if (saved && !Number.isNaN(Number(saved))) {
-      const nextParams = new URLSearchParams(searchParams ? searchParams.toString() : "")
-      nextParams.set("branch_id", saved)
-      const nextQuery = nextParams.toString()
-      const targetUrl = nextQuery ? `${pathname}?${nextQuery}` : pathname
-      router.replace(targetUrl, { scroll: false })
-    }
-  }, [param, searchParams, pathname, router])
+  }, [branchId])
 
   const setBranchId = useCallback(
     (id: number | string | null) => {
       const numericId =
         id !== null && id !== "" && id !== "all" && !Number.isNaN(Number(id)) ? Number(id) : null
-
-      setStoredBranchId(numericId)
 
       try {
         if (numericId !== null) {
@@ -129,7 +86,7 @@ function BranchProviderInner({ children }: { children: ReactNode }) {
         nextParams.set("branch_id", String(numericId))
         nextParams.delete("fulfillment_branch_id")
       } else {
-        nextParams.set("branch_id", "all")
+        nextParams.delete("branch_id")
         nextParams.delete("fulfillment_branch_id")
       }
 
@@ -153,23 +110,15 @@ function BranchProviderInner({ children }: { children: ReactNode }) {
 
   const formatBranchUrl = useCallback(
     (url: string) => {
+      if (!branchId) return url
       if (/^https?:\/\//.test(url) || url.includes("branch_id=")) return url
 
       const [path, query] = url.split("?")
       const params = new URLSearchParams(query || "")
-
-      if (branchId !== null) {
-        params.set("branch_id", String(branchId))
-      } else if (param === "all") {
-        params.set("branch_id", "all")
-      } else {
-        return url
-      }
-
-      const nextQuery = params.toString()
-      return nextQuery ? `${path}?${nextQuery}` : path
+      params.set("branch_id", String(branchId))
+      return `${path}?${params.toString()}`
     },
-    [branchId, param]
+    [branchId]
   )
 
   const value = useMemo<BranchContextValue>(
