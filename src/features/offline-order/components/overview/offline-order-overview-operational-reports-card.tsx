@@ -1,7 +1,13 @@
 import type { ReactNode } from "react"
 
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import type {
   ApiSalesDashboardOperationalReports,
   SalesDashboardOperationalReportsPeriod,
@@ -14,15 +20,14 @@ import {
   formatOfflineOrderAmount,
   resolveOfflineOrderAmount,
 } from "@/features/offline-order/utils/order-totals"
-import { cn } from "@/lib/utils"
 
 const PERIOD_OPTIONS: Array<{
   value: SalesDashboardOperationalReportsPeriod
   label: string
 }> = [
-  { value: "day", label: "Today" },
+  { value: "24h", label: "Last 24 hours" },
   { value: "week", label: "This Week" },
-  { value: "month", label: "This Month" },
+  { value: "3months", label: "Last 3 months" },
   { value: "year", label: "This Year" },
 ]
 
@@ -88,28 +93,27 @@ export function OfflineOrderOverviewOperationalReportsCard({
           </p>
         </div>
 
-        <div className="flex flex-wrap gap-2">
-          {PERIOD_OPTIONS.map((option) => {
-            const isActive = period === option.value
-
-            return (
-              <Button
-                key={option.value}
-                type="button"
-                variant={isActive ? "secondary" : "ghost"}
-                size="sm"
-                className={cn(
-                  "h-9",
-                  isActive ? "text-primary" : "text-muted-foreground",
-                )}
-                disabled={isLoading}
-                onClick={() => onPeriodChange(option.value)}
-              >
+        <Select
+          value={period}
+          onValueChange={(value) =>
+            onPeriodChange(value as SalesDashboardOperationalReportsPeriod)
+          }
+          disabled={isLoading}
+        >
+          <SelectTrigger
+            size="lg"
+            className="w-[11.5rem] border-border bg-background font-normal"
+          >
+            <SelectValue placeholder="Select period" />
+          </SelectTrigger>
+          <SelectContent align="end">
+            {PERIOD_OPTIONS.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
                 {option.label}
-              </Button>
-            )
-          })}
-        </div>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">

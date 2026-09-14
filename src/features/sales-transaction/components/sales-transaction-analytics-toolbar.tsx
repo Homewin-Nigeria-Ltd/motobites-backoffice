@@ -42,6 +42,7 @@ export function SalesTransactionAnalyticsToolbar({
       <DashboardDateRangePicker
         value={dateRange}
         onChange={onDateRangeChange}
+        className="h-10 px-2.5 text-xs"
       />
 
       <div className="ml-auto shrink-0">
@@ -52,7 +53,10 @@ export function SalesTransactionAnalyticsToolbar({
           }
           disabled={isLoading}
         >
-          <SelectTrigger className="h-10 w-[11.5rem] border-border bg-background">
+          <SelectTrigger
+            size="lg"
+            className="w-[11.5rem] border-border bg-background font-normal"
+          >
             <SelectValue placeholder="Select period" />
           </SelectTrigger>
           <SelectContent align="end">
