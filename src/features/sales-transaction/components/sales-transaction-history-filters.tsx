@@ -68,8 +68,9 @@ function FilterSelect({
   return (
     <Select value={value} onValueChange={onChange}>
       <SelectTrigger
+        size="lg"
         className={cn(
-          "h-10 w-full min-w-0 gap-1 border-border bg-background px-2.5 text-xs font-normal",
+          "w-full min-w-0 gap-1 border-border bg-background font-normal",
           className,
         )}
       >
@@ -103,35 +104,35 @@ export function SalesTransactionHistoryFiltersBar({
   }
 
   const itemClassName = "min-w-0 w-full"
+  const controlClassName = "h-10 text-xs font-normal"
 
   return (
-    <div className="grid grid-cols-6 items-center gap-2">
-      <div className={itemClassName}>
-        <DashboardDateRangePicker
-          value={dateRange}
-          onChange={onDateRangeChange}
-        />
-      </div>
+    <div className="grid grid-cols-[minmax(0,2.2fr)_repeat(3,minmax(0,1fr))_minmax(0,1.2fr)_auto] items-stretch gap-2">
+      <DashboardDateRangePicker
+        value={dateRange}
+        onChange={onDateRangeChange}
+        className={cn(controlClassName, "truncate px-2.5")}
+      />
 
       <FilterSelect
         value={filters.source}
         options={SOURCE_OPTIONS}
         onChange={(value) => updateFilter("source", value)}
-        className={itemClassName}
+        className={cn(itemClassName, controlClassName)}
       />
 
       <FilterSelect
         value={filters.method}
         options={METHOD_OPTIONS}
         onChange={(value) => updateFilter("method", value)}
-        className={itemClassName}
+        className={cn(itemClassName, controlClassName)}
       />
 
       <FilterSelect
         value={filters.status}
         options={STATUS_OPTIONS}
         onChange={(value) => updateFilter("status", value)}
-        className={itemClassName}
+        className={cn(itemClassName, controlClassName)}
       />
 
       <Input
@@ -140,14 +141,15 @@ export function SalesTransactionHistoryFiltersBar({
         placeholder="Search..."
         value={filters.search}
         onChange={(event) => onSearchChange(event.target.value)}
-        className={cn(itemClassName, "h-10 px-2.5 text-xs")}
+        className={cn(itemClassName, controlClassName)}
       />
 
       <Button
         type="button"
         className={cn(
           itemClassName,
-          "h-10 gap-1.5 px-2 text-xs",
+          controlClassName,
+          "gap-1.5 px-3",
         )}
         disabled={isExporting}
         onClick={onExport}

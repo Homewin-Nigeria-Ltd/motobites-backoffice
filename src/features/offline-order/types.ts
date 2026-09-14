@@ -353,9 +353,9 @@ export type ApiSalesDashboardRecentTransactionsResponse = {
 }
 
 export type SalesDashboardOperationalReportsPeriod =
-  | "day"
+  | "24h"
   | "week"
-  | "month"
+  | "3months"
   | "year"
 
 export type SalesDashboardOperationalReportsParams = {
