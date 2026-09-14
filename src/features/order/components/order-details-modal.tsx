@@ -40,7 +40,6 @@ import { toImageSrc } from "@/lib/image-url"
 
 const ADMIN_STATUS_OPTIONS = Object.values(OrderStatus)
 
-const detailGrid3 = "grid grid-cols-1 gap-x-10 gap-y-8 md:grid-cols-3"
 const detailGrid2 = "grid grid-cols-1 gap-x-10 gap-y-8 md:grid-cols-2"
 const detailField = "min-w-0 space-y-2"
 const detailLabel = "text-sm font-normal text-muted-foreground"
@@ -119,12 +118,23 @@ export function OrderDetailsModal({
           />
         </div>
         <div className="min-w-0 flex-1 space-y-2.5">
-          <Badge
-            variant="secondary"
-            className="w-fit rounded-full border-0 bg-secondary px-3 py-1 text-xs font-medium text-primary"
-          >
-            Order {order.order_number}
-          </Badge>
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge
+              variant="secondary"
+              className="w-fit rounded-full border-0 bg-secondary px-3 py-1 text-xs font-medium text-primary"
+            >
+              Order {order.order_number}
+            </Badge>
+            {order.fulfillment_branch?.name ? (
+              <Badge
+                variant="outline"
+                className="flex items-center gap-1 rounded-full border-primary/30 bg-primary/5 px-2.5 py-0.5 text-xs font-medium text-primary"
+              >
+                <Icons.mapPin className="size-3 text-primary" />
+                {order.fulfillment_branch.name}
+              </Badge>
+            ) : null}
+          </div>
           <h2 className="text-xl font-semibold leading-tight text-foreground">
             {order.item.name}
           </h2>
@@ -137,10 +147,16 @@ export function OrderDetailsModal({
       </div>
 
       <div className="flex flex-col gap-8">
-        <div className={detailGrid3}>
+        <div className={detailGrid2}>
           <div className={detailField}>
             <Label className={detailLabel}>Customer Name</Label>
             <p className={cn(detailValue, "font-medium")}>{order.customer_name}</p>
+          </div>
+          <div className={detailField}>
+            <Label className={detailLabel}>Fulfillment Branch</Label>
+            <p className={cn(detailValue, "font-medium")}>
+              {order.fulfillment_branch?.name ?? "Central Kitchen / All Branches"}
+            </p>
           </div>
           <div className={detailField}>
             <Label className={detailLabel}>Delivery Address</Label>

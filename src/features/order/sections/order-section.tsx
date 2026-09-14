@@ -1,5 +1,6 @@
 "use client"
 
+import { useBranchFilter } from "@/context/branch-context"
 import { OrderDetailsModal } from "@/features/order/components/order-details-modal"
 import { OrderHubSection } from "@/features/order/components/order-hub-section"
 import { useOrderDetailsModal } from "@/features/order/hooks/use-order-details-modal"
@@ -13,6 +14,7 @@ type OrderManagementSectionProps = {
 
 export function OrderManagementSection({ tab }: OrderManagementSectionProps) {
   const search = useOrderSearchQuery()
+  const { branchId } = useBranchFilter()
   const {
     selectedOrderId,
     detailsOpen,
@@ -20,7 +22,11 @@ export function OrderManagementSection({ tab }: OrderManagementSectionProps) {
     handleOpenChange,
   } = useOrderDetailsModal()
 
-  const { data, isPending, isError, error } = useOrders({ tab, search })
+  const { data, isPending, isError, error } = useOrders({
+    tab,
+    search,
+    fulfillment_branch_id: branchId,
+  })
 
   const groups = data?.groups ?? []
 

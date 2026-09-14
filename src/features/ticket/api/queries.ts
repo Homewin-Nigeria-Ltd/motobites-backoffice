@@ -29,13 +29,23 @@ import { ticketKeys } from "./keys"
 import { api } from "@/lib/api/client"
 import { queryOptions } from "@tanstack/react-query"
 
-function periodQuery(params: TicketOverviewParams) {
-  return params.period ? { period: params.period } : undefined
+function overviewQuery(params: TicketOverviewParams = {}) {
+  const query: Record<string, string | number> = {}
+  if (params.period) {
+    query.period = params.period
+  }
+  if (params.fulfillment_branch_id !== undefined && params.fulfillment_branch_id !== null) {
+    query.fulfillment_branch_id = params.fulfillment_branch_id
+  }
+  return Object.keys(query).length > 0 ? query : undefined
 }
 
-async function fetchTicketSummary(): Promise<TicketSummaryKpi[]> {
+async function fetchTicketSummary(
+  params: TicketOverviewParams = {}
+): Promise<TicketSummaryKpi[]> {
   const response = await api.get<ApiTicketSummaryResponse>(
-    ticketEndpoints.overviewSummary
+    ticketEndpoints.overviewSummary,
+    overviewQuery(params)
   )
 
   return response.data.map(mapApiSummaryItem)
@@ -46,7 +56,7 @@ async function fetchTicketResolutionRate(
 ): Promise<TicketResolutionRate> {
   const response = await api.get<ApiTicketResolutionRateResponse>(
     ticketEndpoints.overviewResolutionRate,
-    periodQuery(params)
+    overviewQuery(params)
   )
 
   return mapResolutionRate(response.data)
@@ -57,7 +67,7 @@ async function fetchTicketByIssue(
 ): Promise<TicketIssueCategory[]> {
   const response = await api.get<ApiTicketByIssueResponse>(
     ticketEndpoints.overviewByIssue,
-    periodQuery(params)
+    overviewQuery(params)
   )
 
   return response.data.map(mapApiByIssueItem)
@@ -68,15 +78,18 @@ async function fetchTicketByStatus(
 ): Promise<TicketVolumeByStatus[]> {
   const response = await api.get<ApiTicketByStatusResponse>(
     ticketEndpoints.overviewByStatus,
-    periodQuery(params)
+    overviewQuery(params)
   )
 
   return response.data.map(mapApiByStatusItem)
 }
 
-async function fetchTicketUrgentAlert(): Promise<TicketAlert | null> {
+async function fetchTicketUrgentAlert(
+  params: TicketOverviewParams = {}
+): Promise<TicketAlert | null> {
   const response = await api.get<ApiTicketUrgentAlertResponse>(
-    ticketEndpoints.overviewUrgentAlert
+    ticketEndpoints.overviewUrgentAlert,
+    overviewQuery(params)
   )
 
   return response.data ? mapApiUrgentAlert(response.data) : null
@@ -88,6 +101,10 @@ async function fetchTicketList(
   const query: Record<string, string | number> = {
     page: params.page,
     per_page: params.per_page ?? 8,
+  }
+
+  if (params.fulfillment_branch_id !== undefined && params.fulfillment_branch_id !== null) {
+    query.fulfillment_branch_id = params.fulfillment_branch_id
   }
 
   const response = await api.get<ApiTicketListResponse>(
@@ -110,10 +127,10 @@ async function fetchTicketDetail(id: string): Promise<SupportTicket> {
 }
 
 export const ticketQueries = {
-  overviewSummary: () =>
+  overviewSummary: (params: TicketOverviewParams = {}) =>
     queryOptions({
-      queryKey: ticketKeys.overviewSummary(),
-      queryFn: () => fetchTicketSummary(),
+      queryKey: ticketKeys.overviewSummary(params),
+      queryFn: () => fetchTicketSummary(params),
       staleTime: 60 * 1000,
     }),
 
@@ -138,10 +155,10 @@ export const ticketQueries = {
       staleTime: 60 * 1000,
     }),
 
-  overviewUrgentAlert: () =>
+  overviewUrgentAlert: (params: TicketOverviewParams = {}) =>
     queryOptions({
-      queryKey: ticketKeys.overviewUrgentAlert(),
-      queryFn: () => fetchTicketUrgentAlert(),
+      queryKey: ticketKeys.overviewUrgentAlert(params),
+      queryFn: () => fetchTicketUrgentAlert(params),
       staleTime: 60 * 1000,
     }),
 

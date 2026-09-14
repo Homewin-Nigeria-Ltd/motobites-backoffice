@@ -3,6 +3,8 @@
 import Link from "next/link"
 import { useEffect, useState } from "react"
 
+import { Icons } from "@/components/ui/icons"
+import { RiderAnalyticsModal } from "@/features/dashboard"
 import { RiderSummaryCards } from "../components/rider-summary-cards"
 import { RidersTable } from "../components/riders-table"
 import { useRiders } from "../hooks/use-riders"
@@ -20,6 +22,7 @@ export function RidersSection({
 }: RidersSectionProps = {}) {
   const [internalSearch, setInternalSearch] = useState("")
   const [page, setPage] = useState(1)
+  const [isAnalyticsModalOpen, setIsAnalyticsModalOpen] = useState(false)
   const [debouncedSearch, setDebouncedSearch] = useState(
     externalSearch ?? internalSearch
   )
@@ -78,9 +81,20 @@ export function RidersSection({
       <div className="min-h-0 flex-1 space-y-8 overflow-y-auto p-4 md:p-6">
         {showSearchInput ? (
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <Button asChild className="h-10 rounded-xl px-4">
-              <Link href="/riders/new">Add Rider</Link>
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                className="h-10 rounded-xl px-4 gap-2 border-amber-500/30 text-amber-600 hover:bg-amber-500/10 hover:text-amber-600 dark:text-amber-400"
+                onClick={() => setIsAnalyticsModalOpen(true)}
+              >
+                <Icons.barChart className="size-4" />
+                Rider Analytics
+              </Button>
+              <Button asChild className="h-10 rounded-xl px-4">
+                <Link href="/riders/new">Add Rider</Link>
+              </Button>
+            </div>
             <div className="w-full max-w-xs sm:w-64">
               <Input
                 type="search"
@@ -93,14 +107,25 @@ export function RidersSection({
             </div>
           </div>
         ) : (
-          <div className="flex justify-end">
+          <div className="flex items-center justify-end gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              className="h-10 rounded-xl px-4 gap-2 border-amber-500/30 text-amber-600 hover:bg-amber-500/10 hover:text-amber-600 dark:text-amber-400"
+              onClick={() => setIsAnalyticsModalOpen(true)}
+            >
+              <Icons.barChart className="size-4" />
+              Rider Analytics
+            </Button>
             <Button asChild className="h-10 rounded-xl px-4">
               <Link href="/riders/new">Add Rider</Link>
             </Button>
           </div>
         )}
 
-        <RiderSummaryCards />
+        <RiderSummaryCards
+          onCardClick={() => setIsAnalyticsModalOpen(true)}
+        />
 
         <RidersTable
           riders={riders}
@@ -108,6 +133,11 @@ export function RidersSection({
           totalPages={totalPages}
           onPageChange={handlePageChange}
           isLoading={isLoading}
+        />
+
+        <RiderAnalyticsModal
+          open={isAnalyticsModalOpen}
+          onOpenChange={setIsAnalyticsModalOpen}
         />
       </div>
     </div>

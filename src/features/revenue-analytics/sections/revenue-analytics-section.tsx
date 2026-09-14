@@ -12,16 +12,19 @@ import { RevenueSummaryCards } from "@/features/revenue-analytics/components/rev
 import { RevenueTopKitchensTable } from "@/features/revenue-analytics/components/revenue-top-kitchens-table"
 import { RevenueTrendChart } from "@/features/revenue-analytics/components/revenue-trend-chart"
 import { useRevenueAnalytics } from "@/features/revenue-analytics/hooks/use-revenue-analytics"
+import { useBranchFilter } from "@/context/branch-context"
 import { AppLoader } from "@/components/ui/app-loader"
 import { useFilterToast } from "@/hooks/use-filter-toast"
 import { cn } from "@/lib/utils"
 
 export function RevenueAnalyticsSection() {
+  const { branchId } = useBranchFilter()
   const [period, setPeriod] = useState(DashboardPeriod.TwentyFourHours)
   const [dateRange, setDateRange] = useState<DateRange | undefined>()
   const { data, isPending, isFetching, isError, error } = useRevenueAnalytics(
     period,
-    dateRange
+    dateRange,
+    branchId
   )
 
   useFilterToast({

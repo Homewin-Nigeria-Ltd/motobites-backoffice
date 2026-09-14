@@ -51,6 +51,11 @@ export function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL(nextPath, request.url))
   }
 
+  if (pathname === "/bnpl-analytics" || pathname.startsWith("/bnpl-analytics/")) {
+    const nextPath = pathname.replace("/bnpl-analytics", "/dashboard/bnpl-analytics")
+    return NextResponse.redirect(new URL(nextPath, request.url))
+  }
+
   if (pathname === "/delivery-status/riders" || pathname.startsWith("/delivery-status/riders/")) {
     const nextPath = pathname.replace("/delivery-status/riders", "/riders")
     return NextResponse.redirect(new URL(nextPath, request.url))

@@ -8,6 +8,7 @@ import { customerColumns } from "@/features/customers/columns"
 import { CustomerSummaryCards } from "@/features/customers/components/customer-summary-cards"
 import { CustomerToolbar } from "@/features/customers/components/customer-toolbar"
 import { useCustomerList, useCustomerOverview } from "@/features/customers"
+import { useBranchFilter } from "@/context/branch-context"
 import type { CustomerTab } from "@/features/customers/types"
 import { PROMOTIONS_ROUTES } from "@/features/promotions/constants"
 import { DataTable } from "@/components/data-table"
@@ -16,6 +17,7 @@ import { Button } from "@/components/ui/button"
 const DEFAULT_PAGE_SIZE = 8
 
 export function CustomerManagementSection() {
+  const { branchId } = useBranchFilter()
   const [tab, setTab] = useState<CustomerTab>("all")
   const [search, setSearch] = useState("")
   const [pagination, setPagination] = useState<PaginationState>({
@@ -24,12 +26,13 @@ export function CustomerManagementSection() {
   })
 
   const { data: overviewData, isPending: isOverviewPending } =
-    useCustomerOverview()
+    useCustomerOverview(branchId)
   const { data, isPending, isFetching } = useCustomerList({
     tab,
     search,
     page: pagination.pageIndex + 1,
     per_page: pagination.pageSize,
+    fulfillment_branch_id: branchId ?? undefined,
   })
 
   const handleTabChange = (value: CustomerTab) => {

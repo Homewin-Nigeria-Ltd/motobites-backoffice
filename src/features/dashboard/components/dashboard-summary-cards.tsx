@@ -12,10 +12,13 @@ const illustrationMap = {
   ongoing_orders: ASSETS.illustrations.orders,
   total_users: ASSETS.illustrations.users,
   total_revenue: ASSETS.illustrations.wallet,
+  active_riders: ASSETS.illustrations.riderInTransit,
+  bnpl: ASSETS.illustrations.wallet,
 } as const
 
 type DashboardSummaryCardsProps = {
   kpis: DashboardKpi[]
+  onCardClick?: (key: string) => void
 }
 
 function getKpiIllustration(key: string) {
@@ -33,11 +36,44 @@ function formatKpiValue(kpi: DashboardKpi) {
   return kpi.formatted_value
 }
 
-function SummaryCard({ kpi }: { kpi: DashboardKpi }) {
+function SummaryCard({
+  kpi,
+  onClick,
+}: {
+  kpi: DashboardKpi
+  onClick?: (key: string) => void
+}) {
   const isUp = kpi.trend === "up"
+  const isClickable =
+    (kpi.key === "total_deliveries" ||
+      kpi.key === "ongoing_orders" ||
+      kpi.key === "total_revenue" ||
+      kpi.key === "total_users" ||
+      kpi.key === "active_riders" ||
+      kpi.key === "bnpl") &&
+    Boolean(onClick)
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-border bg-background p-5">
+    <div
+      role={isClickable ? "button" : undefined}
+      tabIndex={isClickable ? 0 : undefined}
+      onClick={isClickable ? () => onClick?.(kpi.key) : undefined}
+      onKeyDown={
+        isClickable
+          ? (e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault()
+                onClick?.(kpi.key)
+              }
+            }
+          : undefined
+      }
+      className={cn(
+        "relative overflow-hidden rounded-2xl border border-border bg-background p-5",
+        isClickable &&
+          "cursor-pointer transition-all duration-200 hover:border-primary/50 hover:shadow-sm active:scale-[0.99] focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
+      )}
+    >
       <Image
         src={ASSETS.illustrations.cardCorner}
         alt=""
@@ -100,11 +136,25 @@ function SummaryCard({ kpi }: { kpi: DashboardKpi }) {
   )
 }
 
-export function DashboardSummaryCards({ kpis }: DashboardSummaryCardsProps) {
+export function DashboardSummaryCards({
+  kpis,
+  onCardClick,
+}: DashboardSummaryCardsProps) {
+  const colCount = kpis.length
+
   return (
-    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div
+      className={cn(
+        "grid gap-4 sm:grid-cols-2",
+        colCount >= 6
+          ? "lg:grid-cols-3 2xl:grid-cols-6"
+          : colCount >= 5
+            ? "lg:grid-cols-3 xl:grid-cols-5"
+            : "xl:grid-cols-4"
+      )}
+    >
       {kpis.map((kpi) => (
-        <SummaryCard key={kpi.key} kpi={kpi} />
+        <SummaryCard key={kpi.key} kpi={kpi} onClick={onCardClick} />
       ))}
     </div>
   )

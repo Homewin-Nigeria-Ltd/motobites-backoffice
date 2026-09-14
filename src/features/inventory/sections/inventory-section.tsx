@@ -15,6 +15,7 @@ import {
   useInventoryItems,
   useInventoryOverview,
 } from "@/features/inventory/hooks/use-inventory-queries"
+import { useBranchFilter } from "@/context/branch-context"
 import type { ApiInventoryItem } from "@/features/inventory/types"
 import { exportInventoryItemsCsv } from "@/features/inventory/utils/export-items-csv"
 import { DataTable } from "@/components/data-table"
@@ -24,6 +25,7 @@ import { Card, CardContent } from "@/components/ui/card"
 const SEARCH_DEBOUNCE_MS = 300
 
 export function InventorySection() {
+  const { branchId } = useBranchFilter()
   const [tableSearch, setTableSearch] = useState("")
   const [debouncedTableSearch, setDebouncedTableSearch] = useState("")
   const [category, setCategory] = useState("")
@@ -59,7 +61,7 @@ export function InventorySection() {
     isPending: isOverviewPending,
     isError: isOverviewError,
     error: overviewError,
-  } = useInventoryOverview()
+  } = useInventoryOverview(branchId)
 
   const {
     data: itemsResponse,
@@ -71,6 +73,7 @@ export function InventorySection() {
     search: debouncedTableSearch || undefined,
     category: category || undefined,
     stock_level: stockLevel || undefined,
+    fulfillment_branch_id: branchId ?? undefined,
   })
 
   const overview = overviewResponse?.data

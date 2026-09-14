@@ -58,9 +58,12 @@ export function useSalesDashboardDeleteRequests(
   })
 }
 
-export function useSalesDashboardStats(options?: { enabled?: boolean }) {
+export function useSalesDashboardStats(
+  branchId?: number | null,
+  options?: { enabled?: boolean }
+) {
   return useQuery({
-    ...offlineOrderQueries.stats(),
+    ...offlineOrderQueries.stats(branchId),
     enabled: options?.enabled ?? true,
   })
 }

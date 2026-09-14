@@ -1,2 +1,2 @@
-pnpm typecheck
-pnpm build
+CI=true pnpm typecheck
+CI=true pnpm build

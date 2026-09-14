@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation"
 
 import { AppSidebar } from "@/components/layouts/dashboard/app-sidebar"
 import { DashboardHeader } from "@/components/layouts/dashboard/dashboard-header"
+import { BranchProvider } from "@/context/branch-context"
 import type { NavItem, SupportItem } from "@/config/sidebar"
 import type { AuthUser } from "@/features/auth"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
@@ -28,16 +29,18 @@ export function DashboardLayout({
   const shouldShowHeader = showDashboardHeader ?? !isMenuDetailPage
 
   return (
-    <SidebarProvider>
-      <AppSidebar
-        user={user}
-        filteredNavMain={filteredNavMain}
-        filteredSupport={filteredSupport}
-      />
-      <SidebarInset className="flex min-h-0 min-w-0 flex-1 flex-col">
-        {shouldShowHeader ? <DashboardHeader user={user} /> : null}
-        <div className="flex min-h-0 min-w-0 flex-1 flex-col">{children}</div>
-      </SidebarInset>
-    </SidebarProvider>
+    <BranchProvider>
+      <SidebarProvider>
+        <AppSidebar
+          user={user}
+          filteredNavMain={filteredNavMain}
+          filteredSupport={filteredSupport}
+        />
+        <SidebarInset className="flex min-h-0 min-w-0 flex-1 flex-col">
+          {shouldShowHeader ? <DashboardHeader user={user} /> : null}
+          <div className="flex min-h-0 min-w-0 flex-1 flex-col">{children}</div>
+        </SidebarInset>
+      </SidebarProvider>
+    </BranchProvider>
   )
 }

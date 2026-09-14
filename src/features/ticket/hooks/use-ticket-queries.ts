@@ -8,8 +8,8 @@ import type { TicketListParams, TicketOverviewParams } from "../types"
 
 const STAFF_PAGE_SIZE = 100
 
-export function useTicketSummary() {
-  return useQuery(ticketQueries.overviewSummary())
+export function useTicketSummary(params: TicketOverviewParams = {}) {
+  return useQuery(ticketQueries.overviewSummary(params))
 }
 
 export function useTicketResolutionRate(params: TicketOverviewParams = {}) {
@@ -24,8 +24,8 @@ export function useTicketByStatus(params: TicketOverviewParams = {}) {
   return useQuery(ticketQueries.overviewByStatus(params))
 }
 
-export function useTicketUrgentAlert() {
-  return useQuery(ticketQueries.overviewUrgentAlert())
+export function useTicketUrgentAlert(params: TicketOverviewParams = {}) {
+  return useQuery(ticketQueries.overviewUrgentAlert(params))
 }
 
 export function useTicketList(params: TicketListParams) {

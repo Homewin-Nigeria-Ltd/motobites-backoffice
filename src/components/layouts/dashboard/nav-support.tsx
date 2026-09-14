@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/collapsible"
 import { Icon, Icons } from "@/components/ui/icons"
 import { Switch } from "@/components/ui/switch"
+import { useBranchFilter } from "@/context/branch-context"
 import type { SupportItem } from "@/config/sidebar"
 import {
   SidebarGroup,
@@ -30,6 +31,7 @@ export function NavSupport({
 }) {
   const pathname = usePathname()
   const { theme, toggleTheme } = useTheme()
+  const { formatBranchUrl } = useBranchFilter()
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
@@ -79,7 +81,7 @@ export function NavSupport({
                               asChild
                               isActive={isSubActive}
                             >
-                              <Link href={subItem.url}>
+                              <Link href={formatBranchUrl(subItem.url)}>
                                 <span>{subItem.name}</span>
                               </Link>
                             </SidebarMenuSubButton>
@@ -100,7 +102,7 @@ export function NavSupport({
                 tooltip={item.name}
                 isActive={isActive}
               >
-                <Link href={item.url ?? "#"}>
+                <Link href={item.url ? formatBranchUrl(item.url) : "#"}>
                   <Icon name={item.icon} size={24} />
                   <span>{item.name}</span>
                 </Link>

@@ -17,6 +17,7 @@ export type Offer = {
 
 export type OfferListParams = {
   tab?: OfferTab
+  fulfillment_branch_id?: number | null
 }
 
 export type ApiOffer = {

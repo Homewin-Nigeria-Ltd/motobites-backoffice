@@ -13,6 +13,13 @@ export type ApiOrderKitchen = {
   name: string
 } | null
 
+export type ApiOrderFulfillmentBranch = {
+  id: number
+  key: string
+  name: string
+  address?: string | null
+} | null
+
 export type ApiOrder = {
   id: string
   order_number: string
@@ -28,6 +35,7 @@ export type ApiOrder = {
   amount_paid_formatted: string
   rider_name: string | null
   kitchen: ApiOrderKitchen
+  fulfillment_branch?: ApiOrderFulfillmentBranch
   map: unknown
   created_at: string
 }
@@ -76,6 +84,8 @@ export type OrdersGroupedParams = {
   per_page?: number
   page?: number
   search?: string
+  fulfillment_branch_id?: number | null
+  branch_id?: number | null
 }
 
 export type ApiOrderAssignee = {
@@ -164,6 +174,7 @@ export type ApiOrderDetailData = {
     name: string | null
     vendor_name: string | null
   }
+  fulfillment_branch?: ApiOrderFulfillmentBranch
   created_at: string
 }
 

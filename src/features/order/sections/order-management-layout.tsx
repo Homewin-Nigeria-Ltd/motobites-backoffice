@@ -1,5 +1,6 @@
 "use client"
 
+import { useBranchFilter } from "@/context/branch-context"
 import { OrderFilterTabs } from "@/features/order/components/order-filter-tabs"
 import {
   useOrderSearchInput,
@@ -12,7 +13,8 @@ type OrderManagementLayoutProps = {
 }
 
 export function OrderManagementLayout({ children }: OrderManagementLayoutProps) {
-  const { counts } = useOrderTabCounts()
+  const { branchId } = useBranchFilter()
+  const { counts } = useOrderTabCounts(branchId)
   const { value: search, setValue: setSearch } = useOrderSearchInput()
 
   return (

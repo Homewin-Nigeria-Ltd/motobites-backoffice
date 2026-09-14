@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation"
 import { getOrderTabPath, type OrderTab } from "@/features/order/types"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { useBranchFilter } from "@/context/branch-context"
 
 const tabLabels: Record<OrderTab, string> = {
   pending: "Pending Orders",
@@ -21,6 +22,7 @@ type OrderFilterTabsProps = {
 
 export function OrderFilterTabs({ counts }: OrderFilterTabsProps) {
   const pathname = usePathname()
+  const { formatBranchUrl } = useBranchFilter()
 
   return (
     <div
@@ -29,8 +31,9 @@ export function OrderFilterTabs({ counts }: OrderFilterTabsProps) {
       aria-label="Order filters"
     >
       {(Object.keys(tabLabels) as OrderTab[]).map((tab) => {
-        const href = getOrderTabPath(tab)
-        const isActive = pathname === href
+        const rawHref = getOrderTabPath(tab)
+        const href = formatBranchUrl(rawHref)
+        const isActive = pathname === rawHref
         const count = counts[tab]
         const showCount = tab !== "performance" && count > 0
 

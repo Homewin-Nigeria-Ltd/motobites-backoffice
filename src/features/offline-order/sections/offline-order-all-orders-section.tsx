@@ -18,6 +18,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { DataTable } from "@/components/data-table"
 import { createAllOrdersColumns } from "@/features/offline-order/columns/all-orders-columns"
 import { OfflineOrderSearchToolbar } from "@/features/offline-order/components/offline-order-search-toolbar"
+import { useBranchFilter } from "@/context/branch-context"
 import { useSession } from "@/features/auth/hooks/use-session"
 import {
   useRequestOfflineOrderDeletion,
@@ -31,10 +32,10 @@ import { toast } from "@/lib/toast"
 const DEFAULT_PAGE_SIZE = 10
 
 export function OfflineOrderAllOrdersSection() {
+  const { branchId } = useBranchFilter()
   const { data: session } = useSession()
   const user = session?.user
   const canRequestDeletion = isSalesRep(user)
-
   const [search, setSearch] = useState("")
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -47,6 +48,7 @@ export function OfflineOrderAllOrdersSection() {
     search: search.trim() || undefined,
     page: pagination.pageIndex + 1,
     per_page: pagination.pageSize,
+    fulfillment_branch_id: branchId ?? undefined,
   })
 
   const requestDeletion = useRequestOfflineOrderDeletion()
