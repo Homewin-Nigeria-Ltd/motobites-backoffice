@@ -7,6 +7,7 @@ export type Menu = {
   imageUrl: string
   enabled: boolean
   isPopular?: boolean
+  videos?: MenuItemVideo[]
 }
 
 export type Hub = {

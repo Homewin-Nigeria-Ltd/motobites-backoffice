@@ -33,6 +33,7 @@ import { AppLoader } from "@/components/ui/app-loader";
 import { Icons } from "@/components/ui/icons";
 import { toImageSrc } from "@/lib/image-url";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 function formatFileSize(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
@@ -70,6 +71,7 @@ function AddMenuSheetForm({
 
   const imageInputRef = React.useRef<HTMLInputElement>(null);
   const videoInputRef = React.useRef<HTMLInputElement>(null);
+  const [isDraggingVideo, setIsDraggingVideo] = React.useState(false);
 
   const { createMenuItem, isPending: isCreating } = useCreateMenuItem();
   const { updateMenuItem, isPending: isUpdating } = useUpdateMenuItem();
@@ -215,9 +217,17 @@ function AddMenuSheetForm({
   // Videos Management
   const handleAddVideos = (files: FileList | null) => {
     if (!files || files.length === 0) return;
-    const newFiles = Array.from(files).filter(
+    const fileList = Array.from(files);
+    const oversized = fileList.filter((f) => f.size > 100 * 1024 * 1024);
+    if (oversized.length > 0) {
+      toast.error(
+        `Video "${oversized[0].name}" exceeds the 100MB limit (${formatFileSize(oversized[0].size)}).`
+      );
+    }
+    const newFiles = fileList.filter(
       (file) => file.size <= 100 * 1024 * 1024,
     );
+    if (newFiles.length === 0) return;
     const current = (form.getValues("videos") as File[]) || [];
     setValue("videos", [...current, ...newFiles], { shouldValidate: true });
     if (videoInputRef.current) {
@@ -774,41 +784,74 @@ function AddMenuSheetForm({
               <div className="mb-3 space-y-1.5">
                 <p className="text-xs font-medium text-foreground">Existing Videos</p>
                 <div className="space-y-1.5">
-                  {existingVideosList.map((vid, idx) => (
-                    <div
-                      key={vid.id ?? idx}
-                      className="flex items-center justify-between rounded-lg border border-border bg-background px-3 py-2 text-xs"
-                    >
-                      <div className="flex items-center gap-2 min-w-0">
-                        <Icons.video size={15} className="text-primary shrink-0" />
-                        <span className="font-medium text-foreground truncate max-w-56">
-                          {vid.title || `Video ${idx + 1}`}
-                        </span>
-                        <span className="rounded bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground">
-                          {vid.video_status || "READY"}
-                        </span>
+                  {existingVideosList.map((vid, idx) => {
+                    const isReady = vid.video_status === "READY";
+                    const isFailed = vid.video_status === "FAILED";
+
+                    return (
+                      <div
+                        key={vid.id ?? idx}
+                        className="flex flex-col gap-1 rounded-lg border border-border bg-background p-2.5 text-xs"
+                      >
+                        <div className="flex items-center justify-between gap-2 min-w-0">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <Icons.video size={15} className="text-primary shrink-0" />
+                            <span className="font-medium text-foreground truncate max-w-56" title={vid.title ?? undefined}>
+                              {vid.title || `Video ${idx + 1}`}
+                            </span>
+                            <span
+                              className={cn(
+                                "rounded-full px-2 py-0.5 text-[10px] font-semibold shrink-0",
+                                isReady
+                                  ? "bg-emerald-500/10 text-emerald-600"
+                                  : isFailed
+                                    ? "bg-destructive/10 text-destructive"
+                                    : "bg-amber-500/10 text-amber-600"
+                              )}
+                            >
+                              {vid.video_status || "READY"}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            {isReady && vid.video_url && (
+                              <a
+                                href={vid.video_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-primary hover:underline text-[11px] font-medium"
+                              >
+                                Preview
+                              </a>
+                            )}
+                            {menuItemId && vid.id && (
+                              <button
+                                type="button"
+                                disabled={isDeletingVideo}
+                                onClick={async () => {
+                                  await deleteMenuItemVideo({
+                                    itemId: menuItemId,
+                                    videoId: vid.id!,
+                                  });
+                                  setExistingVideosList((prev) =>
+                                    prev.filter((v) => v.id !== vid.id),
+                                  );
+                                }}
+                                className="text-destructive hover:opacity-80 p-1"
+                                title="Remove video"
+                              >
+                                <Icons.trash size={14} />
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                        {isFailed && vid.failure_reason && (
+                          <p className="text-[10px] text-destructive pl-6">
+                            Reason: {vid.failure_reason}
+                          </p>
+                        )}
                       </div>
-                      {menuItemId && vid.id && (
-                        <button
-                          type="button"
-                          disabled={isDeletingVideo}
-                          onClick={async () => {
-                            await deleteMenuItemVideo({
-                              itemId: menuItemId,
-                              videoId: vid.id!,
-                            });
-                            setExistingVideosList((prev) =>
-                              prev.filter((v) => v.id !== vid.id),
-                            );
-                          }}
-                          className="text-destructive hover:opacity-80 p-1"
-                          title="Remove video"
-                        >
-                          <Icons.trash size={14} />
-                        </button>
-                      )}
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -849,13 +892,34 @@ function AddMenuSheetForm({
             {/* Upload Video Dropzone */}
             <div
               onClick={() => videoInputRef.current?.click()}
-              className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border bg-muted/30 p-4 text-center transition-colors hover:border-primary/50 hover:bg-muted/60"
+              onDragOver={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setIsDraggingVideo(true);
+              }}
+              onDragLeave={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setIsDraggingVideo(false);
+              }}
+              onDrop={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setIsDraggingVideo(false);
+                handleAddVideos(e.dataTransfer.files);
+              }}
+              className={cn(
+                "flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed p-4 text-center transition-colors",
+                isDraggingVideo
+                  ? "border-primary bg-primary/10"
+                  : "border-border bg-muted/30 hover:border-primary/50 hover:bg-muted/60"
+              )}
             >
               <input
                 ref={videoInputRef}
                 type="file"
                 multiple
-                accept="video/mp4,video/quicktime,video/webm"
+                accept="video/mp4,video/quicktime,video/webm,video/x-matroska,video/x-m4v,video/*,.mp4,.mov,.webm,.mkv,.m4v"
                 className="hidden"
                 onChange={(e) => handleAddVideos(e.target.files)}
               />
@@ -867,7 +931,7 @@ function AddMenuSheetForm({
                   Click to select or drop video files
                 </p>
                 <p className="text-[11px] text-muted-foreground">
-                  MP4, MOV, WEBM up to 100MB
+                  MP4, MOV, WEBM, MKV up to 100MB
                 </p>
               </div>
             </div>

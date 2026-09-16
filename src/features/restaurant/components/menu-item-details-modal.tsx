@@ -275,6 +275,82 @@ function MenuItemDetailsContent({
         </div>
       </div>
 
+      {Array.isArray(item.videos) && item.videos.length > 0 && (
+        <section className="space-y-3">
+          <div className="flex items-center gap-2">
+            <Icons.video size={16} className="text-primary" />
+            <h4 className="text-sm font-semibold text-foreground">
+              Menu Videos ({item.videos.length})
+            </h4>
+          </div>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            {item.videos.map((vid, idx) => {
+              const isReady = vid.video_status === "READY" && Boolean(vid.video_url);
+              const isFailed = vid.video_status === "FAILED";
+
+              return (
+                <div
+                  key={vid.id ?? idx}
+                  className="flex flex-col gap-2 rounded-xl border border-border bg-card p-3 shadow-2xs"
+                >
+                  <div className="flex items-center justify-between gap-2 min-w-0">
+                    <span
+                      className="truncate text-xs font-medium text-foreground"
+                      title={vid.title ?? undefined}
+                    >
+                      {vid.title || `Video ${idx + 1}`}
+                    </span>
+                    <span
+                      className={cn(
+                        "shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold",
+                        isReady
+                          ? "bg-emerald-500/10 text-emerald-600"
+                          : isFailed
+                            ? "bg-destructive/10 text-destructive"
+                            : "bg-amber-500/10 text-amber-600"
+                      )}
+                    >
+                      {vid.video_status || "PROCESSING"}
+                    </span>
+                  </div>
+
+                  {isReady && vid.video_url ? (
+                    <video
+                      src={vid.video_url}
+                      controls
+                      preload="metadata"
+                      className="aspect-video w-full rounded-lg bg-black object-contain"
+                    />
+                  ) : isFailed ? (
+                    <div className="flex aspect-video w-full flex-col items-center justify-center rounded-lg bg-destructive/5 p-3 text-center">
+                      <Icons.alertCircle size={20} className="mb-1 text-destructive" />
+                      <p className="text-xs font-medium text-destructive">
+                        Transcoding Failed
+                      </p>
+                      {vid.failure_reason && (
+                        <p className="mt-1 line-clamp-2 text-[11px] text-muted-foreground">
+                          {vid.failure_reason}
+                        </p>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="flex aspect-video w-full flex-col items-center justify-center rounded-lg bg-muted/40 p-3 text-center">
+                      <Icons.loader className="mb-2 size-5 animate-spin text-primary" />
+                      <p className="text-xs font-medium text-foreground">
+                        Video Processing...
+                      </p>
+                      <p className="mt-0.5 text-[11px] text-muted-foreground">
+                        HLS streaming will be ready once transcoding completes.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
       <section className="space-y-3">
         <div>
           <h4 className="text-sm font-semibold text-foreground">
