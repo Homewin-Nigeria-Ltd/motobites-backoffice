@@ -1,7 +1,16 @@
 import type { ReactNode } from "react"
+import type { DateRange } from "react-day-picker"
 
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import { Skeleton } from "@/components/ui/skeleton"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { DashboardDateRangePicker } from "@/features/dashboard/components/dashboard-date-range-picker"
 import type {
   ApiSalesDashboardOperationalReports,
   SalesDashboardOperationalReportsPeriod,
@@ -14,22 +23,26 @@ import {
   formatOfflineOrderAmount,
   resolveOfflineOrderAmount,
 } from "@/features/offline-order/utils/order-totals"
-import { cn } from "@/lib/utils"
 
 const PERIOD_OPTIONS: Array<{
   value: SalesDashboardOperationalReportsPeriod
   label: string
 }> = [
-  { value: "day", label: "Today" },
+  { value: "today", label: "Today" },
   { value: "week", label: "This Week" },
   { value: "month", label: "This Month" },
   { value: "year", label: "This Year" },
+  { value: "custom", label: "Custom Range" },
+  { value: "24h", label: "Last 24 hours" },
+  { value: "3months", label: "Last 3 months" },
 ]
 
 type OfflineOrderOverviewOperationalReportsCardProps = {
-  report: ApiSalesDashboardOperationalReports
+  report?: ApiSalesDashboardOperationalReports | null
   period: SalesDashboardOperationalReportsPeriod
+  dateRange?: DateRange
   onPeriodChange: (period: SalesDashboardOperationalReportsPeriod) => void
+  onDateRangeChange: (dateRange: DateRange | undefined) => void
   isLoading?: boolean
 }
 
@@ -58,23 +71,43 @@ function ReportTable({
   )
 }
 
+function OperationalReportsBodySkeleton() {
+  return (
+    <div className="mt-5 space-y-4">
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {Array.from({ length: 4 }).map((_, index) => (
+          <Skeleton key={index} className="h-28 rounded-xl" />
+        ))}
+      </div>
+      <div className="grid gap-4 xl:grid-cols-2">
+        {Array.from({ length: 4 }).map((_, index) => (
+          <Skeleton key={index} className="h-56 rounded-xl" />
+        ))}
+      </div>
+    </div>
+  )
+}
+
 export function OfflineOrderOverviewOperationalReportsCard({
   report,
   period,
+  dateRange,
   onPeriodChange,
+  onDateRangeChange,
   isLoading = false,
 }: OfflineOrderOverviewOperationalReportsCardProps) {
-  const refunds = report.discounts_promotions_refunds ?? {
+  const refunds = report?.discounts_promotions_refunds ?? {
     discounted_or_promotional_orders: 0,
     discounted_or_promotional_sales_kobo: 0,
     discount_given_kobo: 0,
     refund_count: 0,
     refund_amount_kobo: 0,
   }
-  const bestSellingProducts = report.best_selling_products ?? []
-  const categoryPerformance = report.product_category_performance ?? []
-  const orderChannelReport = report.order_channel_report ?? []
-  const paymentPerformance = report.payment_performance ?? []
+  const bestSellingProducts = report?.best_selling_products ?? []
+  const categoryPerformance = report?.product_category_performance ?? []
+  const orderChannelReport = report?.order_channel_report ?? []
+  const paymentPerformance = report?.payment_performance ?? []
+  const showCustomDatePicker = period === "custom"
 
   return (
     <div className="rounded-2xl border border-border bg-background p-5">
@@ -88,30 +121,49 @@ export function OfflineOrderOverviewOperationalReportsCard({
           </p>
         </div>
 
-        <div className="flex flex-wrap gap-2">
-          {PERIOD_OPTIONS.map((option) => {
-            const isActive = period === option.value
+        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center sm:justify-end">
+          {showCustomDatePicker ? (
+            <DashboardDateRangePicker
+              value={dateRange}
+              onChange={onDateRangeChange}
+              className="h-10 truncate px-2.5 text-xs"
+            />
+          ) : null}
 
-            return (
-              <Button
-                key={option.value}
-                type="button"
-                variant={isActive ? "secondary" : "ghost"}
-                size="sm"
-                className={cn(
-                  "h-9",
-                  isActive ? "text-primary" : "text-muted-foreground",
-                )}
-                disabled={isLoading}
-                onClick={() => onPeriodChange(option.value)}
-              >
-                {option.label}
-              </Button>
-            )
-          })}
+          <Select
+            value={period}
+            onValueChange={(value) =>
+              onPeriodChange(value as SalesDashboardOperationalReportsPeriod)
+            }
+            disabled={isLoading}
+          >
+            <SelectTrigger
+              size="lg"
+              className="w-full border-border bg-background font-normal sm:w-[12.5rem]"
+            >
+              <SelectValue placeholder="Select period" />
+            </SelectTrigger>
+            <SelectContent align="end">
+              {PERIOD_OPTIONS.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
+      {isLoading ? (
+        <OperationalReportsBodySkeleton />
+      ) : !report ? (
+        <p className="mt-5 py-12 text-center text-sm text-muted-foreground">
+          {period === "custom"
+            ? "Select a custom date range to load operational reports."
+            : "No operational report data for this period."}
+        </p>
+      ) : (
+        <>
       <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <div className="rounded-xl border border-border bg-muted/30 p-4">
           <p className="text-sm text-muted-foreground">Period Sales</p>
@@ -297,6 +349,8 @@ export function OfflineOrderOverviewOperationalReportsCard({
           )}
         </ReportTable>
       </div>
+        </>
+      )}
     </div>
   )
 }

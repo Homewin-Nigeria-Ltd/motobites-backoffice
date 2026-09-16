@@ -355,13 +355,18 @@ export type ApiSalesDashboardRecentTransactionsResponse = {
 }
 
 export type SalesDashboardOperationalReportsPeriod =
-  | "day"
+  | "today"
   | "week"
   | "month"
   | "year"
+  | "custom"
+  | "24h"
+  | "3months"
 
 export type SalesDashboardOperationalReportsParams = {
   period?: SalesDashboardOperationalReportsPeriod
+  from?: string
+  to?: string
 }
 
 export type ApiSalesDashboardOperationalReportPeriod = {

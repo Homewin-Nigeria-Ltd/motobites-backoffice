@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import type { DateRange } from "react-day-picker"
 
 import { DashboardCategoryPerformanceCard } from "@/features/dashboard/components/dashboard-category-performance-card"
@@ -22,6 +23,7 @@ import { TotalDeliveriesModal } from "@/features/dashboard/components/total-deli
 import { OngoingOrdersModal } from "@/features/dashboard/components/ongoing-orders-modal"
 import { TotalRevenueModal } from "@/features/dashboard/components/total-revenue-modal"
 import { TotalUsersModal } from "@/features/dashboard/components/total-users-modal"
+import { RiderAnalyticsModal } from "@/features/dashboard/components/rider-analytics-modal"
 import { DashboardTopMotopilotCard } from "@/features/dashboard/components/dashboard-top-motopilot-card"
 import { DashboardTopSellingList } from "@/features/dashboard/components/dashboard-top-selling-list"
 import { DashboardPeriod } from "@/features/dashboard/enums"
@@ -34,6 +36,7 @@ import { cn } from "@/lib/utils"
 
 
 export function DashboardSection() {
+  const router = useRouter()
   const { branchId } = useBranchFilter()
   const [period, setPeriod] = useState(DashboardPeriod.TwentyFourHours)
   const [dateRange, setDateRange] = useState<DateRange | undefined>()
@@ -44,6 +47,8 @@ export function DashboardSection() {
   const [isTotalRevenueModalOpen, setIsTotalRevenueModalOpen] =
     useState(false)
   const [isTotalUsersModalOpen, setIsTotalUsersModalOpen] =
+    useState(false)
+  const [isRiderAnalyticsModalOpen, setIsRiderAnalyticsModalOpen] =
     useState(false)
   const { data, isPending, isFetching, isError, error } = useDashboardOverview(
     period,
@@ -120,10 +125,22 @@ export function DashboardSection() {
         onDateRangeChange={handleDateRangeChange}
       />
 
-      {data.kpis?.length ? (
-        <DashboardSummaryCards
-          kpis={data.kpis}
-          onCardClick={(key) => {
+      {(() => {
+        const summaryKpis = data.kpis ? [...data.kpis] : []
+        if (summaryKpis.length && !summaryKpis.some((k) => k.key === "bnpl")) {
+          summaryKpis.push({
+            key: "bnpl",
+            label: "BNPL Analytics",
+            value: 0,
+            formatted_value: "₦0",
+            change_percent: 0,
+            trend: "up",
+          })
+        }
+        return summaryKpis.length ? (
+          <DashboardSummaryCards
+            kpis={summaryKpis}
+            onCardClick={(key) => {
             if (key === "total_deliveries") {
               setIsTotalDeliveriesModalOpen(true)
             } else if (key === "ongoing_orders") {
@@ -132,10 +149,15 @@ export function DashboardSection() {
               setIsTotalRevenueModalOpen(true)
             } else if (key === "total_users") {
               setIsTotalUsersModalOpen(true)
+            } else if (key === "active_riders") {
+              setIsRiderAnalyticsModalOpen(true)
+            } else if (key === "bnpl") {
+              router.push("/dashboard/bnpl-analytics")
             }
           }}
         />
-      ) : null}
+        ) : null
+      })()}
 
       <TotalDeliveriesModal
         open={isTotalDeliveriesModalOpen}
@@ -164,6 +186,14 @@ export function DashboardSection() {
       <TotalUsersModal
         open={isTotalUsersModalOpen}
         onOpenChange={setIsTotalUsersModalOpen}
+        currentPeriod={period}
+        dateRange={dateRange}
+        fulfillmentBranchId={branchId}
+      />
+
+      <RiderAnalyticsModal
+        open={isRiderAnalyticsModalOpen}
+        onOpenChange={setIsRiderAnalyticsModalOpen}
         currentPeriod={period}
         dateRange={dateRange}
         fulfillmentBranchId={branchId}
@@ -231,7 +261,10 @@ export function DashboardSection() {
             </div>
           ) : null}
           {data.top_motopilots ? (
-            <DashboardTopMotopilotCard topMotopilots={data.top_motopilots} />
+            <DashboardTopMotopilotCard
+              topMotopilots={data.top_motopilots}
+              onViewAnalytics={() => setIsRiderAnalyticsModalOpen(true)}
+            />
           ) : null}
         </div>
       ) : null}

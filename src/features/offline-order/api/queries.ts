@@ -81,9 +81,19 @@ function buildRecentTransactionsQuery(
 function buildOperationalReportsQuery(
   params: SalesDashboardOperationalReportsParams,
 ) {
-  return {
-    period: params.period ?? "week",
+  const query: Record<string, string> = {
+    period: params.period ?? "today",
   }
+
+  if (params.from) {
+    query.from = params.from
+  }
+
+  if (params.to) {
+    query.to = params.to
+  }
+
+  return query
 }
 
 export const offlineOrderQueries = {

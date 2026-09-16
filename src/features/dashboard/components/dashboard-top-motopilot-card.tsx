@@ -9,20 +9,33 @@ import { getInitials } from "@/utils/get-initials"
 
 type DashboardTopMotopilotCardProps = {
   topMotopilots: NonNullable<DashboardOverviewData["top_motopilots"]>
+  onViewAnalytics?: () => void
 }
 
 export function DashboardTopMotopilotCard({
   topMotopilots,
+  onViewAnalytics,
 }: DashboardTopMotopilotCardProps) {
   return (
     <Card className="flex h-full flex-col gap-4 py-5">
-      <CardHeader className="shrink-0 px-5 pb-0">
-        <CardTitle className="text-sm font-semibold text-foreground">
-          Top MotoPilot
-        </CardTitle>
-        <p className="text-xs text-muted-foreground">
-          Based on number of completed orders
-        </p>
+      <CardHeader className="flex flex-row items-center justify-between shrink-0 px-5 pb-0">
+        <div>
+          <CardTitle className="text-sm font-semibold text-foreground">
+            Top MotoPilot
+          </CardTitle>
+          <p className="text-xs text-muted-foreground">
+            Based on number of completed orders
+          </p>
+        </div>
+        {onViewAnalytics && (
+          <button
+            type="button"
+            onClick={onViewAnalytics}
+            className="text-xs font-semibold text-amber-500 hover:text-amber-600 hover:underline cursor-pointer"
+          >
+            Analytics
+          </button>
+        )}
       </CardHeader>
       <CardContent className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5">
         {topMotopilots.riders.length === 0 ? (

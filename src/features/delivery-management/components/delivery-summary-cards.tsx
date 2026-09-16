@@ -16,6 +16,7 @@ const illustrationMap = {
 type DeliverySummaryCardsProps = {
   kpis: DeliverySummaryKpi[]
   isLoading?: boolean
+  onCardClick?: (key: string) => void
 }
 
 function getKpiIllustration(key: string) {
@@ -50,12 +51,28 @@ function SummaryCardSkeleton() {
   )
 }
 
-function SummaryCard({ kpi }: { kpi: DeliverySummaryKpi }) {
+function SummaryCard({
+  kpi,
+  onClick,
+}: {
+  kpi: DeliverySummaryKpi
+  onClick?: (key: string) => void
+}) {
   const hasTrend = kpi.change_percent !== undefined && kpi.trend !== undefined
   const isUp = kpi.trend === "up"
+  const isClickable = kpi.key === "active_riders" && Boolean(onClick)
 
   return (
-    <div className="rounded-2xl border border-border bg-background p-5 md:p-6">
+    <div
+      role={isClickable ? "button" : undefined}
+      tabIndex={isClickable ? 0 : undefined}
+      onClick={isClickable ? () => onClick?.(kpi.key) : undefined}
+      className={cn(
+        "rounded-2xl border border-border bg-background p-5 md:p-6",
+        isClickable &&
+          "cursor-pointer transition-all duration-200 hover:border-amber-500/50 hover:shadow-xs"
+      )}
+    >
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-3">
@@ -126,6 +143,7 @@ function SummaryCard({ kpi }: { kpi: DeliverySummaryKpi }) {
 export function DeliverySummaryCards({
   kpis,
   isLoading = false,
+  onCardClick,
 }: DeliverySummaryCardsProps) {
   if (isLoading) {
     return (
@@ -140,7 +158,7 @@ export function DeliverySummaryCards({
   return (
     <div className="grid gap-4 md:grid-cols-3">
       {kpis.map((kpi) => (
-        <SummaryCard key={kpi.key} kpi={kpi} />
+        <SummaryCard key={kpi.key} kpi={kpi} onClick={onCardClick} />
       ))}
     </div>
   )

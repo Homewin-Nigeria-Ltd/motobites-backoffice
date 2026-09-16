@@ -56,14 +56,23 @@ function SummaryCard({
   value,
   illustration,
   iconBg,
+  onClick,
 }: {
   label: string
   value: number
   illustration: string
   iconBg: string
+  onClick?: () => void
 }) {
   return (
-    <div className="rounded-2xl border border-border bg-background p-5">
+    <div
+      onClick={onClick}
+      className={cn(
+        "rounded-2xl border border-border bg-background p-5",
+        onClick &&
+          "cursor-pointer transition-all duration-200 hover:border-amber-500/50 hover:shadow-xs"
+      )}
+    >
       <div className="flex items-center gap-3">
         <div
           className={cn(
@@ -95,11 +104,13 @@ function RiderStatusCard({
   label,
   illustration,
   iconBg,
+  onClick,
 }: {
   status: RiderOverviewStatus
   label: string
   illustration: string
   iconBg: string
+  onClick?: () => void
 }) {
   const { data, isPending, isError, error } = useRiderStatusCount(status)
 
@@ -117,11 +128,16 @@ function RiderStatusCard({
       value={data.meta.total}
       illustration={illustration}
       iconBg={iconBg}
+      onClick={onClick}
     />
   )
 }
 
-export function RiderSummaryCards() {
+export function RiderSummaryCards({
+  onCardClick,
+}: {
+  onCardClick?: () => void
+} = {}) {
   return (
     <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
       {overviewCards.map((card) => (
@@ -131,6 +147,7 @@ export function RiderSummaryCards() {
           label={card.label}
           illustration={card.illustration}
           iconBg={card.iconBg}
+          onClick={onCardClick}
         />
       ))}
     </div>
