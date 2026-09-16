@@ -27,7 +27,12 @@ export type SupportItem = {
 }
 
 export const navMain: NavItem[] = [
-  { title: "Overview", url: "/dashboard", icon: "dashboard", permission: null },
+  {
+    title: "Overview",
+    url: "/dashboard",
+    icon: "dashboard",
+    permission: PERMISSION_KEYS.dashboardOverview,
+  },
   {
     title: "Order Management",
     url: "/order",
@@ -72,7 +77,7 @@ export const navMain: NavItem[] = [
     title: "BNPL Analytics",
     url: "/dashboard/bnpl-analytics",
     icon: "creditCard",
-    permission: null,
+    permission: PERMISSION_KEYS.bnpl,
   },
   {
     title: "Inventory Management",
