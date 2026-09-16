@@ -1,17 +1,18 @@
-import { api } from "@/lib/api/client"
+import { ApiError, api } from "@/lib/api/client"
 
 import {
-  createMenuItemAction,
   deleteMenuItemAction,
   deleteMenuItemImageAction,
   deleteMenuItemVideoAction,
   toggleMenuItemAvailabilityAction,
-  updateMenuItemAction,
 } from "../actions/menu-item.actions"
 import { createFulfillmentBranchAction, updateFulfillmentBranchAction } from "../actions/fulfillment-branch.actions"
 import type {
+  ApiMenuItem,
   CreateFulfillmentBranchInput,
   KitchenMutationResponse,
+  MenuItemMutationResponse,
+  RestaurantActionResult,
   UpdateFulfillmentBranchInput,
 } from "../types"
 import { restaurantEndpoints } from "./endpoints"
@@ -51,17 +52,51 @@ export const restaurantMutations = {
   },
 
   createMenuItem: {
-    mutationFn: (formData: FormData) => createMenuItemAction(formData),
+    mutationFn: async (
+      formData: FormData
+    ): Promise<RestaurantActionResult<ApiMenuItem>> => {
+      try {
+        const response = await api.post<MenuItemMutationResponse, FormData>(
+          restaurantEndpoints.menuItems,
+          formData
+        )
+        return { success: true, data: response.data }
+      } catch (error) {
+        const message =
+          error instanceof ApiError
+            ? error.message
+            : error instanceof Error
+              ? error.message
+              : "Failed to create menu item"
+        return { success: false, error: message }
+      }
+    },
   },
 
   updateMenuItem: {
-    mutationFn: ({
+    mutationFn: async ({
       itemId,
       formData,
     }: {
       itemId: string
       formData: FormData
-    }) => updateMenuItemAction(itemId, formData),
+    }): Promise<RestaurantActionResult<ApiMenuItem>> => {
+      try {
+        const response = await api.post<MenuItemMutationResponse, FormData>(
+          restaurantEndpoints.menuItem(itemId),
+          formData
+        )
+        return { success: true, data: response.data }
+      } catch (error) {
+        const message =
+          error instanceof ApiError
+            ? error.message
+            : error instanceof Error
+              ? error.message
+              : "Failed to update menu item"
+        return { success: false, error: message }
+      }
+    },
   },
 
   deleteMenuItem: {
