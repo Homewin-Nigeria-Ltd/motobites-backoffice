@@ -85,5 +85,6 @@ export function mapApiMenuItemToMenu(item: ApiMenuItem): Menu {
     imageUrl: getMenuItemImageUrl(item) ?? "",
     enabled: item.is_available,
     isPopular: item.is_popular,
+    videos: item.videos ?? [],
   }
 }

@@ -12,6 +12,7 @@ import { MenuItemDetailsModal } from "@/features/restaurant/components/menu-item
 import { buildMenuItemHref } from "@/features/restaurant";
 import type { Menu } from "@/features/restaurant/types";
 import { toImageSrc } from "@/lib/image-url";
+import { Icons } from "@/components/ui/icons";
 
 type MenuCardListProps = {
   menu: Menu;
@@ -98,6 +99,12 @@ export function MenuCardList({
               className="object-cover transition-transform duration-200 group-hover/card:scale-[1.02]"
               sizes="176px"
             />
+            {Array.isArray(menu.videos) && menu.videos.length > 0 && (
+              <span className="absolute top-2.5 right-2.5 z-10 flex items-center gap-1 rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-medium text-white backdrop-blur-xs">
+                <Icons.video size={12} />
+                <span>{menu.videos.length}</span>
+              </span>
+            )}
           </div>
           <div className="flex min-w-0 flex-1 flex-col">
             <div className="flex min-w-0 flex-col gap-1.5 px-5 pt-4">
