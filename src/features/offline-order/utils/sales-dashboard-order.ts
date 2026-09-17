@@ -27,6 +27,14 @@ export function getSalesDashboardOrderTotal(order: ApiSalesDashboardOrder) {
     return order.total_kobo / 100
   }
 
+  if (typeof order.payment?.amount_kobo === "number") {
+    return order.payment.amount_kobo / 100
+  }
+
+  if (typeof order.payment?.amount === "number") {
+    return order.payment.amount
+  }
+
   if (typeof order.total === "number") {
     return order.total
   }
@@ -312,8 +320,14 @@ export function mapSalesDashboardOrderItemsToCart(
       basePrice,
       price: getCartItemUnitPrice(basePrice, addons),
       image: item.image ?? null,
-      kitchenId: String(item.kitchen_id ?? order.kitchen?.id ?? ""),
-      kitchenName: item.kitchen_name ?? order.kitchen?.name ?? "",
+      kitchenId: String(
+        item.kitchen?.id ?? item.kitchen_id ?? order.kitchen?.id ?? "",
+      ),
+      kitchenName:
+        item.kitchen?.name ??
+        item.kitchen_name ??
+        order.kitchen?.name ??
+        "",
       quantity: item.quantity,
       addons,
     }
