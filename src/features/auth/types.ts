@@ -37,7 +37,7 @@ export type Session = {
 }
 
 export type LoginActionResult =
-  | { success: true }
+  | { success: true; redirectTo: string }
   | { success: false; error: string }
 
 export type LoginResponseData = {

@@ -3,7 +3,12 @@
 import { cookies } from "next/headers"
 
 import { loginPayloadSchema, type LoginPayload } from "../schemas/login.schema"
-import type { LoginActionResult, LoginResponseData } from "../types"
+import type {
+  LoginActionResult,
+  LoginResponseData,
+  MeResponseData,
+} from "../types"
+import { getLandingRoute } from "@/lib/get-landing-route"
 import { AUTH_COOKIE_NAME } from "@/constants/auth"
 import { authEndpoints } from "../api/endpoints"
 import { ApiError } from "@/lib/api/client"
@@ -38,7 +43,13 @@ export async function loginAction(data: LoginPayload): Promise<LoginActionResult
     )
 
     await setAuthCookie(token)
-    return { success: true }
+
+    const { user } = await apiServer.get<MeResponseData>(authEndpoints.meServer)
+
+    return {
+      success: true,
+      redirectTo: getLandingRoute(user),
+    }
   } catch (error) {
     if (error instanceof ApiError) {
       return {
