@@ -35,7 +35,7 @@ export function useLogin() {
       toast.success("Signed in successfully")
       queryClient.invalidateQueries({ queryKey: authKeys.all })
       startTransition(() => {
-        router.push("/dashboard")
+        router.push(result.redirectTo)
         router.refresh()
       })
     },

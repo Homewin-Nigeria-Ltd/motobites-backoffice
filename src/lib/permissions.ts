@@ -18,6 +18,8 @@ export const PERMISSION_KEYS = {
   customerRetentionLoyalty: "customer_retention_loyalty",
   customerSupport: "customer_support",
   settings: "settings",
+  dashboardOverview: "dashboard_overview",
+  bnpl: "bnpl",
 } as const
 
 export type PermissionKey =
@@ -38,6 +40,8 @@ export type Permissions = {
   canAccessCustomerRetentionLoyalty: boolean
   canAccessCustomerSupport: boolean
   canAccessSettings: boolean
+  canAccessDashboardOverview: boolean
+  canAccessBnpl: boolean
 }
 
 function userHasPermission(user: AuthUser, permission: PermissionKey) {
@@ -99,6 +103,11 @@ function buildPermissions(user: AuthUser): Permissions {
       PERMISSION_KEYS.customerSupport,
     ),
     canAccessSettings: userHasPermission(user, PERMISSION_KEYS.settings),
+    canAccessDashboardOverview: userHasPermission(
+      user,
+      PERMISSION_KEYS.dashboardOverview,
+    ),
+    canAccessBnpl: userHasPermission(user, PERMISSION_KEYS.bnpl),
   }
 }
 
@@ -123,6 +132,8 @@ const permissionFlagByKey: Record<PermissionKey, keyof Permissions> = {
   [PERMISSION_KEYS.customerRetentionLoyalty]: "canAccessCustomerRetentionLoyalty",
   [PERMISSION_KEYS.customerSupport]: "canAccessCustomerSupport",
   [PERMISSION_KEYS.settings]: "canAccessSettings",
+  [PERMISSION_KEYS.dashboardOverview]: "canAccessDashboardOverview",
+  [PERMISSION_KEYS.bnpl]: "canAccessBnpl",
 }
 
 export function hasPermission(
