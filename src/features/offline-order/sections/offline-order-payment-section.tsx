@@ -1,5 +1,6 @@
 "use client"
 
+import { useQueryClient } from "@tanstack/react-query"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
@@ -21,14 +22,17 @@ import { useOfflineOrderCheckout } from "@/features/offline-order/hooks/use-offl
 import { usePlaceOfflineOrder } from "@/features/offline-order/hooks/use-place-offline-order"
 import { useSaveOfflineOrder } from "@/features/offline-order/hooks/use-save-offline-order"
 import { useSalesDashboardSavedOrders } from "@/features/offline-order/hooks/use-sales-dashboard-saved-orders"
+import { offlineOrderQueries } from "@/features/offline-order/api/queries"
 import {
   useOfflineOrderReceipt,
 } from "@/features/offline-order/hooks/use-offline-order-storage"
+import { mapSalesDashboardOrderToReceipt } from "@/features/offline-order/utils/map-offline-order-receipt"
 import { calculateOfflineOrderTotals } from "@/features/offline-order/utils/order-totals"
 import { toast } from "@/lib/toast"
 
 export function OfflineOrderPaymentSection() {
   const router = useRouter()
+  const queryClient = useQueryClient()
   const { data: session } = useSession()
   const { branchId: contextBranchId, selectedBranch: contextBranch, activeBranches } = useBranchFilter()
   const user = session?.user
@@ -101,18 +105,33 @@ export function OfflineOrderPaymentSection() {
 
   const handlePlaceOrder = async () => {
     try {
-      const receipt = await placeOfflineOrder({
+      const placedReceipt = await placeOfflineOrder({
         items,
         checkout,
         takenByName: checkout.takenByName || user?.name || "Staff",
       })
 
-      setIsLeaving(true)
+      const receipt = placedReceipt.orderId
+        ? mapSalesDashboardOrderToReceipt(
+            await queryClient.fetchQuery(
+              offlineOrderQueries.order(placedReceipt.orderId),
+            ),
+          )
+        : placedReceipt
+
       storeReceipt(receipt)
       clearCart()
       resetCheckout()
       toast.success("Offline order placed successfully")
-      router.push("/offline-order/success")
+      setIsLeaving(true)
+
+      const params = new URLSearchParams()
+      if (receipt.orderId) {
+        params.set("orderId", receipt.orderId)
+      }
+      params.set("print", "1")
+
+      router.push(`/offline-order/success?${params.toString()}`)
     } catch {
       // Error toast handled in hook
     }

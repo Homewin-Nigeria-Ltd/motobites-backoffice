@@ -156,6 +156,10 @@ export type ApiSalesDashboardOrderItem = {
   image?: string | null
   kitchen_id?: number
   kitchen_name?: string
+  kitchen?: {
+    id: number
+    name: string
+  } | null
   modifiers?: unknown[]
   addons?: unknown[]
   modifiers_snapshot?: unknown[]
@@ -174,6 +178,7 @@ export type ApiSalesDashboardOrder = {
   subtotal?: number
   subtotal_kobo?: number
   service_fee?: number
+  service_fee_kobo?: number
   total?: number
   total_kobo?: number
   total_amount?: number
@@ -193,7 +198,16 @@ export type ApiSalesDashboardOrder = {
     id: number
     name: string
   } | null
+  kitchens?: {
+    id: number
+    name: string
+  }[]
   sales_rep?: {
+    id: number
+    name: string
+    avatar?: string | null
+  } | null
+  sales_manager?: {
     id: number
     name: string
     avatar?: string | null
@@ -207,6 +221,27 @@ export type ApiSalesDashboardOrder = {
     id: number
     name: string
     avatar?: string | null
+  } | null
+  customer?: {
+    name?: string | null
+    phone?: string | null
+  } | null
+  fulfillment_branch?: {
+    id: number
+    code?: string | null
+    name: string
+    address?: string | null
+    latitude?: string | null
+    longitude?: string | null
+  } | null
+  payment?: {
+    id?: string
+    reference?: string
+    status?: string
+    channel?: string
+    amount_kobo?: number
+    amount?: number
+    paid_at?: string
   } | null
   items?: ApiSalesDashboardOrderItem[]
 }
@@ -560,7 +595,8 @@ export type SaveOfflineOrderPayload = {
 }
 
 export type ApiOfflineOrder = {
-  id?: number
+  id?: number | string
+  reference_number?: string
   order_number?: string
   order_id?: string | number
   customer_name?: string | null
@@ -575,6 +611,12 @@ export type ApiOfflineOrder = {
 export type ApiOfflineOrderResponse = {
   success: boolean
   data: ApiOfflineOrder
+  message?: string
+}
+
+export type ApiSalesDashboardOrderResponse = {
+  success: boolean
+  data: ApiSalesDashboardOrder
   message?: string
 }
 
@@ -614,6 +656,7 @@ export type OfflineOrderSavedOrder = {
 export type OfflineOrderSavedSnapshot = OfflineOrderSavedOrder
 
 export type OfflineOrderReceipt = {
+  orderId: string
   orderNumber: string
   items: OfflineOrderCartItem[]
   customerName: string

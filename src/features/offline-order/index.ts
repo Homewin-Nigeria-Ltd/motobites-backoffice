@@ -112,7 +112,11 @@ export {
   buildOfflineOrderPayload,
   buildSaveOfflineOrderPayload,
 } from "./utils/build-offline-order-payload"
-export { mapOfflineOrderReceipt } from "./utils/map-offline-order-receipt"
+export {
+  mapOfflineOrderReceipt,
+  mapSalesDashboardOrderToReceipt,
+} from "./utils/map-offline-order-receipt"
+export { useOfflineOrderReceiptDetail } from "./hooks/use-offline-order-receipt-detail"
 export {
   filterSavedOrders,
   formatTimeSaved,

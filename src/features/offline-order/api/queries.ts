@@ -6,6 +6,7 @@ import type {
   ApiSalesDashboardDeleteRequestsResponse,
   ApiSalesDashboardKitchensResponse,
   ApiSalesDashboardMenuItemsResponse,
+  ApiSalesDashboardOrderResponse,
   ApiSalesDashboardOrdersResponse,
   ApiSalesDashboardRecentActivityResponse,
   ApiSalesDashboardOperationalReportsResponse,
@@ -157,6 +158,18 @@ export const offlineOrderQueries = {
         api
           .get<ApiSalesDashboardSavedOrderResponse>(
             offlineOrderEndpoints.savedOrder(orderId),
+          )
+          .then((response) => response.data),
+      staleTime: 30_000,
+    }),
+
+  order: (orderId: string | number) =>
+    queryOptions({
+      queryKey: offlineOrderKeys.order(orderId),
+      queryFn: () =>
+        api
+          .get<ApiSalesDashboardOrderResponse>(
+            offlineOrderEndpoints.order(orderId),
           )
           .then((response) => response.data),
       staleTime: 30_000,
