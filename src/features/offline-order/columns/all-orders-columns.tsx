@@ -1,6 +1,7 @@
 "use client"
 
 import type { ColumnDef } from "@tanstack/react-table"
+import Link from "next/link"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -117,27 +118,38 @@ export function createAllOrdersColumns({
     },
   ]
 
-  if (showDeleteAction && onRequestDeletion) {
-    columns.push({
-      id: "actions",
-      header: () => <span className="block text-right">Actions</span>,
-      cell: ({ row }) => (
-        <div className="text-right">
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            className="gap-1.5 text-destructive hover:text-destructive"
-            onClick={() => onRequestDeletion(String(row.original.id))}
-          >
-            <Icon name="trash" className="size-4" />
-            Delete
+  columns.push({
+    id: "actions",
+    header: () => <span className="block text-right">Actions</span>,
+    cell: ({ row }) => {
+      const orderId = encodeURIComponent(String(row.original.id))
+      const reprintHref = `/offline-order/success?orderId=${orderId}&print=1`
+
+      return (
+        <div className="flex justify-end gap-2">
+          <Button asChild variant="outline" size="sm" className="gap-1.5">
+            <Link href={reprintHref}>
+              <Icon name="fileText" className="size-4" />
+              Reprint
+            </Link>
           </Button>
+          {showDeleteAction && onRequestDeletion ? (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="gap-1.5 text-destructive hover:text-destructive"
+              onClick={() => onRequestDeletion(String(row.original.id))}
+            >
+              <Icon name="trash" className="size-4" />
+              Delete
+            </Button>
+          ) : null}
         </div>
-      ),
-      enableHiding: false,
-    })
-  }
+      )
+    },
+    enableHiding: false,
+  })
 
   return columns
 }
