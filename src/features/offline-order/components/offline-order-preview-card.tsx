@@ -5,6 +5,10 @@ import Image from "next/image"
 import { Card } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import type { OfflineOrderCartItem } from "@/features/offline-order/types"
+import {
+  formatCartAddonLabel,
+  getCartItemComboPrice,
+} from "@/features/offline-order/utils/cart-line"
 import { formatOfflineOrderAmount } from "@/features/offline-order/utils/order-totals"
 import { toImageSrc } from "@/lib/image-url"
 
@@ -50,13 +54,15 @@ export function OfflineOrderPreviewCard({
                   </p>
                   {(item.addons ?? []).map((addon) => (
                     <p key={addon.id} className="text-xs text-muted-foreground">
-                      {addon.name}
+                      {formatCartAddonLabel(addon)}
                     </p>
                   ))}
                 </div>
               </div>
               <span className="shrink-0 text-sm font-medium">
-                {formatOfflineOrderAmount(item.price * item.quantity)}
+                {formatOfflineOrderAmount(
+                  getCartItemComboPrice(item) * item.quantity,
+                )}
               </span>
             </div>
           ))}

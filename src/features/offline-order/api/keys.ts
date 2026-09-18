@@ -16,6 +16,8 @@ export const offlineOrderKeys = {
     [...offlineOrderKeys.all, "saved-orders", params] as const,
   savedOrder: (orderId: string | number) =>
     [...offlineOrderKeys.all, "saved-order", orderId] as const,
+  order: (orderId: string | number) =>
+    [...offlineOrderKeys.all, "order", orderId] as const,
   deleteRequests: (params: SalesDashboardOrdersParams) =>
     [...offlineOrderKeys.all, "delete-requests", params] as const,
   stats: (branchId?: number | null) =>

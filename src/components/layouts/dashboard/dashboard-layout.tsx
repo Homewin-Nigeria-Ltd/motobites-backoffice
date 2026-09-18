@@ -30,15 +30,17 @@ export function DashboardLayout({
 
   return (
     <BranchProvider>
-      <SidebarProvider>
+      <SidebarProvider className="h-svh overflow-hidden">
         <AppSidebar
           user={user}
           filteredNavMain={filteredNavMain}
           filteredSupport={filteredSupport}
         />
-        <SidebarInset className="flex min-h-0 min-w-0 flex-1 flex-col">
+        <SidebarInset className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
           {shouldShowHeader ? <DashboardHeader user={user} /> : null}
-          <div className="flex min-h-0 min-w-0 flex-1 flex-col">{children}</div>
+          <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto">
+            {children}
+          </div>
         </SidebarInset>
       </SidebarProvider>
     </BranchProvider>

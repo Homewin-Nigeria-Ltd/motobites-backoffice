@@ -66,6 +66,22 @@ export type ApiSalesDashboardMenuItemModifier = {
   is_active: boolean
 }
 
+export type ApiSalesDashboardMenuItemAddon = {
+  id: number
+  name: string
+  description: string | null
+  price: number
+  additional_price: number
+  price_kobo: number
+  is_required: boolean
+  is_active: boolean
+}
+
+export type ApiSalesDashboardMenuItemAddonCategory = {
+  category_name: string
+  items: ApiSalesDashboardMenuItemAddon[]
+}
+
 export type ApiSalesDashboardMenuItemModifierGroup = {
   group_name: string
   display_name: string
@@ -126,7 +142,7 @@ export type ApiSalesDashboardMenuItem = {
   }
   modifier_groups?: ApiSalesDashboardMenuItemModifierGroup[]
   modifiers?: ApiSalesDashboardMenuItemModifier[]
-  addons?: ApiSalesDashboardMenuItemModifier[]
+  addons?: ApiSalesDashboardMenuItemAddonCategory[]
 }
 
 export type ApiSalesDashboardMenuItemsMeta = {
@@ -156,6 +172,10 @@ export type ApiSalesDashboardOrderItem = {
   image?: string | null
   kitchen_id?: number
   kitchen_name?: string
+  kitchen?: {
+    id: number
+    name: string
+  } | null
   modifiers?: unknown[]
   addons?: unknown[]
   modifiers_snapshot?: unknown[]
@@ -174,6 +194,7 @@ export type ApiSalesDashboardOrder = {
   subtotal?: number
   subtotal_kobo?: number
   service_fee?: number
+  service_fee_kobo?: number
   total?: number
   total_kobo?: number
   total_amount?: number
@@ -193,7 +214,16 @@ export type ApiSalesDashboardOrder = {
     id: number
     name: string
   } | null
+  kitchens?: {
+    id: number
+    name: string
+  }[]
   sales_rep?: {
+    id: number
+    name: string
+    avatar?: string | null
+  } | null
+  sales_manager?: {
     id: number
     name: string
     avatar?: string | null
@@ -207,6 +237,27 @@ export type ApiSalesDashboardOrder = {
     id: number
     name: string
     avatar?: string | null
+  } | null
+  customer?: {
+    name?: string | null
+    phone?: string | null
+  } | null
+  fulfillment_branch?: {
+    id: number
+    code?: string | null
+    name: string
+    address?: string | null
+    latitude?: string | null
+    longitude?: string | null
+  } | null
+  payment?: {
+    id?: string
+    reference?: string
+    status?: string
+    channel?: string
+    amount_kobo?: number
+    amount?: number
+    paid_at?: string
   } | null
   items?: ApiSalesDashboardOrderItem[]
 }
@@ -386,6 +437,16 @@ export type ApiSalesDashboardBestSellingProduct = {
   sales: number
 }
 
+export type ApiSalesDashboardMealPerformance = {
+  menu_item_id: number
+  meal: string
+  price: number
+  price_kobo: number
+  units_sold: number
+  total_amount_sold_kobo: number
+  total_amount_sold: number
+}
+
 export type ApiSalesDashboardProductCategoryPerformance = {
   category: string
   units: number
@@ -430,6 +491,7 @@ export type ApiSalesDashboardOperationalReports = {
   period: ApiSalesDashboardOperationalReportPeriod
   scope: string
   best_selling_products: ApiSalesDashboardBestSellingProduct[]
+  meal_performance?: ApiSalesDashboardMealPerformance[]
   product_category_performance: ApiSalesDashboardProductCategoryPerformance[]
   order_channel_report: ApiSalesDashboardOrderChannelReport[]
   discounts_promotions_refunds: ApiSalesDashboardDiscountsPromotionsRefunds
@@ -560,7 +622,8 @@ export type SaveOfflineOrderPayload = {
 }
 
 export type ApiOfflineOrder = {
-  id?: number
+  id?: number | string
+  reference_number?: string
   order_number?: string
   order_id?: string | number
   customer_name?: string | null
@@ -575,6 +638,12 @@ export type ApiOfflineOrder = {
 export type ApiOfflineOrderResponse = {
   success: boolean
   data: ApiOfflineOrder
+  message?: string
+}
+
+export type ApiSalesDashboardOrderResponse = {
+  success: boolean
+  data: ApiSalesDashboardOrder
   message?: string
 }
 
@@ -614,6 +683,7 @@ export type OfflineOrderSavedOrder = {
 export type OfflineOrderSavedSnapshot = OfflineOrderSavedOrder
 
 export type OfflineOrderReceipt = {
+  orderId: string
   orderNumber: string
   items: OfflineOrderCartItem[]
   customerName: string

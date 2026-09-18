@@ -104,6 +104,7 @@ export function OfflineOrderOverviewOperationalReportsCard({
     refund_amount_kobo: 0,
   }
   const bestSellingProducts = report?.best_selling_products ?? []
+  const mealPerformance = report?.meal_performance ?? []
   const categoryPerformance = report?.product_category_performance ?? []
   const orderChannelReport = report?.order_channel_report ?? []
   const paymentPerformance = report?.payment_performance ?? []
@@ -200,7 +201,43 @@ export function OfflineOrderOverviewOperationalReportsCard({
       </div>
 
       <div className="mt-5 grid gap-4 xl:grid-cols-2">
-        <ReportTable title="Best Selling Products">
+        <ReportTable title="Meal Performance">
+          {mealPerformance.length > 0 ? (
+            <div className="space-y-3">
+              {mealPerformance.map((meal) => (
+                <div
+                  key={meal.menu_item_id}
+                  className="flex items-center justify-between gap-3 text-sm"
+                >
+                  <div className="min-w-0">
+                    <p className="font-medium text-foreground">{meal.meal}</p>
+                    <p className="text-muted-foreground">
+                      {meal.units_sold} units ·{" "}
+                      {formatOfflineOrderAmount(
+                        resolveOfflineOrderAmount(meal.price, meal.price_kobo),
+                      )}{" "}
+                      each
+                    </p>
+                  </div>
+                  <span className="font-semibold text-foreground">
+                    {formatOfflineOrderAmount(
+                      resolveOfflineOrderAmount(
+                        meal.total_amount_sold,
+                        meal.total_amount_sold_kobo,
+                      ),
+                    )}
+                  </span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              No meal performance data yet.
+            </p>
+          )}
+        </ReportTable>
+
+        <ReportTable title="Best Selling Meals">
           {bestSellingProducts.length > 0 ? (
             <div className="space-y-3">
               {bestSellingProducts.map((product) => (

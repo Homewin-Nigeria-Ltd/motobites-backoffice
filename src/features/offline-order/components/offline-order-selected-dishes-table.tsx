@@ -14,6 +14,11 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import type { OfflineOrderCartItem } from "@/features/offline-order/types"
+import {
+  formatCartAddonLabel,
+  getCartItemComboPrice,
+  getCartItemLineTotal,
+} from "@/features/offline-order/utils/cart-line"
 import { formatOfflineOrderAmount } from "@/features/offline-order/utils/order-totals"
 import { toImageSrc } from "@/lib/image-url"
 
@@ -48,7 +53,8 @@ export function OfflineOrderSelectedDishesTable({
         </TableHeader>
         <TableBody>
           {items.map((item) => {
-            const lineTotal = item.price * item.quantity
+            const comboPrice = getCartItemComboPrice(item)
+            const lineTotal = getCartItemLineTotal(item)
 
             return (
               <TableRow key={item.lineId}>
@@ -70,20 +76,20 @@ export function OfflineOrderSelectedDishesTable({
                           key={addon.id}
                           className="text-sm text-muted-foreground"
                         >
-                          {addon.name}
+                          {formatCartAddonLabel(addon)}
                         </p>
                       ))}
                       <p className="truncate text-sm text-muted-foreground">
                         {item.kitchenName}
                       </p>
                       <p className="mt-1 text-sm text-muted-foreground sm:hidden">
-                        {formatOfflineOrderAmount(item.price)}
+                        {formatOfflineOrderAmount(comboPrice)}
                       </p>
                     </div>
                   </div>
                 </TableCell>
                 <TableCell className="hidden sm:table-cell">
-                  {formatOfflineOrderAmount(item.price)}
+                  {formatOfflineOrderAmount(comboPrice)}
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">

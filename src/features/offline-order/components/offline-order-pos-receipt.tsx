@@ -1,6 +1,6 @@
 import type { OfflineOrderReceipt } from "../types"
 import { getPaymentMethodLabel } from "../utils/order-checkout"
-import { getCartItemAddonSummary } from "../utils/cart-line"
+import { getCartItemComboPrice } from "../utils/cart-line"
 import { formatOfflineOrderAmount } from "../utils/order-totals"
 import "./offline-order-pos-receipt.css"
 
@@ -42,14 +42,16 @@ function ReceiptItemRow({
   name,
   quantity,
   amount,
+  indented = false,
 }: {
   name: string
   quantity: number
   amount: string
+  indented?: boolean
 }) {
   return (
     <div className="receipt-item-row">
-      <span className="item-name">{name}</span>
+      <span className={`item-name${indented ? " item-addon" : ""}`}>{name}</span>
       <span className="item-qty">x{quantity}</span>
       <span className="item-price">{amount}</span>
     </div>
@@ -100,19 +102,26 @@ export function OfflineOrderPosReceipt({
             <span className="item-price">Amt</span>
           </div>
           {receipt.items.map((item) => {
-            const lineTotal = item.price * item.quantity
-            const addonSummary = getCartItemAddonSummary(item.addons)
-            const label = addonSummary
-              ? `${item.name} (${addonSummary})`
-              : item.name
+            const comboTotal = getCartItemComboPrice(item) * item.quantity
+            const addons = item.addons ?? []
 
             return (
-              <ReceiptItemRow
-                key={item.lineId}
-                name={label}
-                quantity={item.quantity}
-                amount={formatPosAmount(lineTotal)}
-              />
+              <div key={item.lineId}>
+                <ReceiptItemRow
+                  name={item.name}
+                  quantity={item.quantity}
+                  amount={formatPosAmount(comboTotal)}
+                />
+                {addons.map((addon) => (
+                  <ReceiptItemRow
+                    key={addon.id}
+                    name={addon.name}
+                    quantity={item.quantity}
+                    amount={`+${formatPosAmount(addon.price * item.quantity)}`}
+                    indented
+                  />
+                ))}
+              </div>
             )
           })}
         </div>
