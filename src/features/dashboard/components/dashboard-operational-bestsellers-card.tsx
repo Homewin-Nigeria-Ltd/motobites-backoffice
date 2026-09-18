@@ -39,7 +39,7 @@ export function DashboardOperationalBestsellersCard({
             </div>
             <div>
               <CardTitle className="text-sm font-medium text-foreground">
-                Best Selling Products
+                Best Selling Meals
               </CardTitle>
               <p className="text-xs text-muted-foreground">
                 Top dishes ranked by order quantity and revenue

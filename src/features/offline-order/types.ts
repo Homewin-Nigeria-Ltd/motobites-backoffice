@@ -66,6 +66,22 @@ export type ApiSalesDashboardMenuItemModifier = {
   is_active: boolean
 }
 
+export type ApiSalesDashboardMenuItemAddon = {
+  id: number
+  name: string
+  description: string | null
+  price: number
+  additional_price: number
+  price_kobo: number
+  is_required: boolean
+  is_active: boolean
+}
+
+export type ApiSalesDashboardMenuItemAddonCategory = {
+  category_name: string
+  items: ApiSalesDashboardMenuItemAddon[]
+}
+
 export type ApiSalesDashboardMenuItemModifierGroup = {
   group_name: string
   display_name: string
@@ -126,7 +142,7 @@ export type ApiSalesDashboardMenuItem = {
   }
   modifier_groups?: ApiSalesDashboardMenuItemModifierGroup[]
   modifiers?: ApiSalesDashboardMenuItemModifier[]
-  addons?: ApiSalesDashboardMenuItemModifier[]
+  addons?: ApiSalesDashboardMenuItemAddonCategory[]
 }
 
 export type ApiSalesDashboardMenuItemsMeta = {
@@ -421,6 +437,16 @@ export type ApiSalesDashboardBestSellingProduct = {
   sales: number
 }
 
+export type ApiSalesDashboardMealPerformance = {
+  menu_item_id: number
+  meal: string
+  price: number
+  price_kobo: number
+  units_sold: number
+  total_amount_sold_kobo: number
+  total_amount_sold: number
+}
+
 export type ApiSalesDashboardProductCategoryPerformance = {
   category: string
   units: number
@@ -465,6 +491,7 @@ export type ApiSalesDashboardOperationalReports = {
   period: ApiSalesDashboardOperationalReportPeriod
   scope: string
   best_selling_products: ApiSalesDashboardBestSellingProduct[]
+  meal_performance?: ApiSalesDashboardMealPerformance[]
   product_category_performance: ApiSalesDashboardProductCategoryPerformance[]
   order_channel_report: ApiSalesDashboardOrderChannelReport[]
   discounts_promotions_refunds: ApiSalesDashboardDiscountsPromotionsRefunds

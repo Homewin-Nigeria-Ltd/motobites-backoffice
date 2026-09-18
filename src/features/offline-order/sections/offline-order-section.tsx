@@ -107,7 +107,7 @@ export function OfflineOrderSection() {
   }
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col bg-muted">
+    <div className="bg-muted">
       <OfflineOrderBackButton href="/offline-order" label="Back to Overview" />
 
       {savedOrderCount > 0 ? (
@@ -124,7 +124,7 @@ export function OfflineOrderSection() {
         </div>
       ) : null}
 
-      <div className="border-b border-border/50 bg-background px-4 py-4 md:px-6">
+      <div className="sticky top-0 z-30 border-b border-border/50 bg-background px-4 py-4 shadow-sm md:px-6">
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div className="max-w-3xl flex-1">
@@ -172,8 +172,7 @@ export function OfflineOrderSection() {
         </div>
       </div>
 
-      <div className="flex min-h-0 flex-1 flex-col">
-        <div className="min-h-0 flex-1 space-y-8 overflow-y-auto px-4 py-6 md:px-6">
+      <div className="space-y-8 px-4 py-6 md:px-6">
           {isKitchensPending ? (
             <AppLoader />
           ) : kitchens.length === 0 ? (
@@ -215,7 +214,6 @@ export function OfflineOrderSection() {
           selectedCount={selectedCount}
           subtotal={subtotal}
         />
-      </div>
     </div>
   )
 }

@@ -3,7 +3,7 @@
 import Image from "next/image"
 
 import type { ApiSalesDashboardMenuItem, OfflineOrderCartItem } from "@/features/offline-order/types"
-import { getCartItemAddonSummary } from "@/features/offline-order/utils/cart-line"
+import { formatCartAddonLabel } from "@/features/offline-order/utils/cart-line"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Icons } from "@/components/ui/icons"
@@ -151,9 +151,13 @@ export function OfflineOrderMenuCard({
                   <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                     Selected add-ons
                   </p>
-                  <p className="mt-1 text-sm font-medium text-foreground">
-                    {getCartItemAddonSummary(addonLine.addons)}
-                  </p>
+                  <div className="mt-1 space-y-0.5">
+                    {(addonLine.addons ?? []).map((addon) => (
+                      <p key={addon.id} className="text-sm font-medium text-foreground">
+                        {formatCartAddonLabel(addon)}
+                      </p>
+                    ))}
+                  </div>
                 </div>
               ) : null}
 

@@ -1,13 +1,54 @@
 import type {
   ApiSalesDashboardMenuItem,
+  ApiSalesDashboardMenuItemAddonCategory,
   ApiSalesDashboardMenuItemModifier,
   ApiSalesDashboardMenuItemModifierGroup,
   OfflineOrderCartAddon,
   OfflineOrderCartItem,
 } from "../types"
 
+function addonCategoriesToModifierGroups(
+  categories: ApiSalesDashboardMenuItemAddonCategory[] = [],
+): ApiSalesDashboardMenuItemModifierGroup[] {
+  return categories
+    .filter((category) => category.items?.some((addon) => addon.is_active))
+    .map((category) => {
+      const isRequired = category.items.some((addon) => addon.is_required)
+
+      return {
+        group_name: category.category_name,
+        display_name: category.category_name,
+        is_required: isRequired,
+        min_select: isRequired ? 1 : 0,
+        max_select: 1,
+        options: category.items.map((addon) => ({
+          id: addon.id,
+          name: addon.name,
+          description: addon.description,
+          price: addon.price,
+          additional_price: addon.additional_price,
+          price_kobo: addon.price_kobo,
+          group_name: category.category_name,
+          type: "addon",
+          is_required: addon.is_required,
+          is_active: addon.is_active,
+        })),
+        addons: [],
+        sub_variations: [],
+      }
+    })
+}
+
 export function getMenuItemModifierGroups(item: ApiSalesDashboardMenuItem) {
-  return (item.modifier_groups ?? []).filter(
+  const fromModifierGroups = (item.modifier_groups ?? []).filter(
+    (group) => getActiveModifierOptions(group).length > 0,
+  )
+
+  if (fromModifierGroups.length > 0) {
+    return fromModifierGroups
+  }
+
+  return addonCategoriesToModifierGroups(item.addons ?? []).filter(
     (group) => getActiveModifierOptions(group).length > 0,
   )
 }
@@ -130,8 +171,24 @@ export function getCartItemUnitPrice(
   return basePrice + addons.reduce((sum, addon) => sum + addon.price, 0)
 }
 
+export function getCartItemComboPrice(item: OfflineOrderCartItem) {
+  return item.basePrice ?? item.price
+}
+
+export function getCartItemLineTotal(item: OfflineOrderCartItem) {
+  return getCartItemUnitPrice(getCartItemComboPrice(item), item.addons ?? []) * item.quantity
+}
+
+export function formatCartAddonLabel(addon: OfflineOrderCartAddon) {
+  if (!addon.price) {
+    return addon.name
+  }
+
+  return `${addon.name} +₦${addon.price.toLocaleString()}`
+}
+
 export function getCartItemAddonSummary(addons: OfflineOrderCartAddon[] = []) {
-  return addons.map((addon) => addon.name).join(", ")
+  return addons.map(formatCartAddonLabel).join(", ")
 }
 
 export function isModifierSelectionValid(
