@@ -142,8 +142,13 @@ export function OfflineOrderMenuItemAddonsDialog({
               <p className="text-base font-semibold text-foreground">{item.name}</p>
               <p className="text-sm text-muted-foreground">{kitchenName}</p>
               <p className="text-sm font-medium text-primary">
-                {formatOfflineOrderAmount(unitPrice)}
+                {formatOfflineOrderAmount(item.price)}
               </p>
+              {selectedAddons.length > 0 ? (
+                <p className="text-xs text-muted-foreground">
+                  Total with add-ons {formatOfflineOrderAmount(unitPrice)}
+                </p>
+              ) : null}
             </div>
           </div>
 
