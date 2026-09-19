@@ -13,6 +13,7 @@ export type DataTableProps<TData, TValue = unknown> = {
   isLoading?: boolean
   className?: string
   tableClassName?: string
+  scrollable?: boolean
 }
 
 export type DataTablePaginationState = {

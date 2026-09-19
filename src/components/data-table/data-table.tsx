@@ -31,6 +31,7 @@ export function DataTable<TData, TValue>({
   isLoading = false,
   className,
   tableClassName,
+  scrollable = false,
 }: DataTableProps<TData, TValue>) {
   const showPagination =
     page !== undefined &&
@@ -50,13 +51,17 @@ export function DataTable<TData, TValue>({
       data-slot="data-table"
       className={cn(
         "min-w-0 overflow-hidden rounded-2xl border border-border bg-background",
+        scrollable && "flex min-h-0 flex-1 flex-col",
         className
       )}
     >
-      {toolbar}
+      {toolbar ? <div className="shrink-0">{toolbar}</div> : null}
 
-      <Table className={cn("min-w-[56rem]", tableClassName)}>
-        <TableHeader className="bg-muted/50">
+      <div className={cn(scrollable && "min-h-0 flex-1 overflow-auto")}>
+        <Table className={cn("min-w-[56rem]", tableClassName)}>
+          <TableHeader
+            className={cn("bg-muted/50", scrollable && "sticky top-0 z-10")}
+          >
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow
               key={headerGroup.id}
@@ -127,13 +132,15 @@ export function DataTable<TData, TValue>({
             </TableRow>
           )}
         </TableBody>
-      </Table>
+        </Table>
+      </div>
 
       {showPagination ? (
         <DataTablePagination
           page={page}
           totalPages={totalPages}
           onPageChange={onPageChange}
+          className={scrollable ? "shrink-0 border-t border-border" : undefined}
         />
       ) : null}
     </div>
