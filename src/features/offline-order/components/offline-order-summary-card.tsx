@@ -32,12 +32,14 @@ export function OfflineOrderSummaryCard({
           <span className="text-muted-foreground">Subtotal</span>
           <span className="font-medium">{formatOfflineOrderAmount(subtotal)}</span>
         </div>
+        {/* Service charge is paused for now.
         <div className="flex items-center justify-between text-sm">
           <span className="text-muted-foreground">Service Fee (Walk-in)</span>
           <span className="font-medium">
             {formatOfflineOrderAmount(serviceFee)}
           </span>
         </div>
+        */}
 
         <Separator />
 
