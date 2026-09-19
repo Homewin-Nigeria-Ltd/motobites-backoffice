@@ -1,7 +1,9 @@
-import { WALK_IN_SERVICE_FEE } from "../constants"
+// import { WALK_IN_SERVICE_FEE } from "../constants"
 
 export function calculateOfflineOrderTotals(subtotal: number) {
-  const serviceFee = WALK_IN_SERVICE_FEE
+  // Service charge is paused for now.
+  // const serviceFee = WALK_IN_SERVICE_FEE
+  const serviceFee = 0
   const total = subtotal + serviceFee
 
   return { subtotal, serviceFee, total }
