@@ -131,7 +131,7 @@ export function OfflineOrderAllOrdersSection() {
     : "this order"
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col bg-muted p-4 md:p-6">
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-muted p-4 md:p-6">
       <DataTable
         columns={columns}
         data={orders}
@@ -140,6 +140,7 @@ export function OfflineOrderAllOrdersSection() {
         onPageChange={handlePageChange}
         isLoading={isPending || (isFetching && orders.length === 0)}
         emptyMessage={emptyMessage}
+        scrollable
         toolbar={
           <OfflineOrderSearchToolbar
             search={search}
@@ -149,7 +150,7 @@ export function OfflineOrderAllOrdersSection() {
         }
       />
 
-      <div className="mt-4">
+      <div className="mt-4 shrink-0">
         <Button asChild variant="ghost">
           <Link href="/offline-order/new">Back to New Order</Link>
         </Button>

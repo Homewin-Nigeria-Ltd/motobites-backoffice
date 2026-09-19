@@ -13,6 +13,7 @@ import {
   normalizeOrderSourceFromApi,
   normalizePaymentMethodFromApi,
 } from "./order-checkout"
+import { resolveOfflineOrderAmount } from "./order-totals"
 
 export function getSalesDashboardOrderStatus(order: ApiSalesDashboardOrder) {
   return (order.status ?? order.display_status ?? "").toLowerCase()
@@ -23,31 +24,7 @@ export function getSalesDashboardOrderReference(order: ApiSalesDashboardOrder) {
 }
 
 export function getSalesDashboardOrderTotal(order: ApiSalesDashboardOrder) {
-  if (typeof order.total_kobo === "number") {
-    return order.total_kobo / 100
-  }
-
-  if (typeof order.payment?.amount_kobo === "number") {
-    return order.payment.amount_kobo / 100
-  }
-
-  if (typeof order.payment?.amount === "number") {
-    return order.payment.amount
-  }
-
-  if (typeof order.total === "number") {
-    return order.total
-  }
-
-  if (typeof order.total_amount === "number") {
-    return order.total_amount
-  }
-
-  if (typeof order.amount_paid === "number") {
-    return order.amount_paid
-  }
-
-  return 0
+  return resolveOfflineOrderAmount(order.subtotal, order.subtotal_kobo)
 }
 
 export function getSalesDashboardOrderItemCount(order: ApiSalesDashboardOrder) {

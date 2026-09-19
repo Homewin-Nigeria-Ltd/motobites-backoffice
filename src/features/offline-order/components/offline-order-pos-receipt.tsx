@@ -134,11 +134,6 @@ export function OfflineOrderPosReceipt({
             value={formatPosAmount(receipt.subtotal)}
             valueNoWrap
           />
-          <ReceiptRow
-            label="Service Fee"
-            value={formatPosAmount(receipt.serviceFee)}
-            valueNoWrap
-          />
         </div>
 
         <div className="my-3 border-t border-double border-black" />

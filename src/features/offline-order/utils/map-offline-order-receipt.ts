@@ -8,7 +8,6 @@ import type {
 import {
   getSalesDashboardOrderAssignedTo,
   getSalesDashboardOrderReference,
-  getSalesDashboardOrderTotal,
   mapSalesDashboardOrderItemsToCart,
 } from "./sales-dashboard-order"
 import { normalizePaymentMethodFromApi } from "./order-checkout"
@@ -62,10 +61,12 @@ export function mapSalesDashboardOrderToReceipt(
   const subtotal =
     resolveOfflineOrderAmount(order.subtotal, order.subtotal_kobo) ||
     items.reduce((sum, item) => sum + item.price * item.quantity, 0)
-  const serviceFee =
-    resolveOfflineOrderAmount(order.service_fee, order.service_fee_kobo) ||
-    calculateOfflineOrderTotals(subtotal).serviceFee
-  const total = getSalesDashboardOrderTotal(order) || subtotal + serviceFee
+  // Service charge is paused for now.
+  // const serviceFee =
+  //   resolveOfflineOrderAmount(order.service_fee, order.service_fee_kobo) ||
+  //   calculateOfflineOrderTotals(subtotal).serviceFee
+  const serviceFee = 0
+  const total = subtotal
 
   return {
     orderId: resolveOrderId(order),
@@ -99,9 +100,10 @@ export function mapOfflineOrderReceipt({
   )
 
   const subtotal = apiOrder.subtotal ?? localTotals.subtotal
-  const serviceFee = apiOrder.service_fee ?? localTotals.serviceFee
-  const total =
-    apiOrder.total ?? apiOrder.total_amount ?? subtotal + serviceFee
+  // Service charge is paused for now.
+  // const serviceFee = apiOrder.service_fee ?? localTotals.serviceFee
+  const serviceFee = 0
+  const total = subtotal
 
   return {
     orderId: resolveOrderId(apiOrder),
