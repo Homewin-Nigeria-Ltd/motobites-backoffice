@@ -40,7 +40,7 @@ export function OfflineOrderSuccessSection() {
   const receipt = fetchedReceipt ?? storedReceipt
   const hasAutoPrintedRef = useRef(false)
   const showReprintCount =
-    Boolean(order) &&
+    order != null &&
     canUserViewReceiptReprintCount(user) &&
     isCompletedSalesDashboardOrder(order)
 

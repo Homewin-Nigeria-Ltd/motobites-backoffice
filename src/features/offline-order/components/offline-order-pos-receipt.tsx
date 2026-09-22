@@ -1,3 +1,5 @@
+import { ASSETS } from "@/constants/assets"
+
 import type { OfflineOrderReceipt } from "../types"
 import { getPaymentMethodLabel } from "../utils/order-checkout"
 import { getCartItemComboPrice } from "../utils/cart-line"
@@ -73,6 +75,13 @@ export function OfflineOrderPosReceipt({
     <div className="pos-receipt mx-auto w-full max-w-[80mm] bg-white font-mono text-[20px] leading-[1.4] text-black print:text-[20px]">
       <div className="border border-black/15 p-4 print:border-0 print:p-0">
         <div className="text-center">
+          <img
+            src={ASSETS.brand.logo}
+            alt={businessName}
+            width={191}
+            height={32}
+            className="receipt-logo"
+          />
           <p className="font-bold uppercase tracking-wide">{businessName}</p>
           <p className="uppercase tracking-[0.12em]">Walk-in Order Receipt</p>
         </div>

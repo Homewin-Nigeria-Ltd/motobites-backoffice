@@ -71,6 +71,7 @@ export const offlineOrderMutations = {
     mutationFn: (orderId: string | number) =>
       api.post<ApiReceiptReprintResponse>(
         offlineOrderEndpoints.receiptReprint(orderId),
+        {},
       ),
   },
 } as const
