@@ -53,13 +53,16 @@ export function OfflineOrderSection() {
     updateQuantity,
   } = useOfflineOrderCart()
   const { savedOrderCount } = useSalesDashboardSavedOrders()
+  const searchQuery = debouncedValue?.trim() || undefined
 
   const {
     data: kitchens = [],
     isPending: isKitchensPending,
     isError: isKitchensError,
     error: kitchensError,
-  } = useSalesDashboardKitchens()
+  } = useSalesDashboardKitchens({
+    search: searchQuery,
+  })
 
   const activeKitchenId = useMemo(() => {
     if (selectedKitchenId === ALL_KITCHENS_TAB_VALUE) {
@@ -74,8 +77,6 @@ export function OfflineOrderSection() {
       ? selectedKitchenId
       : ALL_KITCHENS_TAB_VALUE
   }, [kitchens, selectedKitchenId])
-
-  const searchQuery = debouncedValue?.trim() || undefined
 
   const kitchenGroups = useMemo(() => {
     const visibleKitchens =
@@ -175,6 +176,12 @@ export function OfflineOrderSection() {
       <div className="space-y-8 px-4 py-6 md:px-6">
           {isKitchensPending ? (
             <AppLoader />
+          ) : kitchens.length === 0 && searchQuery ? (
+            <div className="flex flex-1 items-center justify-center rounded-2xl border border-border bg-background p-12 text-center">
+              <p className="text-sm text-muted-foreground">
+                {`No menu items found for "${search}".`}
+              </p>
+            </div>
           ) : kitchens.length === 0 ? (
             <div className="flex flex-1 items-center justify-center rounded-2xl border border-border bg-background p-12 text-center">
               <p className="text-sm text-muted-foreground">

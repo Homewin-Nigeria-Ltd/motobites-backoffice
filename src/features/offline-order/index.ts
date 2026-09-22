@@ -20,6 +20,7 @@ export type {
   SaveOfflineOrderPayload,
   SalesDashboardMenuItemsParams,
   SalesDashboardOrdersParams,
+  SalesDashboardKitchensParams,
 } from "./types"
 export {
   OFFLINE_ORDER_ACTIVE_SAVED_ID_KEY,
@@ -69,6 +70,7 @@ export {
   useRecordReceiptReprint,
   useRequestOfflineOrderDeletion,
   useSalesDashboardDeleteRequests,
+  useSalesDashboardDeletedOrders,
   useSalesDashboardKitchens,
   useSalesDashboardMenuItems,
   useSalesDashboardOrders,

@@ -22,14 +22,23 @@ import { useBranchFilter } from "@/context/branch-context"
 import { useSession } from "@/features/auth/hooks/use-session"
 import {
   useRequestOfflineOrderDeletion,
+  useSalesDashboardDeletedOrders,
   useSalesDashboardOrders,
 } from "@/features/offline-order/hooks/use-offline-order-queries"
 import { isSalesManager, isSalesRep } from "@/features/offline-order/utils/admin-role"
 import { getSalesDashboardOrderReference } from "@/features/offline-order/utils/sales-dashboard-order"
 import { ApiError } from "@/lib/api/client"
+import { cn } from "@/lib/utils"
 import { toast } from "@/lib/toast"
 
 const DEFAULT_PAGE_SIZE = 10
+
+const ORDER_TABS = [
+  { id: "all", label: "All Orders" },
+  { id: "deleted", label: "Deleted Orders" },
+] as const
+
+type AllOrdersTab = (typeof ORDER_TABS)[number]["id"]
 
 export function OfflineOrderAllOrdersSection() {
   const { branchId } = useBranchFilter()
@@ -37,6 +46,7 @@ export function OfflineOrderAllOrdersSection() {
   const user = session?.user
   const canRequestDeletion = isSalesRep(user)
   const showReprintCount = isSalesManager(user)
+  const [tab, setTab] = useState<AllOrdersTab>("all")
   const [search, setSearch] = useState("")
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -44,19 +54,28 @@ export function OfflineOrderAllOrdersSection() {
   })
   const [deleteOrderId, setDeleteOrderId] = useState<string | null>(null)
   const [deleteReason, setDeleteReason] = useState("")
+  const isDeletedTab = tab === "deleted"
 
-  const { data, isPending, isFetching, isError, error } = useSalesDashboardOrders({
+  const queryParams = {
     search: search.trim() || undefined,
     page: pagination.pageIndex + 1,
     per_page: pagination.pageSize,
     fulfillment_branch_id: branchId ?? undefined,
+  }
+
+  const ordersQuery = useSalesDashboardOrders(queryParams, {
+    enabled: !isDeletedTab,
   })
+  const deletedOrdersQuery = useSalesDashboardDeletedOrders(queryParams, {
+    enabled: isDeletedTab,
+  })
+  const activeQuery = isDeletedTab ? deletedOrdersQuery : ordersQuery
 
   const requestDeletion = useRequestOfflineOrderDeletion()
 
-  const orders = data?.data ?? []
-  const totalPages = data?.meta.last_page ?? 1
-  const currentPage = data?.meta.current_page ?? pagination.pageIndex + 1
+  const orders = activeQuery.data?.data ?? []
+  const totalPages = activeQuery.data?.meta.last_page ?? 1
+  const currentPage = activeQuery.data?.meta.current_page ?? pagination.pageIndex + 1
 
   const selectedOrder = useMemo(
     () => orders.find((order) => String(order.id) === deleteOrderId) ?? null,
@@ -66,18 +85,24 @@ export function OfflineOrderAllOrdersSection() {
   const columns = useMemo(
     () =>
       createAllOrdersColumns({
-        showDeleteAction: canRequestDeletion,
-        showReprintCount,
+        showDeleteAction: canRequestDeletion && !isDeletedTab,
+        showReprintAction: !isDeletedTab,
+        showReprintCount: showReprintCount && !isDeletedTab,
         onRequestDeletion: (orderId) => {
           setDeleteOrderId(orderId)
           setDeleteReason("")
         },
       }),
-    [canRequestDeletion, showReprintCount],
+    [canRequestDeletion, isDeletedTab, showReprintCount],
   )
 
-  if (isError) {
-    throw error
+  if (activeQuery.isError) {
+    throw activeQuery.error
+  }
+
+  const handleTabChange = (nextTab: AllOrdersTab) => {
+    setTab(nextTab)
+    setPagination((current) => ({ ...current, pageIndex: 0 }))
   }
 
   const handleSearchChange = (value: string) => {
@@ -125,8 +150,12 @@ export function OfflineOrderAllOrdersSection() {
   }
 
   const emptyMessage = search
-    ? "No orders match your search."
-    : "No offline orders found yet."
+    ? isDeletedTab
+      ? "No deleted orders match your search."
+      : "No orders match your search."
+    : isDeletedTab
+      ? "No deleted orders found."
+      : "No offline orders found yet."
 
   const selectedOrderLabel = selectedOrder
     ? `#${getSalesDashboardOrderReference(selectedOrder)}`
@@ -134,20 +163,56 @@ export function OfflineOrderAllOrdersSection() {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-muted p-4 md:p-6">
+      <div
+        className="mb-4 flex flex-wrap items-center gap-2"
+        role="tablist"
+        aria-label="Order lists"
+      >
+        {ORDER_TABS.map((orderTab) => {
+          const isActive = tab === orderTab.id
+
+          return (
+            <Button
+              key={orderTab.id}
+              type="button"
+              role="tab"
+              aria-selected={isActive}
+              variant="outline"
+              className={cn(
+                "h-auto rounded-lg px-4 py-2 text-sm font-medium",
+                isActive
+                  ? "border-primary bg-primary/5 text-primary"
+                  : "border-border text-muted-foreground hover:bg-transparent hover:text-foreground",
+              )}
+              onClick={() => handleTabChange(orderTab.id)}
+            >
+              {orderTab.label}
+            </Button>
+          )
+        })}
+      </div>
+
       <DataTable
         columns={columns}
         data={orders}
         page={currentPage}
         totalPages={totalPages}
         onPageChange={handlePageChange}
-        isLoading={isPending || (isFetching && orders.length === 0)}
+        isLoading={
+          activeQuery.isPending ||
+          (activeQuery.isFetching && orders.length === 0)
+        }
         emptyMessage={emptyMessage}
         scrollable
         toolbar={
           <OfflineOrderSearchToolbar
             search={search}
             onSearchChange={handleSearchChange}
-            placeholder="Search orders by ID or customer..."
+            placeholder={
+              isDeletedTab
+                ? "Search deleted orders by ID or customer..."
+                : "Search orders by ID or customer..."
+            }
           />
         }
       />

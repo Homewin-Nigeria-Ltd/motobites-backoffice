@@ -14,6 +14,7 @@ import type {
   ApiSalesDashboardSavedOrderResponse,
   ApiSalesDashboardStatsResponse,
   ApiSalesDashboardTopStaffResponse,
+  SalesDashboardKitchensParams,
   SalesDashboardMenuItemsParams,
   SalesDashboardOperationalReportsParams,
   SalesDashboardOrdersParams,
@@ -21,6 +22,16 @@ import type {
 } from "../types"
 import { offlineOrderEndpoints } from "./endpoints"
 import { offlineOrderKeys } from "./keys"
+
+function buildKitchensQuery(params: SalesDashboardKitchensParams = {}) {
+  const query: Record<string, string> = {}
+
+  if (params.search) {
+    query.search = params.search
+  }
+
+  return Object.keys(query).length > 0 ? query : undefined
+}
 
 function buildMenuItemsQuery(params: SalesDashboardMenuItemsParams) {
   const query: Record<string, string | number> = {
@@ -98,13 +109,17 @@ function buildOperationalReportsQuery(
 }
 
 export const offlineOrderQueries = {
-  kitchens: () =>
+  kitchens: (params: SalesDashboardKitchensParams = {}) =>
     queryOptions({
-      queryKey: offlineOrderKeys.kitchens(),
+      queryKey: offlineOrderKeys.kitchens(params),
       queryFn: () =>
         api
-          .get<ApiSalesDashboardKitchensResponse>(offlineOrderEndpoints.kitchens)
+          .get<ApiSalesDashboardKitchensResponse>(
+            offlineOrderEndpoints.kitchens,
+            buildKitchensQuery(params),
+          )
           .then((response) => response.data),
+      placeholderData: (previous) => previous,
       staleTime: 30_000,
     }),
 
@@ -182,6 +197,20 @@ export const offlineOrderQueries = {
         api
           .get<ApiSalesDashboardDeleteRequestsResponse>(
             offlineOrderEndpoints.deleteRequests,
+            buildOrdersQuery(params),
+          )
+          .then((response) => response),
+      placeholderData: (previous) => previous,
+      staleTime: 30_000,
+    }),
+
+  deletedOrders: (params: SalesDashboardOrdersParams) =>
+    queryOptions({
+      queryKey: offlineOrderKeys.deletedOrders(params),
+      queryFn: () =>
+        api
+          .get<ApiSalesDashboardOrdersResponse>(
+            offlineOrderEndpoints.deletedOrders,
             buildOrdersQuery(params),
           )
           .then((response) => response),

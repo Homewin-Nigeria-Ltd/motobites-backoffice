@@ -13,6 +13,7 @@ export const offlineOrderEndpoints = {
   deleteRequest: (orderId: string | number) =>
     `/api/proxy/admin/sales-dashboard/orders/${encodeURIComponent(String(orderId))}/delete-request`,
   deleteRequests: "/api/proxy/admin/sales-dashboard/delete-requests",
+  deletedOrders: "/api/proxy/admin/sales-dashboard/deleted-orders",
   stats: "/api/proxy/admin/sales-dashboard/stats",
   topStaff: "/api/proxy/admin/sales-dashboard/top-staff",
   recentActivity: "/api/proxy/admin/sales-dashboard/recent-activity",

@@ -33,6 +33,10 @@ export type SalesDashboardMenuItemsParams = {
   page?: number
 }
 
+export type SalesDashboardKitchensParams = {
+  search?: string
+}
+
 export type SalesDashboardOrdersParams = {
   search?: string
   per_page?: number

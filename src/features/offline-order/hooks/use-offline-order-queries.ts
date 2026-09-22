@@ -7,6 +7,7 @@ import { offlineOrderKeys } from "../api/keys"
 import type {
   ApproveOfflineOrderDeletionPayload,
   CreateOfflineOrderDeleteRequestPayload,
+  SalesDashboardKitchensParams,
   SalesDashboardMenuItemsParams,
   SalesDashboardOperationalReportsParams,
   SalesDashboardOrdersParams,
@@ -14,8 +15,10 @@ import type {
 } from "../types"
 import { offlineOrderQueries } from "../api/queries"
 
-export function useSalesDashboardKitchens() {
-  return useQuery(offlineOrderQueries.kitchens())
+export function useSalesDashboardKitchens(
+  params: SalesDashboardKitchensParams = {},
+) {
+  return useQuery(offlineOrderQueries.kitchens(params))
 }
 
 export function useSalesDashboardMenuItems(
@@ -54,6 +57,16 @@ export function useSalesDashboardDeleteRequests(
 ) {
   return useQuery({
     ...offlineOrderQueries.deleteRequests(params),
+    enabled: options?.enabled ?? true,
+  })
+}
+
+export function useSalesDashboardDeletedOrders(
+  params: SalesDashboardOrdersParams,
+  options?: { enabled?: boolean },
+) {
+  return useQuery({
+    ...offlineOrderQueries.deletedOrders(params),
     enabled: options?.enabled ?? true,
   })
 }
