@@ -24,7 +24,7 @@ import {
   useRequestOfflineOrderDeletion,
   useSalesDashboardOrders,
 } from "@/features/offline-order/hooks/use-offline-order-queries"
-import { isSalesRep } from "@/features/offline-order/utils/admin-role"
+import { isSalesManager, isSalesRep } from "@/features/offline-order/utils/admin-role"
 import { getSalesDashboardOrderReference } from "@/features/offline-order/utils/sales-dashboard-order"
 import { ApiError } from "@/lib/api/client"
 import { toast } from "@/lib/toast"
@@ -36,6 +36,7 @@ export function OfflineOrderAllOrdersSection() {
   const { data: session } = useSession()
   const user = session?.user
   const canRequestDeletion = isSalesRep(user)
+  const showReprintCount = isSalesManager(user)
   const [search, setSearch] = useState("")
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -66,12 +67,13 @@ export function OfflineOrderAllOrdersSection() {
     () =>
       createAllOrdersColumns({
         showDeleteAction: canRequestDeletion,
+        showReprintCount,
         onRequestDeletion: (orderId) => {
           setDeleteOrderId(orderId)
           setDeleteReason("")
         },
       }),
-    [canRequestDeletion],
+    [canRequestDeletion, showReprintCount],
   )
 
   if (isError) {

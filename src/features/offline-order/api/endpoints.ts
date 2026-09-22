@@ -8,6 +8,8 @@ export const offlineOrderEndpoints = {
     `/api/proxy/admin/sales-dashboard/saved-orders/${encodeURIComponent(String(orderId))}`,
   order: (orderId: string | number) =>
     `/api/proxy/admin/sales-dashboard/orders/${encodeURIComponent(String(orderId))}`,
+  receiptReprint: (orderId: string | number) =>
+    `/api/proxy/admin/sales-dashboard/orders/${encodeURIComponent(String(orderId))}/receipt/reprints`,
   deleteRequest: (orderId: string | number) =>
     `/api/proxy/admin/sales-dashboard/orders/${encodeURIComponent(String(orderId))}/delete-request`,
   deleteRequests: "/api/proxy/admin/sales-dashboard/delete-requests",

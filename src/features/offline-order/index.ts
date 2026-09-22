@@ -66,6 +66,7 @@ export { OfflineOrderAllOrdersSection } from "./sections/offline-order-all-order
 export { useSalesDashboardGroupedMenuItems } from "./hooks/use-sales-dashboard-grouped-menu-items"
 export {
   useApproveOfflineOrderDeletion,
+  useRecordReceiptReprint,
   useRequestOfflineOrderDeletion,
   useSalesDashboardDeleteRequests,
   useSalesDashboardKitchens,

@@ -124,6 +124,20 @@ export function useApproveOfflineOrderDeletion() {
   })
 }
 
+export function useRecordReceiptReprint() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    ...offlineOrderMutations.recordReceiptReprint,
+    onSuccess: (_data, orderId) => {
+      queryClient.invalidateQueries({ queryKey: offlineOrderKeys.all })
+      queryClient.invalidateQueries({
+        queryKey: offlineOrderKeys.order(orderId),
+      })
+    },
+  })
+}
+
 export type RequestOfflineOrderDeletionInput = {
   orderId: string | number
   payload: CreateOfflineOrderDeleteRequestPayload

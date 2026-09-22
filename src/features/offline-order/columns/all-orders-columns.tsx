@@ -16,15 +16,19 @@ import {
   getSalesDashboardOrderStatusLabel,
   getSalesDashboardOrderTimeLabel,
   getSalesDashboardOrderTotal,
+  isCompletedSalesDashboardOrder,
 } from "@/features/offline-order/utils/sales-dashboard-order"
+import { getSalesDashboardOrderReceiptReprintCount } from "@/features/offline-order/utils/receipt-reprint"
 
 type CreateAllOrdersColumnsOptions = {
   showDeleteAction?: boolean
+  showReprintCount?: boolean
   onRequestDeletion?: (orderId: string) => void
 }
 
 export function createAllOrdersColumns({
   showDeleteAction = false,
+  showReprintCount = false,
   onRequestDeletion,
 }: CreateAllOrdersColumnsOptions = {}): ColumnDef<ApiSalesDashboardOrder>[] {
   const columns: ColumnDef<ApiSalesDashboardOrder>[] = [
@@ -94,6 +98,25 @@ export function createAllOrdersColumns({
         </span>
       ),
     },
+    ...(showReprintCount
+      ? [
+          {
+            id: "reprintCount",
+            header: () => <span className="block text-center">Reprints</span>,
+            cell: ({ row }: { row: { original: ApiSalesDashboardOrder } }) => {
+              if (!isCompletedSalesDashboardOrder(row.original)) {
+                return <span className="block text-center text-muted-foreground">—</span>
+              }
+
+              return (
+                <span className="block text-center font-medium text-foreground">
+                  {getSalesDashboardOrderReceiptReprintCount(row.original)}
+                </span>
+              )
+            },
+          } satisfies ColumnDef<ApiSalesDashboardOrder>,
+        ]
+      : []),
     {
       id: "orderDate",
       header: () => <span className="block text-right">Order Date</span>,
@@ -122,8 +145,9 @@ export function createAllOrdersColumns({
     id: "actions",
     header: () => <span className="block text-right">Actions</span>,
     cell: ({ row }) => {
-      const orderId = encodeURIComponent(String(row.original.id))
-      const reprintHref = `/offline-order/success?orderId=${orderId}&print=1`
+      const order = row.original
+      const orderId = encodeURIComponent(String(order.id))
+      const reprintHref = `/offline-order/success?orderId=${orderId}&print=1&reprint=1`
 
       return (
         <div className="flex justify-end gap-2">

@@ -4,6 +4,7 @@ import type {
   ApiOfflineOrderCancelResponse,
   ApiOfflineOrderDeleteRequestResponse,
   ApiOfflineOrderResponse,
+  ApiReceiptReprintResponse,
   ApiSalesDashboardSavedOrderMutationResponse,
   ApiSalesDashboardSavedOrderResponse,
   ApproveOfflineOrderDeletionPayload,
@@ -64,6 +65,12 @@ export const offlineOrderMutations = {
     mutationFn: () =>
       api.delete<ApiSalesDashboardSavedOrderMutationResponse>(
         offlineOrderEndpoints.savedOrders,
+      ),
+  },
+  recordReceiptReprint: {
+    mutationFn: (orderId: string | number) =>
+      api.post<ApiReceiptReprintResponse>(
+        offlineOrderEndpoints.receiptReprint(orderId),
       ),
   },
 } as const
