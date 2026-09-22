@@ -23,6 +23,7 @@ export function useOfflineOrderReceiptDetail(orderId: string | null) {
 
   return {
     receipt,
+    order: query.data ?? null,
     isLoading: query.isLoading,
     isError: query.isError,
     error: query.error,

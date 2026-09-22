@@ -1,3 +1,11 @@
+.receipt-logo {
+  display: block;
+  height: 32px;
+  width: auto;
+  max-width: 70%;
+  margin: 0 auto 8px;
+}
+
 .receipt-detail-row {
   display: flex;
   justify-content: space-between;
@@ -134,5 +142,15 @@
     box-shadow: none !important;
     font-size: 20px !important;
     line-height: 1.4 !important;
+  }
+
+  .pos-receipt .receipt-logo {
+    height: 32px !important;
+    width: auto !important;
+    max-width: 70% !important;
+    font-size: unset !important;
+    line-height: unset !important;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
   }
 }
