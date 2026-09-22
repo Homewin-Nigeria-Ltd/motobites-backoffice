@@ -1,4 +1,5 @@
 import type {
+  SalesDashboardKitchensParams,
   SalesDashboardMenuItemsParams,
   SalesDashboardOperationalReportsParams,
   SalesDashboardOrdersParams,
@@ -7,7 +8,8 @@ import type {
 
 export const offlineOrderKeys = {
   all: ["offline-order"] as const,
-  kitchens: () => [...offlineOrderKeys.all, "kitchens"] as const,
+  kitchens: (params: SalesDashboardKitchensParams = {}) =>
+    [...offlineOrderKeys.all, "kitchens", params] as const,
   menuItems: (params: SalesDashboardMenuItemsParams) =>
     [...offlineOrderKeys.all, "menu-items", params] as const,
   orders: (params: SalesDashboardOrdersParams) =>
@@ -20,6 +22,8 @@ export const offlineOrderKeys = {
     [...offlineOrderKeys.all, "order", orderId] as const,
   deleteRequests: (params: SalesDashboardOrdersParams) =>
     [...offlineOrderKeys.all, "delete-requests", params] as const,
+  deletedOrders: (params: SalesDashboardOrdersParams) =>
+    [...offlineOrderKeys.all, "deleted-orders", params] as const,
   stats: (branchId?: number | null) =>
     [...offlineOrderKeys.all, "stats", branchId] as const,
   topStaff: () => [...offlineOrderKeys.all, "top-staff"] as const,

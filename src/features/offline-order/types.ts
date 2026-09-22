@@ -33,6 +33,10 @@ export type SalesDashboardMenuItemsParams = {
   page?: number
 }
 
+export type SalesDashboardKitchensParams = {
+  search?: string
+}
+
 export type SalesDashboardOrdersParams = {
   search?: string
   per_page?: number
@@ -260,6 +264,7 @@ export type ApiSalesDashboardOrder = {
     paid_at?: string
   } | null
   items?: ApiSalesDashboardOrderItem[]
+  receipt_reprint_count?: number
 }
 
 export type ApiSalesDashboardOrdersMeta = {
@@ -644,6 +649,12 @@ export type ApiOfflineOrderResponse = {
 export type ApiSalesDashboardOrderResponse = {
   success: boolean
   data: ApiSalesDashboardOrder
+  message?: string
+}
+
+export type ApiReceiptReprintResponse = {
+  success: boolean
+  data?: ApiSalesDashboardOrder
   message?: string
 }
 
