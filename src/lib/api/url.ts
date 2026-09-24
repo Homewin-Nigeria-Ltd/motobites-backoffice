@@ -45,7 +45,7 @@ export function buildApiUrl(
     return `${endpoint}${queryString}`
   }
 
-  const resolvedBaseUrl = args.baseUrl || API_BASE_URL || ""
+  const resolvedBaseUrl = (args.baseUrl || API_BASE_URL || "").replace(/\/+$/, "")
   const path = endpoint.startsWith("/") ? endpoint : `/${endpoint}`
 
   return `${resolvedBaseUrl}${path}${queryString}`

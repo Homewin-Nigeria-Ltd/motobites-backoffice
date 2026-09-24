@@ -38,7 +38,9 @@ import { toast } from "sonner";
 function formatFileSize(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  if (bytes < 1024 * 1024 * 1024)
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GB`;
 }
 
 type AddMenuSheetProps = {
@@ -214,19 +216,18 @@ function AddMenuSheetForm({
     );
   };
 
-  // Videos Management
+  // Videos Management (Up to 2GB per video)
+  const MAX_VIDEO_SIZE = 2 * 1024 * 1024 * 1024;
   const handleAddVideos = (files: FileList | null) => {
     if (!files || files.length === 0) return;
     const fileList = Array.from(files);
-    const oversized = fileList.filter((f) => f.size > 100 * 1024 * 1024);
+    const oversized = fileList.filter((f) => f.size > MAX_VIDEO_SIZE);
     if (oversized.length > 0) {
       toast.error(
-        `Video "${oversized[0].name}" exceeds the 100MB limit (${formatFileSize(oversized[0].size)}).`
+        `Video "${oversized[0].name}" exceeds the 2GB limit (${formatFileSize(oversized[0].size)}).`
       );
     }
-    const newFiles = fileList.filter(
-      (file) => file.size <= 100 * 1024 * 1024,
-    );
+    const newFiles = fileList.filter((file) => file.size <= MAX_VIDEO_SIZE);
     if (newFiles.length === 0) return;
     const current = (form.getValues("videos") as File[]) || [];
     setValue("videos", [...current, ...newFiles], { shouldValidate: true });
@@ -775,7 +776,7 @@ function AddMenuSheetForm({
             <div className="mb-2">
               <FieldLabel>Menu Videos (Optional)</FieldLabel>
               <p className="text-xs text-muted-foreground">
-                Upload short promotional or preparation video (MP4, MOV, WEBM, max 100MB).
+                Upload short promotional or preparation video (MP4, MOV, WEBM, max 2GB).
               </p>
             </div>
 
@@ -931,7 +932,7 @@ function AddMenuSheetForm({
                   Click to select or drop video files
                 </p>
                 <p className="text-[11px] text-muted-foreground">
-                  MP4, MOV, WEBM, MKV up to 100MB
+                  MP4, MOV, WEBM, MKV up to 2GB
                 </p>
               </div>
             </div>

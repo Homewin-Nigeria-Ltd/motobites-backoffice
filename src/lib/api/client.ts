@@ -1,4 +1,8 @@
 import { buildApiUrl } from "@/lib/api/url"
+import {
+  clearDirectUploadConfigCache,
+  getDirectUploadConfig,
+} from "@/lib/api/auth-token"
 
 export type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE"
 
@@ -65,19 +69,38 @@ export async function request<TResponse, TBody = unknown>(
   options: RequestOptions<TBody> = {}
 ): Promise<TResponse> {
   const { method = "GET", body, headers = {}, params, baseUrl } = options
-  const url = buildUrl(endpoint, params, baseUrl)
+  let url = buildUrl(endpoint, params, baseUrl)
 
   const isFormData =
     typeof FormData !== "undefined" && body instanceof FormData
 
+  const requestHeaders: Record<string, string> = {
+    Accept: "application/json",
+    ...(isFormData ? {} : { "Content-Type": "application/json" }),
+    ...headers,
+  }
+
+  // Bypass Vercel Serverless Function 4.5MB payload limit for FormData uploads in browser
+  if (
+    typeof window !== "undefined" &&
+    isFormData &&
+    (endpoint.startsWith("/api/proxy/") || url.startsWith("/api/proxy/"))
+  ) {
+    const config = await getDirectUploadConfig()
+    const pathWithoutProxy = endpoint.startsWith("/api/proxy/")
+      ? endpoint.slice("/api/proxy".length)
+      : url.slice("/api/proxy".length)
+
+    url = buildUrl(pathWithoutProxy, params, config.apiUrl)
+    if (config.token && !requestHeaders.Authorization && !requestHeaders.authorization) {
+      requestHeaders.Authorization = `Bearer ${config.token}`
+    }
+  }
+
   const res = await fetch(url, {
     method,
     credentials: "include",
-    headers: {
-      Accept: "application/json",
-      ...(isFormData ? {} : { "Content-Type": "application/json" }),
-      ...headers,
-    },
+    headers: requestHeaders,
     body:
       body === undefined
         ? undefined
@@ -94,9 +117,27 @@ export async function request<TResponse, TBody = unknown>(
     // ignore invalid JSON
   }
 
+  if (res.status === 401 && typeof window !== "undefined") {
+    clearDirectUploadConfigCache()
+  }
+
   if (!res.ok) {
+    const errorData = data as {
+      message?: string
+      error?: string
+      errors?: Record<string, string[] | string>
+    } | null
+    const firstFieldError = errorData?.errors
+      ? Object.values(errorData.errors).flat()[0]
+      : undefined
+    const message =
+      firstFieldError ||
+      errorData?.message ||
+      errorData?.error ||
+      "Request failed"
+
     throw new ApiError(
-      (data as { message?: string })?.message || "Request failed",
+      message,
       res.status,
       data
     )
