@@ -97,9 +97,11 @@ export async function request<TResponse, TBody = unknown>(
     }
   }
 
+  const isCrossOrigin = /^https?:\/\//.test(url)
+
   const res = await fetch(url, {
     method,
-    credentials: "include",
+    credentials: isCrossOrigin ? "omit" : "include",
     headers: requestHeaders,
     body:
       body === undefined
