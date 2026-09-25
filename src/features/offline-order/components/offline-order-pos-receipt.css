@@ -1,6 +1,6 @@
 .receipt-logo {
   display: block;
-  height: 32px;
+  height: 96px;
   width: auto;
   max-width: 70%;
   margin: 0 auto 8px;
@@ -145,7 +145,7 @@
   }
 
   .pos-receipt .receipt-logo {
-    height: 32px !important;
+    height: 96px !important;
     width: auto !important;
     max-width: 70% !important;
     font-size: unset !important;
