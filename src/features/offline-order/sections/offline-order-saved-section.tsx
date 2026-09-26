@@ -69,7 +69,7 @@ export function OfflineOrderSavedSection() {
     : "No saved orders on hold yet."
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col bg-muted p-4 md:p-6">
+    <div className="flex flex-col bg-muted p-4 md:p-6">
       <DataTable
         columns={columns}
         data={visibleOrders}

@@ -27,7 +27,7 @@ export function CustomerDetailSection({
   }
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col bg-muted">
+    <div className="bg-muted">
       <div className="flex-1 p-4 md:p-6">
         <div className="rounded-2xl bg-background px-4 py-2 md:px-8 md:py-4">
           <CustomerPersonalInformationSection customer={customer} />

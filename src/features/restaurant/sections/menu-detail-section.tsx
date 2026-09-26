@@ -50,7 +50,7 @@ export function MenuDetailSection({ kitchenId }: MenuDetailSectionProps) {
   }
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col bg-muted">
+    <div className="bg-muted">
       <PageHeader
         title="Restaurant Management"
         description="Allow restaurants to update their virtual menus, add new items, or mark certain items as unavailable."

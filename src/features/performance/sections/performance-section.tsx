@@ -50,7 +50,7 @@ export function PerformanceSection() {
 
   if (isError) {
     return (
-      <div className="flex min-h-0 flex-1 flex-col gap-6 bg-muted p-4 md:gap-8 md:p-6">
+      <div className="flex flex-col gap-6 bg-muted p-4 md:gap-8 md:p-6">
         {filter}
         <div className="rounded-2xl border border-border bg-background p-6 text-sm text-destructive">
           {error instanceof Error
@@ -63,7 +63,7 @@ export function PerformanceSection() {
 
   if (isPending || !data) {
     return (
-      <div className="flex min-h-0 flex-1 flex-col gap-6 bg-muted p-4 md:gap-8 md:p-6">
+      <div className="flex flex-col gap-6 bg-muted p-4 md:gap-8 md:p-6">
         {filter}
         <AppLoader className="flex-1 py-24" />
       </div>
@@ -71,7 +71,7 @@ export function PerformanceSection() {
   }
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col gap-6 bg-muted p-4 md:gap-8 md:p-6">
+    <div className="flex flex-col gap-6 bg-muted p-4 md:gap-8 md:p-6">
       {filter}
 
       <div className="grid min-w-0 gap-4 xl:grid-cols-2">

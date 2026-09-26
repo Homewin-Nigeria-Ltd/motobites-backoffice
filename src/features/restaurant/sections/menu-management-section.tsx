@@ -59,7 +59,7 @@ export function MenuManagementSection() {
   }
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col bg-muted">
+    <div className="bg-muted">
       <div className="border-b border-border/50 bg-background px-4 py-4 md:px-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex flex-1 flex-col gap-3 sm:flex-row sm:items-center">
@@ -135,8 +135,8 @@ export function MenuManagementSection() {
         </div>
       </div>
 
-      <div className="flex min-h-0 flex-1 flex-col">
-        <div className="min-h-0 flex-1 space-y-6 overflow-y-auto px-4 py-6 md:px-6">
+      <div>
+        <div className="space-y-6 px-4 py-6 md:px-6">
           {isPending ? (
             <AppLoader />
           ) : totalItems === 0 ? (

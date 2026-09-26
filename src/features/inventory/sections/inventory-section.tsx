@@ -108,7 +108,7 @@ export function InventorySection() {
 
   if (isOverviewPending && !overview) {
     return (
-      <div className="flex min-h-0 flex-1 items-center justify-center bg-muted p-6">
+      <div className="flex items-center justify-center bg-muted p-6">
         <AppLoader spinnerClassName="size-8" />
       </div>
     )
@@ -116,7 +116,7 @@ export function InventorySection() {
 
   if (isOverviewError) {
     return (
-      <div className="flex min-h-0 flex-1 flex-col bg-muted p-4 md:p-6">
+      <div className="flex flex-col bg-muted p-4 md:p-6">
         <div className="rounded-2xl border border-border bg-background p-6 text-sm text-destructive">
           {overviewError instanceof Error
             ? overviewError.message
@@ -127,7 +127,7 @@ export function InventorySection() {
   }
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col bg-muted p-4 md:p-6">
+    <div className="flex flex-col bg-muted p-4 md:p-6">
       <div className="space-y-4">
         <InventoryToolbar onAddItem={handleAddItem} />
 

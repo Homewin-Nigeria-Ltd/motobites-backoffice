@@ -17,6 +17,9 @@ type OfflineOrderPreviewCardProps = {
   subtotal: number
   serviceFee: number
   total: number
+  promoCode?: string
+  discount?: number
+  discountPercentage?: number
 }
 
 export function OfflineOrderPreviewCard({
@@ -24,6 +27,9 @@ export function OfflineOrderPreviewCard({
   subtotal,
   serviceFee,
   total,
+  promoCode,
+  discount = 0,
+  discountPercentage = 0,
 }: OfflineOrderPreviewCardProps) {
   return (
     <Card className="gap-0 overflow-hidden py-0">
@@ -75,6 +81,21 @@ export function OfflineOrderPreviewCard({
             <span className="text-muted-foreground">Subtotal</span>
             <span>{formatOfflineOrderAmount(subtotal)}</span>
           </div>
+          {promoCode ? (
+            <div className="flex items-center justify-between">
+              <span className="text-muted-foreground">Promo Code</span>
+              <span className="font-medium">{promoCode}</span>
+            </div>
+          ) : null}
+          {discount > 0 ? (
+            <div className="flex items-center justify-between">
+              <span className="text-muted-foreground">
+                Discount
+                {discountPercentage > 0 ? ` (${discountPercentage}%)` : ""}
+              </span>
+              <span>-{formatOfflineOrderAmount(discount)}</span>
+            </div>
+          ) : null}
           {/* Service charge is paused for now.
           <div className="flex items-center justify-between">
             <span className="text-muted-foreground">Service Fee</span>

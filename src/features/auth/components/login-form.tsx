@@ -64,14 +64,14 @@ export function LoginForm() {
           </div>
         </div>
       )}
-      <CardHeader className="items-center gap-3 px-4 text-center sm:px-6">
+      <CardHeader className="justify-items-center gap-3 px-4 text-center sm:px-6">
         <Image
           src={ASSETS.brand.logo}
           alt="Motobites Admin"
-          width={191}
-          height={32}
+          width={240}
+          height={240}
           priority
-          className="h-8 w-auto max-w-full"
+          className="mx-auto h-24 w-auto max-w-full"
         />
         <CardDescription className="text-base">
           Sign in to your admin dashboard

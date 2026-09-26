@@ -67,6 +67,7 @@ export { OfflineOrderAllOrdersSection } from "./sections/offline-order-all-order
 export { useSalesDashboardGroupedMenuItems } from "./hooks/use-sales-dashboard-grouped-menu-items"
 export {
   useApproveOfflineOrderDeletion,
+  usePreviewOfflineOrder,
   useRecordReceiptReprint,
   useRequestOfflineOrderDeletion,
   useSalesDashboardDeleteRequests,
@@ -132,6 +133,7 @@ export {
   filterSalesDashboardOrders,
   getSalesDashboardOrderAssignedTo,
   getSalesDashboardOrderDateLabel,
+  getSalesDashboardOrderDiscount,
   getSalesDashboardOrderItemCount,
   getSalesDashboardOrderReference,
   getSalesDashboardOrderStatusLabel,

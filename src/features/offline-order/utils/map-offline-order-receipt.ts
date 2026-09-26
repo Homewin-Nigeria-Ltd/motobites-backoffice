@@ -66,7 +66,18 @@ export function mapSalesDashboardOrderToReceipt(
   //   resolveOfflineOrderAmount(order.service_fee, order.service_fee_kobo) ||
   //   calculateOfflineOrderTotals(subtotal).serviceFee
   const serviceFee = 0
-  const total = subtotal
+  const discount =
+    resolveOfflineOrderAmount(null, order.discount_kobo) ||
+    resolveOfflineOrderAmount(order.discount ?? order.discount_amount, null)
+  const discountPercentage =
+    typeof order.discount_percentage === "number" &&
+    Number.isFinite(order.discount_percentage)
+      ? order.discount_percentage
+      : 0
+  const total =
+    resolveOfflineOrderAmount(null, order.total_kobo) ||
+    resolveOfflineOrderAmount(order.total, null) ||
+    subtotal
 
   return {
     orderId: resolveOrderId(order),
@@ -79,6 +90,8 @@ export function mapSalesDashboardOrderToReceipt(
     branchName: order.fulfillment_branch?.name ?? null,
     subtotal,
     serviceFee,
+    discount,
+    discountPercentage,
     total,
     placedAt:
       order.ordered_at ??
@@ -99,11 +112,27 @@ export function mapOfflineOrderReceipt({
     items.reduce((sum, item) => sum + item.price * item.quantity, 0),
   )
 
-  const subtotal = apiOrder.subtotal ?? localTotals.subtotal
+  const subtotal =
+    resolveOfflineOrderAmount(apiOrder.subtotal, apiOrder.subtotal_kobo) ||
+    localTotals.subtotal
   // Service charge is paused for now.
   // const serviceFee = apiOrder.service_fee ?? localTotals.serviceFee
   const serviceFee = 0
-  const total = subtotal
+  const discount =
+    resolveOfflineOrderAmount(null, apiOrder.discount_kobo) ||
+    resolveOfflineOrderAmount(
+      apiOrder.discount ?? apiOrder.discount_amount,
+      null,
+    )
+  const discountPercentage =
+    typeof apiOrder.discount_percentage === "number" &&
+    Number.isFinite(apiOrder.discount_percentage)
+      ? apiOrder.discount_percentage
+      : 0
+  const total =
+    resolveOfflineOrderAmount(null, apiOrder.total_kobo) ||
+    resolveOfflineOrderAmount(apiOrder.total ?? apiOrder.total_amount, null) ||
+    subtotal
 
   return {
     orderId: resolveOrderId(apiOrder),
@@ -126,6 +155,8 @@ export function mapOfflineOrderReceipt({
     branchName: checkout.branchName || null,
     subtotal,
     serviceFee,
+    discount,
+    discountPercentage,
     total,
     placedAt: new Date().toISOString(),
   }

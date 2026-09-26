@@ -77,8 +77,8 @@ export function RidersSection({
   }
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col bg-muted">
-      <div className="min-h-0 flex-1 space-y-8 overflow-y-auto p-4 md:p-6">
+    <div className="bg-muted">
+      <div className="space-y-8 p-4 md:p-6">
         {showSearchInput ? (
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-2">

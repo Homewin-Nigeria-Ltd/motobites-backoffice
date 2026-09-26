@@ -24,7 +24,17 @@ export function getSalesDashboardOrderReference(order: ApiSalesDashboardOrder) {
 }
 
 export function getSalesDashboardOrderTotal(order: ApiSalesDashboardOrder) {
-  return resolveOfflineOrderAmount(order.subtotal, order.subtotal_kobo)
+  return (
+    resolveOfflineOrderAmount(null, order.total_kobo) ||
+    resolveOfflineOrderAmount(order.total ?? order.total_amount, null)
+  )
+}
+
+export function getSalesDashboardOrderDiscount(order: ApiSalesDashboardOrder) {
+  return (
+    resolveOfflineOrderAmount(null, order.discount_kobo) ||
+    resolveOfflineOrderAmount(order.discount ?? order.discount_amount, null)
+  )
 }
 
 export function getSalesDashboardOrderItemCount(order: ApiSalesDashboardOrder) {
@@ -187,6 +197,7 @@ export function mapSalesDashboardOrderToOverviewRow(
     customerName: order.customer_name?.trim() || "Walk-in Customer",
     itemsCount: getSalesDashboardOrderItemCount(order),
     total: getSalesDashboardOrderTotal(order),
+    discount: getSalesDashboardOrderDiscount(order),
     timeLabel: getSalesDashboardOrderTimeLabel(order),
   }
 }
@@ -326,6 +337,7 @@ export function mapSalesDashboardOrderToCheckout(
         : "",
     takenByName: getSalesDashboardOrderAssignedTo(order),
     managerVerificationNotes: "",
+    promoCode: order.promo_code?.trim() || order.coupon_code?.trim() || "",
   }
 }
 

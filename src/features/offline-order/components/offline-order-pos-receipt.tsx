@@ -78,11 +78,10 @@ export function OfflineOrderPosReceipt({
           <img
             src={ASSETS.brand.logo}
             alt={businessName}
-            width={191}
-            height={32}
+            width={240}
+            height={240}
             className="receipt-logo"
           />
-          <p className="font-bold uppercase tracking-wide">{businessName}</p>
           <p className="uppercase tracking-[0.12em]">Walk-in Order Receipt</p>
         </div>
 
@@ -143,6 +142,17 @@ export function OfflineOrderPosReceipt({
             value={formatPosAmount(receipt.subtotal)}
             valueNoWrap
           />
+          {(receipt.discount ?? 0) > 0 ? (
+            <ReceiptRow
+              label={
+                (receipt.discountPercentage ?? 0) > 0
+                  ? `Discount (${receipt.discountPercentage}%)`
+                  : "Discount"
+              }
+              value={`-${formatPosAmount(receipt.discount)}`}
+              valueNoWrap
+            />
+          ) : null}
         </div>
 
         <div className="my-3 border-t border-double border-black" />
