@@ -37,7 +37,7 @@ export function BranchesSection() {
   }
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col bg-muted">
+    <div className="bg-muted">
       <div className="border-b border-border/50 bg-background px-4 py-4 md:px-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="max-w-2xl flex-1">
@@ -63,8 +63,8 @@ export function BranchesSection() {
         </div>
       </div>
 
-      <div className="flex min-h-0 flex-1 flex-col">
-        <div className="min-h-0 flex-1 overflow-y-auto px-4 py-6 md:px-6">
+      <div>
+        <div className="px-4 py-6 md:px-6">
           {isPending ? (
             <AppLoader />
           ) : filteredBranches.length === 0 ? (

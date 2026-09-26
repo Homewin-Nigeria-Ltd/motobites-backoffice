@@ -18,7 +18,7 @@ export function OfflineOrderReviewSection() {
 
   if (!isHydrated) {
     return (
-      <div className="flex min-h-0 flex-1 flex-col bg-muted">
+      <div className="bg-muted">
         <OfflineOrderBackButton href="/offline-order/new" label="Back to Menu" />
         <AppLoader />
       </div>
@@ -27,7 +27,7 @@ export function OfflineOrderReviewSection() {
 
   if (selectedCount === 0) {
     return (
-      <div className="flex min-h-0 flex-1 flex-col bg-muted">
+      <div className="bg-muted">
         <OfflineOrderBackButton href="/offline-order/new" label="Back to Menu" />
         <OfflineOrderEmptyState
           message="No items selected yet. Add menu items to continue."
@@ -38,10 +38,10 @@ export function OfflineOrderReviewSection() {
   }
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col bg-muted">
+    <div className="bg-muted">
       <OfflineOrderBackButton href="/offline-order/new" label="Back to Menu" />
 
-      <div className="grid min-h-0 flex-1 gap-6 p-4 md:p-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+      <div className="grid gap-6 p-4 md:p-6 lg:grid-cols-[minmax(0,1fr)_320px]">
         <OfflineOrderSelectedDishesTable
           items={items}
           onQuantityChange={updateQuantity}

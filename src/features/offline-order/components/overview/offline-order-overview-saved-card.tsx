@@ -60,9 +60,16 @@ export function OfflineOrderOverviewSavedCard({
                 <Badge className="bg-primary/10 text-primary hover:bg-primary/10">
                   {order.itemsCount} item{order.itemsCount === 1 ? "" : "s"}
                 </Badge>
-                <span className="min-w-[5rem] text-sm font-semibold text-foreground">
-                  {formatOverviewCurrency(order.total)}
-                </span>
+                <div className="min-w-[5rem] text-right">
+                  <span className="block text-sm font-semibold text-foreground">
+                    {formatOverviewCurrency(order.total)}
+                  </span>
+                  {order.discount > 0 ? (
+                    <span className="block text-xs text-muted-foreground">
+                      -{formatOverviewCurrency(order.discount)} discount
+                    </span>
+                  ) : null}
+                </div>
                 <Button
                   type="button"
                   size="sm"

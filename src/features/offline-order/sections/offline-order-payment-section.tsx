@@ -20,14 +20,20 @@ import { OfflineOrderStaffField } from "@/features/offline-order/components/offl
 import { useOfflineOrderCart } from "@/features/offline-order/hooks/use-offline-order-cart"
 import { useOfflineOrderCheckout } from "@/features/offline-order/hooks/use-offline-order-checkout"
 import { usePlaceOfflineOrder } from "@/features/offline-order/hooks/use-place-offline-order"
+import { usePreviewOfflineOrder } from "@/features/offline-order/hooks/use-offline-order-queries"
 import { useSaveOfflineOrder } from "@/features/offline-order/hooks/use-save-offline-order"
 import { useSalesDashboardSavedOrders } from "@/features/offline-order/hooks/use-sales-dashboard-saved-orders"
 import { offlineOrderQueries } from "@/features/offline-order/api/queries"
 import {
   useOfflineOrderReceipt,
 } from "@/features/offline-order/hooks/use-offline-order-storage"
+import { buildOfflineOrderPayload } from "@/features/offline-order/utils/build-offline-order-payload"
 import { mapSalesDashboardOrderToReceipt } from "@/features/offline-order/utils/map-offline-order-receipt"
-import { calculateOfflineOrderTotals } from "@/features/offline-order/utils/order-totals"
+import {
+  calculateOfflineOrderTotals,
+  mapOfflineOrderPreviewTotals,
+} from "@/features/offline-order/utils/order-totals"
+import { ApiError } from "@/lib/api/client"
 import { toast } from "@/lib/toast"
 
 export function OfflineOrderPaymentSection() {
@@ -45,14 +51,25 @@ export function OfflineOrderPaymentSection() {
     setPaymentMethod,
     setTakenBy,
     setBranch,
+    setPromoCode,
     resetCheckout,
   } = useOfflineOrderCheckout()
   const { savedOrderCount } = useSalesDashboardSavedOrders()
   const { storeReceipt } = useOfflineOrderReceipt()
   const { placeOfflineOrder, isPending: isPlacingOrder } = usePlaceOfflineOrder()
   const { saveOfflineOrder, isPending: isSavingOrder } = useSaveOfflineOrder()
+  const previewOrder = usePreviewOfflineOrder()
   const [isLeaving, setIsLeaving] = useState(false)
-  const totals = calculateOfflineOrderTotals(subtotal)
+  const [appliedPromo, setAppliedPromo] = useState<{
+    code: string
+    subtotal: number
+    discount: number
+    discountPercentage: number
+    serviceFee: number
+    total: number
+  } | null>(null)
+  const cartTotals = calculateOfflineOrderTotals(subtotal)
+  const totals = appliedPromo ?? cartTotals
 
   useEffect(() => {
     if (!user || checkout.takenById) {
@@ -76,7 +93,7 @@ export function OfflineOrderPaymentSection() {
 
   if (isLeaving || !isHydrated) {
     return (
-      <div className="flex min-h-0 flex-1 flex-col bg-muted">
+      <div className="bg-muted">
         <OfflineOrderBackButton href="/offline-order/review" label="Back to Review" />
         <AppLoader />
       </div>
@@ -85,7 +102,7 @@ export function OfflineOrderPaymentSection() {
 
   if (selectedCount === 0) {
     return (
-      <div className="flex min-h-0 flex-1 flex-col bg-muted">
+      <div className="bg-muted">
         <OfflineOrderBackButton href="/offline-order/review" label="Back to Review" />
         <OfflineOrderEmptyState
           message="No items selected yet. Add menu items to continue."
@@ -107,7 +124,10 @@ export function OfflineOrderPaymentSection() {
     try {
       const placedReceipt = await placeOfflineOrder({
         items,
-        checkout,
+        checkout: {
+          ...checkout,
+          promoCode: appliedPromo?.code || checkout.promoCode,
+        },
         takenByName: checkout.takenByName || user?.name || "Staff",
       })
 
@@ -151,11 +171,44 @@ export function OfflineOrderPaymentSection() {
     }
   }
 
+  const handleApplyPromo = async () => {
+    const promoCode = checkout.promoCode.trim()
+
+    if (!promoCode) {
+      toast.error("Enter a promo code to apply.")
+      return
+    }
+
+    try {
+      const response = await previewOrder.mutateAsync(
+        buildOfflineOrderPayload(items, checkout),
+      )
+      const previewTotals = mapOfflineOrderPreviewTotals(
+        response.data ?? {},
+        subtotal,
+      )
+
+      setAppliedPromo({
+        code: promoCode,
+        ...previewTotals,
+      })
+      toast.success(response.message || "Promo code applied.")
+    } catch (mutationError) {
+      setAppliedPromo(null)
+      const message =
+        mutationError instanceof ApiError
+          ? mutationError.message
+          : "Failed to apply promo code."
+
+      toast.error(message)
+    }
+  }
+
   return (
-    <div className="flex min-h-0 flex-1 flex-col bg-muted">
+    <div className="bg-muted">
       <OfflineOrderBackButton href="/offline-order/review" label="Back to Review" />
 
-      <div className="grid min-h-0 flex-1 gap-6 p-4 md:p-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+      <div className="grid gap-6 p-4 md:p-6 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div className="space-y-6">
           <section className="space-y-4 rounded-2xl border border-border bg-background p-5">
             <div className="flex items-center justify-between gap-3">
@@ -224,6 +277,40 @@ export function OfflineOrderPaymentSection() {
               onChange={setPaymentMethod}
             />
           </section>
+
+          <section className="space-y-3 rounded-2xl border border-border bg-background p-5">
+            <h2 className="text-base font-semibold text-foreground">
+              Promo Code
+            </h2>
+            <div className="space-y-2">
+              <Label htmlFor="offline-order-promo-code">
+                Enter promo code (optional)
+              </Label>
+              <div className="flex gap-2">
+                <Input
+                  id="offline-order-promo-code"
+                  value={checkout.promoCode}
+                  onChange={(event) => {
+                    setAppliedPromo(null)
+                    setPromoCode(event.target.value.toUpperCase())
+                  }}
+                  placeholder="e.g. WEEKEND10"
+                  className="h-10 uppercase"
+                  autoComplete="off"
+                />
+                <Button
+                  type="button"
+                  className="h-10 shrink-0"
+                  onClick={() => void handleApplyPromo()}
+                  disabled={
+                    previewOrder.isPending || checkout.promoCode.trim().length === 0
+                  }
+                >
+                  {previewOrder.isPending ? "Applying..." : "Apply"}
+                </Button>
+              </div>
+            </div>
+          </section>
         </div>
 
         <div className="space-y-4 lg:sticky lg:top-6 lg:self-start">
@@ -232,6 +319,9 @@ export function OfflineOrderPaymentSection() {
             subtotal={totals.subtotal}
             serviceFee={totals.serviceFee}
             total={totals.total}
+            promoCode={appliedPromo?.code}
+            discount={appliedPromo?.discount}
+            discountPercentage={appliedPromo?.discountPercentage}
           />
 
           <div className="space-y-3">

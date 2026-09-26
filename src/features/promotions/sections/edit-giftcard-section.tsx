@@ -21,7 +21,7 @@ export function EditGiftcardSection({ giftcardId }: EditGiftcardSectionProps) {
   )
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col bg-muted p-4 md:p-6">
+    <div className="flex flex-col bg-muted p-4 md:p-6">
       <div className="mb-4 flex items-center gap-3">
         <Button variant="ghost" size="icon-sm" className="shrink-0" asChild>
           <Link href={PROMOTIONS_ROUTES.list} aria-label="Back to promotions">

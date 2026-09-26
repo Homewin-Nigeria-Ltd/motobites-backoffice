@@ -149,7 +149,7 @@ export function OfflineOrderSuccessSection() {
 
   if (orderId && isLoading) {
     return (
-      <div className="flex min-h-0 flex-1 flex-col bg-muted">
+      <div className="bg-muted">
         <OfflineOrderBackButton href="/offline-order" label="Back to Overview" />
         <AppLoader />
       </div>
@@ -158,7 +158,7 @@ export function OfflineOrderSuccessSection() {
 
   if (!receipt) {
     return (
-      <div className="flex min-h-0 flex-1 flex-col bg-muted">
+      <div className="bg-muted">
         <OfflineOrderBackButton href="/offline-order" label="Back to Overview" />
 
         <div className="flex flex-1 items-center justify-center px-4 py-12">
@@ -189,7 +189,7 @@ export function OfflineOrderSuccessSection() {
 
   return (
     <>
-      <div className="no-print flex min-h-0 flex-1 flex-col bg-muted">
+      <div className="no-print bg-muted">
         <OfflineOrderBackButton href="/offline-order" label="Back to Overview" />
 
         <div className="mx-auto flex w-full max-w-2xl flex-col items-center px-4 py-8 md:px-6">

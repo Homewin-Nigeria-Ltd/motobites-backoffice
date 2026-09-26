@@ -137,6 +137,12 @@ export function useApproveOfflineOrderDeletion() {
   })
 }
 
+export function usePreviewOfflineOrder() {
+  return useMutation({
+    ...offlineOrderMutations.preview,
+  })
+}
+
 export function useRecordReceiptReprint() {
   const queryClient = useQueryClient()
 

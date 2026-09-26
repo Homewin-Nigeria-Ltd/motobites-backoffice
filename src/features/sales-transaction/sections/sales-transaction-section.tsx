@@ -42,8 +42,8 @@ export function SalesTransactionSection() {
   }
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col bg-muted">
-      <div className="min-h-0 flex-1 space-y-6 overflow-y-auto p-4 md:p-6">
+    <div className="bg-muted">
+      <div className="space-y-6 p-4 md:p-6">
         {isLoading || !viewModel ? (
           <SalesTransactionStatsSkeleton />
         ) : (

@@ -10,6 +10,8 @@ type OfflineOrderSummaryCardProps = {
   subtotal: number
   serviceFee: number
   total: number
+  discount?: number
+  discountPercentage?: number
   children?: ReactNode
 }
 
@@ -17,6 +19,8 @@ export function OfflineOrderSummaryCard({
   subtotal,
   serviceFee,
   total,
+  discount = 0,
+  discountPercentage = 0,
   children,
 }: OfflineOrderSummaryCardProps) {
   return (
@@ -32,6 +36,17 @@ export function OfflineOrderSummaryCard({
           <span className="text-muted-foreground">Subtotal</span>
           <span className="font-medium">{formatOfflineOrderAmount(subtotal)}</span>
         </div>
+        {discount > 0 ? (
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-muted-foreground">
+              Discount
+              {discountPercentage > 0 ? ` (${discountPercentage}%)` : ""}
+            </span>
+            <span className="font-medium">
+              -{formatOfflineOrderAmount(discount)}
+            </span>
+          </div>
+        ) : null}
         {/* Service charge is paused for now.
         <div className="flex items-center justify-between text-sm">
           <span className="text-muted-foreground">Service Fee (Walk-in)</span>

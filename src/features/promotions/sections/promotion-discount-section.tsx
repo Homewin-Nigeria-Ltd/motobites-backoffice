@@ -52,7 +52,7 @@ export function PromotionDiscountSection() {
   }
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col gap-6 bg-muted p-4 md:gap-8 md:p-6">
+    <div className="flex flex-col gap-6 bg-muted p-4 md:gap-8 md:p-6">
       <section className="space-y-4">
         <OffersToolbar
           tab={tab}

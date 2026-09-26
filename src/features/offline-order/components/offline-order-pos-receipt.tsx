@@ -142,6 +142,17 @@ export function OfflineOrderPosReceipt({
             value={formatPosAmount(receipt.subtotal)}
             valueNoWrap
           />
+          {(receipt.discount ?? 0) > 0 ? (
+            <ReceiptRow
+              label={
+                (receipt.discountPercentage ?? 0) > 0
+                  ? `Discount (${receipt.discountPercentage}%)`
+                  : "Discount"
+              }
+              value={`-${formatPosAmount(receipt.discount)}`}
+              valueNoWrap
+            />
+          ) : null}
         </div>
 
         <div className="my-3 border-t border-double border-black" />
