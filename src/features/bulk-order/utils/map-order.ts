@@ -76,7 +76,13 @@ export function mapBulkOrderItemsToCart(
       kind: getBulkOrderItemKind(categoryName || lineType),
       lineType,
       allocationRole,
-      addons: item.addons ?? [],
+      addons: (item.addons ?? []).map((addon) => ({
+        id: addon.id,
+        menuItemId: addon.id,
+        name: addon.name,
+        price: addon.price,
+        groupName: addon.groupName,
+      })),
     }
   })
 }

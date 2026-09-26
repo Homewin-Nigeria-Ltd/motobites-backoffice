@@ -107,7 +107,10 @@ function buildGroupedItems(items: BulkOrderCartItem[]): CreateBulkOrderItemPaylo
       return existing
     }
 
-    const next = { addons: [] as CreateBulkOrderAddonPayload[] }
+    const next: {
+      primary?: BulkOrderCartItem
+      addons: CreateBulkOrderAddonPayload[]
+    } = { addons: [] }
     grouped.set(menuItemId, next)
     return next
   }
