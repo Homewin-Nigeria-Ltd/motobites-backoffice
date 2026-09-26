@@ -2,6 +2,7 @@
 
 import { ClientSuspense } from "@/components/client-suspense"
 import { OfflineOrderCreateBanner } from "@/features/offline-order/components/overview/offline-order-create-banner"
+import { OfflineOrderCreateOrderSection } from "@/features/offline-order/components/overview/offline-order-create-order-section"
 import { OfflineOrderOverviewActivitySection } from "@/features/offline-order/components/overview/offline-order-overview-activity-section"
 import { OfflineOrderOverviewCompletedSection } from "@/features/offline-order/components/overview/offline-order-overview-completed-section"
 import { OfflineOrderOverviewSavedSection } from "@/features/offline-order/components/overview/offline-order-overview-saved-section"
@@ -26,6 +27,8 @@ export function OfflineOrderOverviewSection() {
         <ClientSuspense fallback={<OverviewStatsSkeleton />}>
           <OfflineOrderOverviewStatsSection />
         </ClientSuspense>
+
+        <OfflineOrderCreateOrderSection />
 
         <OfflineOrderOverviewOperationalReportsSection />
 

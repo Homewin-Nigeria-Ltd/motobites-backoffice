@@ -55,6 +55,9 @@ export const navMain: NavItem[] = [
         url: "/offline-order/delete-request",
         adminRole: "sales-manager",
       },
+      { title: "Bulk Order", url: "/offline-order/bulk" },
+      { title: "All Bulk Orders", url: "/offline-order/bulk/all" },
+      { title: "Saved Bulk Orders", url: "/offline-order/bulk/saved" },
     ],
   },
   {
