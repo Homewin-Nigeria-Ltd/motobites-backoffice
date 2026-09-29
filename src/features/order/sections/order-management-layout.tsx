@@ -18,7 +18,7 @@ export function OrderManagementLayout({ children }: OrderManagementLayoutProps) 
   const { value: search, setValue: setSearch } = useOrderSearchInput()
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col bg-muted">
+    <div className="bg-muted">
       <div className="border-b border-border/50 bg-background px-4 py-4 md:px-6">
         <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
           <OrderFilterTabs counts={counts} />

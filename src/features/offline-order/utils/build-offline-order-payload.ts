@@ -39,6 +39,7 @@ export function buildOfflineOrderPayload(
   const customerName = checkout.customerName.trim()
   const customerPhone = checkout.customerPhone.trim()
   const notes = checkout.managerVerificationNotes.trim()
+  const promoCode = checkout.promoCode?.trim() ?? ""
   const branchId = checkout.branchId ? Number(checkout.branchId) : undefined
 
   return {
@@ -49,6 +50,7 @@ export function buildOfflineOrderPayload(
     ...(customerPhone ? { customer_phone: customerPhone } : {}),
     ...(branchId ? { fulfillment_branch_id: branchId, branch_id: branchId } : {}),
     ...(notes ? { notes } : {}),
+    ...(promoCode ? { promo_code: promoCode, coupon_code: promoCode } : {}),
   }
 }
 

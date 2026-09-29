@@ -1,9 +1,11 @@
 "use client"
 
+import { useRef } from "react"
 import { usePathname } from "next/navigation"
 
 import { AppSidebar } from "@/components/layouts/dashboard/app-sidebar"
 import { DashboardHeader } from "@/components/layouts/dashboard/dashboard-header"
+import { ScrollToTop } from "@/components/layouts/dashboard/scroll-to-top"
 import { BranchProvider } from "@/context/branch-context"
 import type { NavItem, SupportItem } from "@/config/sidebar"
 import type { AuthUser } from "@/features/auth"
@@ -27,6 +29,7 @@ export function DashboardLayout({
   const isMenuDetailPage =
     kitchenSegment != null && kitchenSegment !== "branches"
   const shouldShowHeader = showDashboardHeader ?? !isMenuDetailPage
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
 
   return (
     <BranchProvider>
@@ -38,9 +41,13 @@ export function DashboardLayout({
         />
         <SidebarInset className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
           {shouldShowHeader ? <DashboardHeader user={user} /> : null}
-          <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto">
+          <div
+            ref={scrollContainerRef}
+            className="flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto"
+          >
             {children}
           </div>
+          <ScrollToTop containerRef={scrollContainerRef} />
         </SidebarInset>
       </SidebarProvider>
     </BranchProvider>

@@ -13,10 +13,12 @@ import { Input } from "@/components/ui/input"
 
 export function MenuCatalogSection() {
   const [view, setView] = useState<"grid" | "list">("grid")
+  const [menuSheetOpen, setMenuSheetOpen] = useState(false)
+  const [editingMenuItemId, setEditingMenuItemId] = useState<string>()
   const { data: hubs = [], isPending } = useMenuHubs()
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col bg-muted">
+    <div className="bg-muted">
       <div className="border-b border-border/50 bg-background px-4 py-4 md:px-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex flex-1 flex-col gap-3 sm:flex-row sm:items-center">
@@ -59,22 +61,22 @@ export function MenuCatalogSection() {
                 aria-pressed={view === "grid"}
               />
             </div>
-            <AddMenuSheet
-              trigger={
-                <Button
-                  className="h-10 px-4"
-                  icon={{ name: "add", position: "left" }}
-                >
-                  Add New Item
-                </Button>
-              }
-            />
+            <Button
+              className="h-10 px-4"
+              icon={{ name: "add", position: "left" }}
+              onClick={() => {
+                setEditingMenuItemId(undefined)
+                setMenuSheetOpen(true)
+              }}
+            >
+              Add New Item
+            </Button>
           </div>
         </div>
       </div>
 
-      <div className="flex min-h-0 flex-1 flex-col">
-        <div className="min-h-0 flex-1 space-y-6 overflow-y-auto px-4 py-6 md:px-6">
+      <div>
+        <div className="space-y-6 px-4 py-6 md:px-6">
           {isPending ? (
             <AppLoader />
           ) : hubs.length === 0 ? (
@@ -83,7 +85,15 @@ export function MenuCatalogSection() {
             </div>
           ) : (
             hubs.map((hub) => (
-              <CatalogHubSection key={hub.id} hub={hub} view={view} />
+              <CatalogHubSection
+                key={hub.id}
+                hub={hub}
+                view={view}
+                onEditItem={(menuId) => {
+                  setEditingMenuItemId(menuId)
+                  setMenuSheetOpen(true)
+                }}
+              />
             ))
           )}
         </div>
@@ -92,6 +102,17 @@ export function MenuCatalogSection() {
           <PaginationControls page={1} totalPages={6} />
         </div>
       </div>
+
+      <AddMenuSheet
+        open={menuSheetOpen}
+        onOpenChange={(open) => {
+          setMenuSheetOpen(open)
+          if (!open) {
+            setEditingMenuItemId(undefined)
+          }
+        }}
+        menuItemId={editingMenuItemId}
+      />
     </div>
   )
 }

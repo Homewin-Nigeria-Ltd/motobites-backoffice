@@ -137,7 +137,7 @@ export function BnplAnalyticsSection() {
 
   if (isError) {
     return (
-      <div className="flex min-h-0 flex-1 flex-col gap-6 bg-muted/40 p-4 md:gap-8 md:p-6">
+      <div className="flex flex-col gap-6 bg-muted/40 p-4 md:gap-8 md:p-6">
         <div className="rounded-2xl border border-border bg-background p-6 text-sm text-destructive">
           {error instanceof Error ? error.message : "Failed to load BNPL analytics."}
         </div>
@@ -147,14 +147,14 @@ export function BnplAnalyticsSection() {
 
   if (isPending && !analytics) {
     return (
-      <div className="flex min-h-0 flex-1 flex-col gap-6 bg-muted/40 p-4 md:gap-8 md:p-6">
+      <div className="flex flex-col gap-6 bg-muted/40 p-4 md:gap-8 md:p-6">
         <AppLoader className="flex-1 py-24" />
       </div>
     )
   }
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col gap-6 bg-muted/30 p-4 pb-12 md:gap-8 md:p-6">
+    <div className="flex flex-col gap-6 bg-muted/30 p-4 pb-12 md:gap-8 md:p-6">
       {/* Breadcrumb & Header Row */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>

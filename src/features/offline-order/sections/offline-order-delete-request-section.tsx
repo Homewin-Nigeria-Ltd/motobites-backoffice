@@ -128,10 +128,10 @@ export function OfflineOrderDeleteRequestSection() {
       : "this order"
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col bg-muted">
+    <div className="bg-muted">
       <OfflineOrderManagerModeBanner />
 
-      <div className="flex min-h-0 flex-1 flex-col gap-6 p-4 md:p-6">
+      <div className="flex flex-col gap-6 p-4 md:p-6">
         <DataTable
           columns={deleteRequestColumns}
           data={deleteRequests}

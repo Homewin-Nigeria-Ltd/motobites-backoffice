@@ -82,7 +82,7 @@ export function DashboardSection() {
 
   if (isError) {
     return (
-      <div className="flex min-h-0 flex-1 flex-col gap-6 bg-muted p-4 md:gap-8 md:p-6">
+      <div className="flex flex-col gap-6 bg-muted p-4 md:gap-8 md:p-6">
         <DashboardPeriodFilter
           value={period}
           onChange={handlePeriodChange}
@@ -100,7 +100,7 @@ export function DashboardSection() {
 
   if (isPending || !data) {
     return (
-      <div className="flex min-h-0 flex-1 flex-col gap-6 bg-muted p-4 md:gap-8 md:p-6">
+      <div className="flex flex-col gap-6 bg-muted p-4 md:gap-8 md:p-6">
         <DashboardPeriodFilter
           value={period}
           onChange={handlePeriodChange}
@@ -115,7 +115,7 @@ export function DashboardSection() {
   return (
     <div
       className={cn(
-        "flex min-h-0 flex-1 flex-col gap-6 bg-muted p-4 md:gap-8 md:p-6",
+        "flex flex-col gap-6 bg-muted p-4 md:gap-8 md:p-6",
       )}
     >
       <DashboardPeriodFilter

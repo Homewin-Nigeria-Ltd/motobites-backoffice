@@ -27,6 +27,7 @@ const defaultCheckout: OfflineOrderCheckoutDraft = {
   branchId: null,
   branchName: "",
   managerVerificationNotes: "",
+  promoCode: "",
 }
 
 export function useOfflineOrderCheckout() {
@@ -93,6 +94,11 @@ export function useOfflineOrderCheckout() {
     [updateCheckout],
   )
 
+  const setPromoCode = useCallback(
+    (promoCode: string) => updateCheckout({ promoCode }),
+    [updateCheckout],
+  )
+
   const resetCheckout = useCallback(() => {
     setStoredCheckout(defaultCheckout)
   }, [setStoredCheckout])
@@ -106,6 +112,7 @@ export function useOfflineOrderCheckout() {
     setTakenBy,
     setBranch,
     setManagerVerificationNotes,
+    setPromoCode,
     resetCheckout,
   }
 }

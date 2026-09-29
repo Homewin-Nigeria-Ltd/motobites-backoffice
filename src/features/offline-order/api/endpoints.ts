@@ -1,5 +1,6 @@
 export const offlineOrderEndpoints = {
   create: "/api/proxy/admin/sales-dashboard/offline-orders",
+  preview: "/api/proxy/admin/sales-dashboard/offline-orders/preview",
   kitchens: "/api/proxy/admin/sales-dashboard/kitchens",
   menuItems: "/api/proxy/admin/sales-dashboard/menu-items",
   orders: "/api/proxy/admin/sales-dashboard/orders",

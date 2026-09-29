@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import type { ApiSalesDashboardOrder } from "@/features/offline-order/types"
 import { formatOfflineOrderAmount } from "@/features/offline-order/utils/order-totals"
 import {
+  getSalesDashboardOrderDiscount,
   getSalesDashboardOrderItemCount,
   getSalesDashboardOrderReference,
   getSalesDashboardOrderStatusLabel,
@@ -54,11 +55,22 @@ export function createDeleteRequestOrderColumns({
     {
       id: "total",
       header: "Total",
-      cell: ({ row }) => (
-        <span className="font-semibold text-foreground">
-          {formatOfflineOrderAmount(getSalesDashboardOrderTotal(row.original))}
-        </span>
-      ),
+      cell: ({ row }) => {
+        const discount = getSalesDashboardOrderDiscount(row.original)
+
+        return (
+          <div>
+            <span className="font-semibold text-foreground">
+              {formatOfflineOrderAmount(getSalesDashboardOrderTotal(row.original))}
+            </span>
+            {discount > 0 ? (
+              <span className="mt-0.5 block text-xs text-muted-foreground">
+                -{formatOfflineOrderAmount(discount)} discount
+              </span>
+            ) : null}
+          </div>
+        )
+      },
     },
     {
       id: "status",

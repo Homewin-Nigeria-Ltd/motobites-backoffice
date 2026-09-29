@@ -41,8 +41,8 @@ export function OrderManagementSection({ tab }: OrderManagementSectionProps) {
 
   return (
     <>
-      <div className="flex min-h-0 flex-1 flex-col">
-        <div className="min-h-0 flex-1 space-y-8 overflow-y-auto p-4 md:p-6">
+      <div>
+        <div className="space-y-8 p-4 md:p-6">
           {isPending && tab !== "performance" ? (
             <AppLoader className="min-h-48 flex-1 rounded-2xl border border-border bg-background" />
           ) : tab === "performance" ? (

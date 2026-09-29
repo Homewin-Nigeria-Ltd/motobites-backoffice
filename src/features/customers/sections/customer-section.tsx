@@ -58,7 +58,7 @@ export function CustomerManagementSection() {
   const stats = overviewData?.stats ?? []
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col gap-4 bg-muted p-4 md:gap-6 md:p-6">
+    <div className="flex flex-col gap-4 bg-muted p-4 md:gap-6 md:p-6">
       <div className="flex justify-end">
         <Button asChild className="h-10 px-4">
           <Link href={PROMOTIONS_ROUTES.list}>

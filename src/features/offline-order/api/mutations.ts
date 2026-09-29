@@ -3,6 +3,7 @@ import { api } from "@/lib/api/client"
 import type {
   ApiOfflineOrderCancelResponse,
   ApiOfflineOrderDeleteRequestResponse,
+  ApiOfflineOrderPreviewResponse,
   ApiOfflineOrderResponse,
   ApiReceiptReprintResponse,
   ApiSalesDashboardSavedOrderMutationResponse,
@@ -19,6 +20,13 @@ export const offlineOrderMutations = {
     mutationFn: (payload: CreateOfflineOrderPayload) =>
       api.post<ApiOfflineOrderResponse>(
         offlineOrderEndpoints.create,
+        payload,
+      ),
+  },
+  preview: {
+    mutationFn: (payload: CreateOfflineOrderPayload) =>
+      api.post<ApiOfflineOrderPreviewResponse>(
+        offlineOrderEndpoints.preview,
         payload,
       ),
   },

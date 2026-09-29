@@ -14,7 +14,7 @@ import {
 import { useToggleMenuItemAvailability } from "@/features/restaurant/hooks/use-restaurant-mutations"
 import { mapApiMenuItemToMenu } from "@/features/restaurant/utils/menu-item"
 import { getMenuItemBranchAvailability } from "@/features/restaurant/utils/menu-item-branch-availability"
-import type { ApiMenuItemDetail, Menu } from "@/features/restaurant/types"
+import type { ApiMenuItemDetail, Menu, MenuItemModifier } from "@/features/restaurant/types"
 import { toImageSrc } from "@/lib/image-url"
 import { cn } from "@/lib/utils"
 
@@ -344,6 +344,77 @@ function MenuItemDetailsContent({
                       </p>
                     </div>
                   )}
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
+      {Array.isArray(item.modifiers) && item.modifiers.length > 0 && (
+        <section className="space-y-3">
+          <div>
+            <h4 className="text-sm font-semibold text-foreground">
+              Add-ons & Modifiers ({item.modifiers.length})
+            </h4>
+            <p className="text-sm text-muted-foreground">
+              Configured options and add-on groups for this meal.
+            </p>
+          </div>
+
+          <div className="space-y-2.5">
+            {Object.entries(
+              item.modifiers.reduce<Record<string, MenuItemModifier[]>>((acc, mod) => {
+                const group =
+                  mod.group_name?.trim() ||
+                  (mod.type ? mod.type.charAt(0).toUpperCase() + mod.type.slice(1) : "Add-ons");
+                if (!acc[group]) acc[group] = [];
+                acc[group].push(mod);
+                return acc;
+              }, {})
+            ).map(([groupName, mods]) => {
+              const first = mods[0];
+              const isRequired = Boolean(first?.is_required);
+              const minSelect = first?.min_select ?? (isRequired ? 1 : 0);
+              const maxSelect = first?.max_select ?? 1;
+
+              return (
+                <div
+                  key={groupName}
+                  className="rounded-xl border border-border bg-card p-3.5 space-y-2.5"
+                >
+                  <div className="flex items-center justify-between gap-2 border-b border-border/50 pb-2">
+                    <span className="text-sm font-medium text-foreground">
+                      {groupName}
+                    </span>
+                    <div className="flex items-center gap-1.5">
+                      {isRequired ? (
+                        <span className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
+                          Required ({minSelect === maxSelect ? `Select ${minSelect}` : `Select ${minSelect} - ${maxSelect}`})
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
+                          Optional
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {mods.map((mod) => (
+                      <div
+                        key={mod.id ?? mod.name}
+                        className="flex items-center justify-between rounded-lg bg-muted/40 px-3 py-2 text-xs"
+                      >
+                        <span className="font-medium text-foreground">{mod.name}</span>
+                        <span className="text-muted-foreground font-medium">
+                          {Number(mod.price) > 0
+                            ? `+₦${Number(mod.price).toLocaleString()}`
+                            : "Free"}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               );
             })}

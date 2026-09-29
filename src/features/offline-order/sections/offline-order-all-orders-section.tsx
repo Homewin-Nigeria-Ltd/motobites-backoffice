@@ -162,7 +162,7 @@ export function OfflineOrderAllOrdersSection() {
     : "this order"
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-muted p-4 md:p-6">
+    <div className="flex flex-col bg-muted p-4 md:p-6">
       <div
         className="mb-4 flex flex-wrap items-center gap-2"
         role="tablist"
@@ -203,7 +203,6 @@ export function OfflineOrderAllOrdersSection() {
           (activeQuery.isFetching && orders.length === 0)
         }
         emptyMessage={emptyMessage}
-        scrollable
         toolbar={
           <OfflineOrderSearchToolbar
             search={search}

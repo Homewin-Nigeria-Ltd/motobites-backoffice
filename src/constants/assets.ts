@@ -1,6 +1,6 @@
 export const ASSETS = {
   brand: {
-    logo: "/brand/logo.svg",
+    logo: "/brand/logo.jpeg",
   },
   illustrations: {
     point: "/illustrations/point.svg",

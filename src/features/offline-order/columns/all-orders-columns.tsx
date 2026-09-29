@@ -11,6 +11,7 @@ import { formatOfflineOrderAmount } from "@/features/offline-order/utils/order-t
 import {
   getSalesDashboardOrderAssignedTo,
   getSalesDashboardOrderDateLabel,
+  getSalesDashboardOrderDiscount,
   getSalesDashboardOrderItemCount,
   getSalesDashboardOrderReference,
   getSalesDashboardOrderStatusLabel,
@@ -76,11 +77,22 @@ export function createAllOrdersColumns({
     {
       id: "total",
       header: "Total",
-      cell: ({ row }) => (
-        <span className="font-semibold text-foreground">
-          {formatOfflineOrderAmount(getSalesDashboardOrderTotal(row.original))}
-        </span>
-      ),
+      cell: ({ row }) => {
+        const discount = getSalesDashboardOrderDiscount(row.original)
+
+        return (
+          <div>
+            <span className="font-semibold text-foreground">
+              {formatOfflineOrderAmount(getSalesDashboardOrderTotal(row.original))}
+            </span>
+            {discount > 0 ? (
+              <span className="mt-0.5 block text-xs text-muted-foreground">
+                -{formatOfflineOrderAmount(discount)} discount
+              </span>
+            ) : null}
+          </div>
+        )
+      },
     },
     {
       id: "status",

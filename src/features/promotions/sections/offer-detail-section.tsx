@@ -47,7 +47,7 @@ export function OfferDetailSection({ offerId }: OfferDetailSectionProps) {
 
   if (isPending) {
     return (
-      <div className="flex min-h-0 flex-1 items-center justify-center bg-muted p-6">
+      <div className="flex items-center justify-center bg-muted p-6">
         <AppLoader spinnerClassName="size-8" />
       </div>
     )
@@ -55,7 +55,7 @@ export function OfferDetailSection({ offerId }: OfferDetailSectionProps) {
 
   if (isError || !data) {
     return (
-      <div className="flex min-h-0 flex-1 flex-col bg-muted p-4 md:p-6">
+      <div className="flex flex-col bg-muted p-4 md:p-6">
         <div className="rounded-2xl border border-border bg-background p-6 text-sm text-destructive">
           {error instanceof Error
             ? error.message
@@ -69,7 +69,7 @@ export function OfferDetailSection({ offerId }: OfferDetailSectionProps) {
   const isActive = offer.status === "active"
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col gap-6 bg-muted p-4 md:gap-8 md:p-6">
+    <div className="flex flex-col gap-6 bg-muted p-4 md:gap-8 md:p-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="flex items-start gap-3">
           <Button variant="ghost" size="icon-sm" className="mt-0.5 shrink-0" asChild>

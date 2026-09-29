@@ -25,7 +25,8 @@ import {
   createEmptyMenuItemFormValues,
   mapApiMenuItemToFormValues,
   type MenuItemFormValues,
-  type MenuItemModifierFormValue,
+  type MenuItemModifierGroupFormValue,
+  type MenuItemModifierOptionFormValue,
 } from "@/features/restaurant/utils/menu-item-form";
 import type { ApiMenuItemImage, MenuItemVideo } from "@/features/restaurant/types";
 import { TimeStepper } from "@/components/ui/time-stepper";
@@ -33,6 +34,7 @@ import { AppLoader } from "@/components/ui/app-loader";
 import { Icons } from "@/components/ui/icons";
 import { toImageSrc } from "@/lib/image-url";
 import { cn } from "@/lib/utils";
+import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 
 function formatFileSize(bytes: number): string {
@@ -84,14 +86,22 @@ function AddMenuSheetForm({
 
   const isSaving = isCreating || isUpdating;
 
-  const modifierSchema = z.object({
+  const modifierOptionSchema = z.object({
     id: z.string(),
     name: z.string(),
     price: z.string(),
-    type: z.string(),
-    group_name: z.string().optional(),
+    type: z.string().optional(),
     description: z.string().optional(),
-    is_required: z.boolean().optional(),
+  });
+
+  const modifierGroupSchema = z.object({
+    id: z.string(),
+    name: z.string(),
+    type: z.string().default("extra"),
+    is_required: z.boolean().default(false),
+    min_select: z.number().default(0),
+    max_select: z.number().default(1),
+    options: z.array(modifierOptionSchema).default([]),
   });
 
   const formSchema = z
@@ -114,7 +124,7 @@ function AddMenuSheetForm({
       customSchedule: z.any().optional(),
       images: z.array(z.any()).default([]),
       videos: z.array(z.any()).default([]),
-      modifiers: z.array(modifierSchema).default([]),
+      modifier_groups: z.array(modifierGroupSchema).default([]),
     })
     .superRefine((data, ctx) => {
       const hasNewImages = Array.isArray(data.images) && data.images.length > 0;
@@ -170,27 +180,70 @@ function AddMenuSheetForm({
     });
   }
 
-  // Modifiers Management
-  function addModifier() {
-    const id = crypto.randomUUID();
-    const current = (form.getValues("modifiers") as MenuItemModifierFormValue[]) || [];
-    const next: MenuItemModifierFormValue = {
-      id,
+  // Modifier Groups & Options Management
+  function addGroup() {
+    const current = (form.getValues("modifier_groups") as MenuItemModifierGroupFormValue[]) || [];
+    const next: MenuItemModifierGroupFormValue = {
+      id: crypto.randomUUID(),
       name: "",
-      price: "",
       type: "extra",
-      group_name: "Add-ons",
-      description: "",
+      is_required: false,
+      min_select: 0,
+      max_select: 1,
+      options: [
+        {
+          id: crypto.randomUUID(),
+          name: "",
+          price: "0",
+        },
+      ],
     };
-    setValue("modifiers", [...current, next]);
+    setValue("modifier_groups", [...current, next]);
   }
 
-  function removeModifier(id: string) {
-    const current = (form.getValues("modifiers") as MenuItemModifierFormValue[]) || [];
+  function removeGroup(groupId: string) {
+    const current = (form.getValues("modifier_groups") as MenuItemModifierGroupFormValue[]) || [];
     setValue(
-      "modifiers",
-      current.filter((m) => m.id !== id),
+      "modifier_groups",
+      current.filter((g) => g.id !== groupId),
     );
+  }
+
+  function addOptionToGroup(groupId: string) {
+    const current = (form.getValues("modifier_groups") as MenuItemModifierGroupFormValue[]) || [];
+    const next = current.map((g) => {
+      if (g.id === groupId) {
+        const existingOptions = Array.isArray(g.options) ? g.options : [];
+        return {
+          ...g,
+          options: [
+            ...existingOptions,
+            {
+              id: crypto.randomUUID(),
+              name: "",
+              price: "0",
+            },
+          ],
+        };
+      }
+      return g;
+    });
+    setValue("modifier_groups", next);
+  }
+
+  function removeOptionFromGroup(groupId: string, optionId: string) {
+    const current = (form.getValues("modifier_groups") as MenuItemModifierGroupFormValue[]) || [];
+    const next = current.map((g) => {
+      if (g.id === groupId) {
+        const existingOptions = Array.isArray(g.options) ? g.options : [];
+        return {
+          ...g,
+          options: existingOptions.filter((o) => o.id !== optionId),
+        };
+      }
+      return g;
+    });
+    setValue("modifier_groups", next);
   }
 
   // Images Management
@@ -394,15 +447,15 @@ function AddMenuSheetForm({
         />
       </section>
 
-      {/* Modifiers (Add-ons & Options) - Variations section omitted for UX */}
-      <section className="space-y-3 rounded-2xl border border-border bg-muted/20 p-4">
+      {/* Modifiers (Add-on Groups & Options) */}
+      <section className="space-y-4 rounded-2xl border border-border bg-muted/20 p-4">
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-sm font-semibold text-foreground">
-              Modifiers (Add-ons & Options)
+              Add-on Groups & Options
             </h3>
             <p className="text-xs text-muted-foreground">
-              Add-ons or choices customers can select with this meal (e.g. extra protein, toppings, drinks).
+              Create groups (e.g. Choice of Protein, Drinks, Extras), mark if required, and add choices under each group.
             </p>
           </div>
           <Button
@@ -411,21 +464,23 @@ function AddMenuSheetForm({
             size="sm"
             className="text-xs shrink-0"
             icon={{ name: "add", position: "left", size: 14 }}
-            onClick={addModifier}
+            onClick={addGroup}
           >
-            Add Option
+            Add Group
           </Button>
         </div>
 
         <Controller
-          name="modifiers"
+          name="modifier_groups"
           control={control}
-          render={({ field }) => (
-            <div className="space-y-2.5 pt-1">
-              {(field.value || []).length === 0 ? (
+          render={({ field }) => {
+            const groups = field.value || [];
+
+            if (groups.length === 0) {
+              return (
                 <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border p-6 text-center">
                   <p className="text-xs text-muted-foreground">
-                    No add-ons or options added yet.
+                    No add-on groups added yet.
                   </p>
                   <Button
                     type="button"
@@ -433,121 +488,279 @@ function AddMenuSheetForm({
                     size="sm"
                     className="mt-2 text-xs text-primary hover:text-primary"
                     icon={{ name: "add", position: "left", size: 14 }}
-                    onClick={addModifier}
+                    onClick={addGroup}
                   >
-                    Add first modifier
+                    Create first add-on group
                   </Button>
                 </div>
-              ) : (
-                field.value.map((mod: MenuItemModifierFormValue, idx: number) => (
-                  <div
-                    key={mod.id}
-                    className="flex flex-col gap-2.5 rounded-xl border border-border bg-background p-3 sm:flex-row sm:items-center sm:gap-3"
-                  >
-                    <div className="min-w-0 flex-1">
-                      <span className="mb-1 block text-xs font-medium text-muted-foreground">
-                        Option Name
-                      </span>
-                      <Input
-                        value={mod.name}
-                        onChange={(e) => {
-                          const next = [...field.value];
-                          next[idx] = { ...next[idx], name: e.target.value };
-                          field.onChange(next);
-                        }}
-                        placeholder="e.g. Extra Beef / Coleslaw"
-                        className="h-9 text-sm"
-                      />
-                    </div>
+              );
+            }
 
-                    <div className="w-full sm:w-28">
-                      <span className="mb-1 block text-xs font-medium text-muted-foreground">
-                        Price (₦)
-                      </span>
-                      <div className="relative">
-                        <span className="pointer-events-none absolute top-1/2 left-2.5 -translate-y-1/2 text-xs text-muted-foreground">
-                          ₦
-                        </span>
-                        <Input
-                          value={mod.price}
-                          onChange={(e) => {
-                            const next = [...field.value];
-                            next[idx] = { ...next[idx], price: e.target.value };
-                            field.onChange(next);
-                          }}
-                          placeholder="0"
-                          inputMode="decimal"
-                          className="h-9 pl-6 text-sm"
-                        />
+            return (
+              <div className="space-y-4 pt-1">
+                {groups.map((group: MenuItemModifierGroupFormValue, gIdx: number) => (
+                  <div
+                    key={group.id}
+                    className="space-y-3.5 rounded-2xl border border-border bg-card p-4 shadow-2xs"
+                  >
+                    {/* Group Header & Name */}
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between border-b border-border/60 pb-3">
+                      <div className="flex-1 grid grid-cols-1 sm:grid-cols-12 gap-3 items-start">
+                        <div className="sm:col-span-7">
+                          <label className="mb-1 block text-xs font-semibold text-foreground">
+                            Group Name <span className="text-destructive">*</span>
+                          </label>
+                          <Input
+                            value={group.name}
+                            onChange={(e) => {
+                              const next = [...groups];
+                              next[gIdx] = { ...next[gIdx], name: e.target.value };
+                              field.onChange(next);
+                            }}
+                            placeholder="e.g. Choice of Protein, Drink, Extras"
+                            className="h-9 text-sm"
+                          />
+                        </div>
+
+                        <div className="sm:col-span-5">
+                          <label className="mb-1 block text-xs font-medium text-muted-foreground">
+                            Category Type
+                          </label>
+                          <select
+                            value={
+                              ["extra", "protein", "drink", "side", "topping", "sauce"].includes(
+                                group.type?.toLowerCase(),
+                              )
+                                ? group.type.toLowerCase()
+                                : "custom"
+                            }
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              const next = [...groups];
+                              next[gIdx] = {
+                                ...next[gIdx],
+                                type: val === "custom" ? "" : val,
+                              };
+                              field.onChange(next);
+                            }}
+                            className="h-9 w-full rounded-lg border border-input bg-background px-2.5 text-xs text-foreground outline-none focus:ring-1 focus:ring-ring"
+                          >
+                            <option value="extra">Extra</option>
+                            <option value="protein">Protein</option>
+                            <option value="drink">Drink</option>
+                            <option value="side">Side</option>
+                            <option value="topping">Topping</option>
+                            <option value="sauce">Sauce</option>
+                            <option value="custom">Custom...</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-end sm:pt-6">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 px-2 text-xs text-destructive hover:bg-destructive/10 hover:text-destructive gap-1"
+                          onClick={() => removeGroup(group.id)}
+                        >
+                          <Icons.trash size={14} />
+                          <span>Delete Group</span>
+                        </Button>
                       </div>
                     </div>
 
-                    <div className="w-full sm:w-36">
-                      <span className="mb-1 block text-xs font-medium text-muted-foreground">
-                        Type / Category
-                      </span>
-                      <select
-                        value={
-                          ["extra", "protein", "drink", "side", "topping", "sauce"].includes(
-                            mod.type?.toLowerCase(),
-                          )
-                            ? mod.type.toLowerCase()
-                            : "custom"
-                        }
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          const next = [...field.value];
-                          next[idx] = {
-                            ...next[idx],
-                            type: val === "custom" ? "" : val,
-                          };
-                          field.onChange(next);
-                        }}
-                        className="h-9 w-full rounded-lg border border-input bg-background px-2 text-xs text-foreground outline-none focus:ring-1 focus:ring-ring"
-                      >
-                        <option value="extra">Extra</option>
-                        <option value="protein">Protein</option>
-                        <option value="drink">Drink</option>
-                        <option value="side">Side</option>
-                        <option value="topping">Topping</option>
-                        <option value="sauce">Sauce</option>
-                        <option value="custom">Custom / Other...</option>
-                      </select>
-
-                      {!["extra", "protein", "drink", "side", "topping", "sauce"].includes(
-                        mod.type?.toLowerCase(),
-                      ) && (
+                    {!["extra", "protein", "drink", "side", "topping", "sauce"].includes(
+                      group.type?.toLowerCase(),
+                    ) && (
+                      <div className="sm:w-64">
                         <Input
-                          value={mod.type}
+                          value={group.type}
                           onChange={(e) => {
-                            const next = [...field.value];
-                            next[idx] = { ...next[idx], type: e.target.value };
+                            const next = [...groups];
+                            next[gIdx] = { ...next[gIdx], type: e.target.value };
                             field.onChange(next);
                           }}
-                          placeholder="e.g. swallow, soup"
-                          className="mt-1.5 h-8 text-xs"
+                          placeholder="Custom type (e.g. soup, swallow)"
+                          className="h-8 text-xs"
                           autoFocus
                         />
+                      </div>
+                    )}
+
+                    {/* Group Requirement Toggle & Selection Bounds */}
+                    <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-muted/40 p-3 border border-border/40">
+                      <div className="flex items-center gap-2.5">
+                        <Switch
+                          id={`group-req-${group.id}`}
+                          size="sm"
+                          checked={Boolean(group.is_required)}
+                          onCheckedChange={(checked) => {
+                            const next = [...groups];
+                            next[gIdx] = {
+                              ...next[gIdx],
+                              is_required: checked,
+                              min_select: checked ? Math.max(1, next[gIdx].min_select || 1) : 0,
+                              max_select: Math.max(1, next[gIdx].max_select || 1),
+                            };
+                            field.onChange(next);
+                          }}
+                        />
+                        <label
+                          htmlFor={`group-req-${group.id}`}
+                          className="flex cursor-pointer flex-col select-none"
+                        >
+                          <span className="text-xs font-semibold text-foreground">
+                            {group.is_required ? "Required Group" : "Optional Group"}
+                          </span>
+                          <span className="text-[11px] text-muted-foreground">
+                            {group.is_required
+                              ? "Customer MUST pick an option from this group before checkout"
+                              : "Customer can optionally add items or skip this group"}
+                          </span>
+                        </label>
+                      </div>
+
+                      {Boolean(group.is_required) && (
+                        <div className="flex items-center gap-3 text-xs bg-background px-3 py-1.5 rounded-lg border border-border">
+                          <div className="flex items-center gap-1.5 text-muted-foreground">
+                            <span className="text-[11px] font-medium">Min:</span>
+                            <Input
+                              type="number"
+                              min={1}
+                              value={group.min_select ?? 1}
+                              onChange={(e) => {
+                                const val = Math.max(1, parseInt(e.target.value, 10) || 1);
+                                const next = [...groups];
+                                next[gIdx] = { ...next[gIdx], min_select: val };
+                                field.onChange(next);
+                              }}
+                              className="h-7 w-14 px-1 text-center text-xs"
+                            />
+                          </div>
+                          <div className="flex items-center gap-1.5 text-muted-foreground">
+                            <span className="text-[11px] font-medium">Max:</span>
+                            <Input
+                              type="number"
+                              min={1}
+                              value={group.max_select ?? 1}
+                              onChange={(e) => {
+                                const val = Math.max(1, parseInt(e.target.value, 10) || 1);
+                                const next = [...groups];
+                                next[gIdx] = { ...next[gIdx], max_select: val };
+                                field.onChange(next);
+                              }}
+                              className="h-7 w-14 px-1 text-center text-xs"
+                            />
+                          </div>
+                        </div>
                       )}
                     </div>
 
-                    <div className="flex items-end justify-end sm:pt-4">
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon-sm"
-                        className="size-9 bg-destructive/10 text-destructive hover:bg-destructive/20"
-                        aria-label="Remove modifier"
-                        onClick={() => removeModifier(mod.id)}
-                      >
-                        <Icons.trash size={15} />
-                      </Button>
+                    {/* Child Options List under this Group */}
+                    <div className="space-y-2 pt-1">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                          Options in this group ({(group.options || []).length})
+                        </span>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 px-2 text-xs text-primary hover:text-primary gap-1"
+                          icon={{ name: "add", position: "left", size: 12 }}
+                          onClick={() => addOptionToGroup(group.id)}
+                        >
+                          Add Option
+                        </Button>
+                      </div>
+
+                      {(group.options || []).length === 0 ? (
+                        <div className="flex items-center justify-between rounded-lg border border-dashed border-border p-3 text-center">
+                          <p className="text-xs text-muted-foreground">
+                            No options added to this group yet.
+                          </p>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="h-7 text-xs"
+                            onClick={() => addOptionToGroup(group.id)}
+                          >
+                            + Add first option
+                          </Button>
+                        </div>
+                      ) : (
+                        (group.options || []).map((opt, oIdx) => (
+                          <div
+                            key={opt.id}
+                            className="flex items-center gap-2.5 rounded-lg border border-border/80 bg-background p-2.5 shadow-2xs"
+                          >
+                            <div className="flex-1 min-w-0">
+                              <span className="mb-0.5 block text-[10px] font-medium text-muted-foreground">
+                                Option Name
+                              </span>
+                              <Input
+                                value={opt.name}
+                                onChange={(e) => {
+                                  const next = [...groups];
+                                  const currentOptions = Array.isArray(next[gIdx].options) ? next[gIdx].options : [];
+                                  const opts = [...currentOptions];
+                                  opts[oIdx] = { ...opts[oIdx], name: e.target.value };
+                                  next[gIdx] = { ...next[gIdx], options: opts };
+                                  field.onChange(next);
+                                }}
+                                placeholder="Option name (e.g. Chicken, Beef, Coke)"
+                                className="h-8 text-xs"
+                              />
+                            </div>
+
+                            <div className="w-28">
+                              <span className="mb-0.5 block text-[10px] font-medium text-muted-foreground">
+                                Extra Price
+                              </span>
+                              <div className="relative">
+                                <span className="pointer-events-none absolute top-1/2 left-2.5 -translate-y-1/2 text-xs text-muted-foreground">
+                                  ₦
+                                </span>
+                                <Input
+                                  value={opt.price}
+                                  onChange={(e) => {
+                                    const next = [...groups];
+                                    const currentOptions = Array.isArray(next[gIdx].options) ? next[gIdx].options : [];
+                                    const opts = [...currentOptions];
+                                    opts[oIdx] = { ...opts[oIdx], price: e.target.value };
+                                    next[gIdx] = { ...next[gIdx], options: opts };
+                                    field.onChange(next);
+                                  }}
+                                  placeholder="0"
+                                  inputMode="decimal"
+                                  className="h-8 pl-6 text-xs"
+                                />
+                              </div>
+                            </div>
+
+                            <div className="flex items-end pt-3">
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon-sm"
+                                className="size-8 text-destructive hover:bg-destructive/10"
+                                aria-label="Remove option"
+                                onClick={() => removeOptionFromGroup(group.id, opt.id)}
+                              >
+                                <Icons.trash size={13} />
+                              </Button>
+                            </div>
+                          </div>
+                        ))
+                      )}
                     </div>
                   </div>
-                ))
-              )}
-            </div>
-          )}
+                ))}
+              </div>
+            );
+          }}
         />
       </section>
 

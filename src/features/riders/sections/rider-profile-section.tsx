@@ -54,7 +54,7 @@ export function RiderProfileSection({ riderId }: RiderProfileSectionProps) {
   const showReviewActions = canReviewRider(rider)
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col bg-muted p-4 md:p-6">
+    <div className="flex flex-col bg-muted p-4 md:p-6">
       <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex items-center gap-3">
           <Button variant="ghost" size="icon-sm" className="shrink-0" asChild>

@@ -24,6 +24,8 @@ type MenuDetailSectionProps = {
 
 export function MenuDetailSection({ kitchenId }: MenuDetailSectionProps) {
   const [detailsMenuId, setDetailsMenuId] = useState<string | null>(null)
+  const [menuSheetOpen, setMenuSheetOpen] = useState(false)
+  const [editingMenuItemId, setEditingMenuItemId] = useState<string>()
   const { data: kitchen, isPending: isKitchenPending } = useRestaurant(kitchenId)
   const { value: search, setValue: setSearch, debouncedValue } =
     useDebouncedSearch()
@@ -50,7 +52,7 @@ export function MenuDetailSection({ kitchenId }: MenuDetailSectionProps) {
   }
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col bg-muted">
+    <div className="bg-muted">
       <PageHeader
         title="Restaurant Management"
         description="Allow restaurants to update their virtual menus, add new items, or mark certain items as unavailable."
@@ -87,17 +89,16 @@ export function MenuDetailSection({ kitchenId }: MenuDetailSectionProps) {
               />
             </div>
           </div>
-          <AddMenuSheet
-            defaultKitchenId={kitchenId}
-            trigger={
-              <Button
-                className="h-10 px-4"
-                icon={{ name: "add", position: "left" }}
-              >
-                Add New Item
-              </Button>
-            }
-          />
+          <Button
+            className="h-10 px-4"
+            icon={{ name: "add", position: "left" }}
+            onClick={() => {
+              setEditingMenuItemId(undefined)
+              setMenuSheetOpen(true)
+            }}
+          >
+            Add New Item
+          </Button>
         </div>
       </div>
 
@@ -129,6 +130,23 @@ export function MenuDetailSection({ kitchenId }: MenuDetailSectionProps) {
             setDetailsMenuId(null)
           }
         }}
+        onEditItem={(menuId) => {
+          setDetailsMenuId(null)
+          setEditingMenuItemId(menuId)
+          setMenuSheetOpen(true)
+        }}
+      />
+
+      <AddMenuSheet
+        open={menuSheetOpen}
+        onOpenChange={(open) => {
+          setMenuSheetOpen(open)
+          if (!open) {
+            setEditingMenuItemId(undefined)
+          }
+        }}
+        menuItemId={editingMenuItemId}
+        defaultKitchenId={kitchenId}
       />
     </div>
   )

@@ -1,0 +1,136 @@
+"use client"
+
+import type { ColumnDef } from "@tanstack/react-table"
+import Link from "next/link"
+
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Icon } from "@/components/ui/icons"
+import type { ApiSalesDashboardOrder } from "@/features/offline-order/types"
+import { formatOfflineOrderAmount } from "@/features/offline-order/utils/order-totals"
+import {
+  getSalesDashboardOrderAssignedTo,
+  getSalesDashboardOrderDateLabel,
+  getSalesDashboardOrderDiscount,
+  getSalesDashboardOrderItemCount,
+  getSalesDashboardOrderReference,
+  getSalesDashboardOrderStatusLabel,
+  getSalesDashboardOrderTimeLabel,
+  getSalesDashboardOrderTotal,
+} from "@/features/offline-order/utils/sales-dashboard-order"
+
+export function createBulkOrdersColumns(): ColumnDef<ApiSalesDashboardOrder>[] {
+  return [
+    {
+      id: "orderId",
+      header: "Order ID",
+      cell: ({ row }) => (
+        <span className="whitespace-nowrap font-medium text-foreground">
+          #{getSalesDashboardOrderReference(row.original)}
+        </span>
+      ),
+    },
+    {
+      id: "customer",
+      header: "Customer",
+      cell: ({ row }) => (
+        <span className="max-w-[160px] truncate">
+          {row.original.customer_name?.trim() || "Walk-in Customer"}
+        </span>
+      ),
+    },
+    {
+      id: "items",
+      header: "Items",
+      cell: ({ row }) => {
+        const itemCount = getSalesDashboardOrderItemCount(row.original)
+        return (
+          <span>
+            {itemCount} item{itemCount === 1 ? "" : "s"}
+          </span>
+        )
+      },
+    },
+    {
+      id: "total",
+      header: "Total",
+      cell: ({ row }) => {
+        const discount = getSalesDashboardOrderDiscount(row.original)
+
+        return (
+          <div>
+            <span className="font-semibold text-foreground">
+              {formatOfflineOrderAmount(getSalesDashboardOrderTotal(row.original))}
+            </span>
+            {discount > 0 ? (
+              <span className="mt-0.5 block text-xs text-muted-foreground">
+                -{formatOfflineOrderAmount(discount)} discount
+              </span>
+            ) : null}
+          </div>
+        )
+      },
+    },
+    {
+      id: "status",
+      header: "Status",
+      cell: ({ row }) => (
+        <Badge variant="outline">
+          {getSalesDashboardOrderStatusLabel(row.original)}
+        </Badge>
+      ),
+    },
+    {
+      id: "assignedTo",
+      header: "Assigned To",
+      cell: ({ row }) => (
+        <span className="max-w-[140px] truncate">
+          {getSalesDashboardOrderAssignedTo(row.original)}
+        </span>
+      ),
+    },
+    {
+      id: "orderDate",
+      header: () => <span className="block text-right">Order Date</span>,
+      cell: ({ row }) => {
+        const order = row.original
+        const dateLabel = getSalesDashboardOrderDateLabel(order)
+        const timeAgo = order.time_ago?.trim()
+        const primaryLabel =
+          dateLabel ?? timeAgo ?? getSalesDashboardOrderTimeLabel(order)
+
+        return (
+          <div className="block text-right">
+            <span className="text-foreground">{primaryLabel}</span>
+            {dateLabel && timeAgo ? (
+              <span className="mt-0.5 block text-xs text-muted-foreground">
+                {timeAgo}
+              </span>
+            ) : null}
+          </div>
+        )
+      },
+    },
+    {
+      id: "actions",
+      header: () => <span className="block text-right">Actions</span>,
+      cell: ({ row }) => {
+        const orderId = encodeURIComponent(String(row.original.id))
+
+        return (
+          <div className="flex justify-end">
+            <Button asChild variant="outline" size="sm" className="gap-1.5">
+              <Link
+                href={`/offline-order/bulk/success?orderId=${orderId}&print=1&reprint=1`}
+              >
+                <Icon name="fileText" className="size-4" />
+                Reprint
+              </Link>
+            </Button>
+          </div>
+        )
+      },
+      enableHiding: false,
+    },
+  ]
+}

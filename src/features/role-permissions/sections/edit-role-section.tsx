@@ -80,7 +80,7 @@ export function EditRoleSection({ roleId }: EditRoleSectionProps) {
 
   if (isError || !roleDetail) {
     return (
-      <div className="flex min-h-0 flex-1 items-center justify-center bg-muted p-6 text-sm text-destructive">
+      <div className="flex items-center justify-center bg-muted p-6 text-sm text-destructive">
         Role not found.
       </div>
     )
@@ -95,7 +95,7 @@ export function EditRoleSection({ roleId }: EditRoleSectionProps) {
   }
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col bg-muted p-4 md:p-6">
+    <div className="flex flex-col bg-muted p-4 md:p-6">
       <div className="mb-4">
         <BackLink href={`/settings/permissions/${roleId}`} label="role details" />
       </div>

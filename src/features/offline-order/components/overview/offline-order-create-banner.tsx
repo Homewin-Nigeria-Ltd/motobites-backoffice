@@ -13,10 +13,11 @@ export function OfflineOrderCreateBanner() {
           <Icons.add size={24} className="text-white" />
         </div>
         <div className="space-y-1">
-          <h2 className="text-lg font-semibold text-white">Create New Order</h2>
+          <h2 className="text-lg font-semibold text-white">
+            Quick Create Single Order
+          </h2>
           <p className="max-w-2xl text-sm text-white/85">
-            Start a new walk-in order, choose items from the digital menu, and
-            configure tables.
+            Start a normal walk-in order, choose items and collect payment.
           </p>
         </div>
       </div>
@@ -26,7 +27,7 @@ export function OfflineOrderCreateBanner() {
         variant="secondary"
         className="h-11 shrink-0 bg-white text-primary hover:bg-white/90"
       >
-        <Link href="/offline-order/new">Start New Order</Link>
+        <Link href="/offline-order/new">Start Single Order</Link>
       </Button>
     </div>
   )
