@@ -107,6 +107,7 @@ function AddMenuSheetForm({
   const formSchema = z
     .object({
       name: z.string().min(1, "Menu name is required"),
+      categoryName: z.string().optional(),
       price: z
         .string()
         .min(1, "Price is required")
@@ -337,6 +338,29 @@ function AddMenuSheetForm({
                 </Button>
               </div>
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+      </section>
+
+      {/* Menu Category */}
+      <section>
+        <div className="mb-2 flex items-center justify-between gap-2">
+          <Field>
+            <FieldLabel>Category</FieldLabel>
+          </Field>
+          <span className="text-xs text-muted-foreground">Optional</span>
+        </div>
+        <Controller
+          name="categoryName"
+          control={control}
+          render={({ field }) => (
+            <Field>
+              <Input
+                {...field}
+                placeholder="e.g. Drinks, Main Dishes, Sides, Desserts"
+                className="h-11 rounded-xl bg-background"
+              />
             </Field>
           )}
         />

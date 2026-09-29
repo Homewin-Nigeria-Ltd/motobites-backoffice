@@ -34,6 +34,7 @@ export type MenuItemModifierFormValue = MenuItemModifierOptionFormValue & {
 
 export type MenuItemFormValues = {
   name: string;
+  categoryName?: string;
   price: string;
   preparationTimeMinutes: string;
   kitchenId: string;
@@ -80,6 +81,7 @@ export function createEmptyMenuItemFormValues(
 ): MenuItemFormValues {
   return {
     name: "",
+    categoryName: "",
     price: "",
     description: "",
     preparationTimeMinutes: "20",
@@ -138,6 +140,7 @@ export function mapApiMenuItemToFormValues(
 
   return {
     name: item.name ?? "",
+    categoryName: item.category?.name ?? "",
     price: String(item.price ?? ""),
     description: item.description ?? "",
     preparationTimeMinutes: String(item.preparation_time_minutes ?? "20"),
@@ -168,6 +171,9 @@ export function buildMenuItemFormData(
   }
 
   formData.append("name", values.name.trim());
+  if (values.categoryName?.trim()) {
+    formData.append("category_name", values.categoryName.trim());
+  }
   formData.append("price", String(Number.parseFloat(values.price) || 0));
   formData.append("kitchen_id", values.kitchenId);
 

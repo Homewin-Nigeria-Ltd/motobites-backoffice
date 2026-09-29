@@ -93,6 +93,7 @@ export type Restaurant = {
   hubId: string
   menus: Menu[]
   isOpen?: boolean
+  kitchenTypeId?: number | null
 }
 
 export type RestaurantFormValues = {
@@ -102,6 +103,7 @@ export type RestaurantFormValues = {
   openingHours: OpeningHoursRow[]
   isOpen: boolean
   image: File | null
+  kitchenTypeId?: number | null
 }
 
 export type ApiKitchenOpeningHour = {

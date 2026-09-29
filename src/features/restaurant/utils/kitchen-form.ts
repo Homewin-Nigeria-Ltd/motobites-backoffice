@@ -63,6 +63,9 @@ export function buildKitchenFormData(
   formData.append("name", name)
   formData.append("restaurant_name", name)
   formData.append("description", values.description.trim())
+  if (values.kitchenTypeId) {
+    formData.append("kitchen_type_id", String(values.kitchenTypeId))
+  }
   appendTags(formData, values.tags)
   appendOpeningHours(formData, openingHours)
   formData.append("is_open", values.isOpen ? "1" : "0")
@@ -114,6 +117,7 @@ export function mapKitchenToRestaurant(kitchen: ApiKitchen): Restaurant {
     hubId: String(kitchen.id),
     menus: [],
     isOpen: kitchen.is_open,
+    kitchenTypeId: kitchen.kitchen_type_id ?? null,
   }
 }
 
@@ -129,5 +133,6 @@ export function restaurantToFormValues(restaurant: Restaurant): RestaurantFormVa
     openingHours: restaurant.openingHours.map((row) => ({ ...row })),
     isOpen: restaurant.isOpen ?? true,
     image: null,
+    kitchenTypeId: restaurant.kitchenTypeId ?? null,
   }
 }

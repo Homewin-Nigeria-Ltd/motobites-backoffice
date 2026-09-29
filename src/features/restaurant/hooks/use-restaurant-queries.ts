@@ -79,3 +79,18 @@ export function useMenuItemDetail(
 export function useFulfillmentBranches() {
   return useQuery(restaurantQueries.branches())
 }
+
+export function useKitchenTypes() {
+  return useQuery({
+    queryKey: ["restaurant", "kitchen-types"],
+    queryFn: async () => {
+      const res = await fetch("/api/proxy/admin/menu-management/kitchen-types")
+      if (!res.ok) {
+        return []
+      }
+      const json = await res.json()
+      return (json.data ?? []) as Array<{ id: number; name: string; is_active: boolean }>
+    },
+    staleTime: 5 * 60 * 1000,
+  })
+}

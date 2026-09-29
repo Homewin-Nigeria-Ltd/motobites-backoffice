@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import { CustomTagInput } from "@/features/restaurant/components/custom-tag-input";
 import { OpeningHoursEditor } from "@/features/restaurant/components/opening-hours-editor";
-import { useKitchenDetailForEdit } from "@/features/restaurant/hooks/use-restaurant-queries";
+import { useKitchenDetailForEdit, useKitchenTypes } from "@/features/restaurant/hooks/use-restaurant-queries";
 import {
   useCreateKitchen,
   useUpdateKitchen,
@@ -46,6 +46,7 @@ function createEmptyValues(): RestaurantFormValues {
     })),
     isOpen: true,
     image: null,
+    kitchenTypeId: null,
   };
 }
 
@@ -71,6 +72,7 @@ function KitchenForm({
   const schema = z
     .object({
       name: z.string().min(1, "Kitchen name is required"),
+      kitchenTypeId: z.number().nullable().optional(),
       description: z.string().optional(),
       tags: z.array(z.string()).optional(),
       isOpen: z.boolean().optional(),
@@ -103,11 +105,14 @@ function KitchenForm({
   type FormValues = ZodForm & { image?: File | null };
   
 
+  const { data: kitchenTypes } = useKitchenTypes();
+
   const form = useForm<FormValues>({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     resolver: zodResolver(schema as any),
     defaultValues: {
       name: initialValues.name,
+      kitchenTypeId: initialValues.kitchenTypeId ?? null,
       description: initialValues.description,
       tags: initialValues.tags,
       isOpen: initialValues.isOpen,
@@ -126,6 +131,7 @@ function KitchenForm({
     const mergedValues: RestaurantFormValues = {
       ...initialValues,
       ...values,
+      kitchenTypeId: values.kitchenTypeId !== undefined ? values.kitchenTypeId : initialValues.kitchenTypeId,
       tags: values.tags ?? initialValues.tags,
       openingHours,
       image: imageFile ?? initialValues.image,
@@ -167,6 +173,31 @@ function KitchenForm({
                 {fieldState.error?.message}
               </p>
             )}
+          </div>
+        )}
+      />
+
+      <Controller
+        name="kitchenTypeId"
+        control={form.control}
+        render={({ field }) => (
+          <div className="space-y-2">
+            <Label htmlFor="kitchen-type">Kitchen Category</Label>
+            <select
+              id="kitchen-type"
+              value={field.value ?? ""}
+              onChange={(e) =>
+                field.onChange(e.target.value ? Number(e.target.value) : null)
+              }
+              className="h-11 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground shadow-xs outline-none focus:ring-1 focus:ring-ring"
+            >
+              <option value="">Select Category (e.g. Drinks, Fast Food)</option>
+              {kitchenTypes?.map((kt) => (
+                <option key={kt.id} value={kt.id}>
+                  {kt.name}
+                </option>
+              ))}
+            </select>
           </div>
         )}
       />
