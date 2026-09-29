@@ -7,14 +7,29 @@ import type {
 import { getMenuItemImageUrl } from "@/features/restaurant/utils/menu-item";
 import { normalizeTimeForApi } from "@/lib/time-format";
 
-export type MenuItemModifierFormValue = {
+export type MenuItemModifierOptionFormValue = {
   id: string;
   name: string;
   price: string;
-  type: string;
-  group_name?: string;
+  type?: string;
   description?: string;
+};
+
+export type MenuItemModifierGroupFormValue = {
+  id: string;
+  name: string;
+  type: string;
+  is_required: boolean;
+  min_select: number;
+  max_select: number;
+  options: MenuItemModifierOptionFormValue[];
+};
+
+export type MenuItemModifierFormValue = MenuItemModifierOptionFormValue & {
+  group_name?: string;
   is_required?: boolean;
+  min_select?: number;
+  max_select?: number;
 };
 
 export type MenuItemFormValues = {
@@ -30,7 +45,7 @@ export type MenuItemFormValues = {
   customSchedule: MenuAvailabilityRow[];
   images: File[];
   videos: File[];
-  modifiers: MenuItemModifierFormValue[];
+  modifier_groups: MenuItemModifierGroupFormValue[];
 };
 
 function isApiMenuItemTags(tags: unknown): tags is ApiMenuItemTags {
@@ -76,7 +91,7 @@ export function createEmptyMenuItemFormValues(
     customSchedule: defaultMenuAvailability.map((row) => ({ ...row })),
     images: [],
     videos: [],
-    modifiers: [],
+    modifier_groups: [],
   };
 }
 
@@ -86,17 +101,40 @@ export function mapApiMenuItemToFormValues(
   const availabilityType =
     item.availability_type === "custom" ? "custom" : "all-day";
 
-  const modifiers: MenuItemModifierFormValue[] = (item.modifiers ?? []).map(
-    (mod, index) => ({
-      id: mod.id ? String(mod.id) : `mod-${index + 1}`,
+  const groupsMap = new Map<string, MenuItemModifierGroupFormValue>();
+
+  (item.modifiers ?? []).forEach((mod, index) => {
+    const rawGroupName = mod.group_name?.trim();
+    const groupName =
+      rawGroupName ||
+      (mod.type ? mod.type.charAt(0).toUpperCase() + mod.type.slice(1) : "Add-ons");
+
+    if (!groupsMap.has(groupName)) {
+      groupsMap.set(groupName, {
+        id: `group-${groupsMap.size + 1}`,
+        name: groupName,
+        type: mod.type || "extra",
+        is_required: Boolean(mod.is_required),
+        min_select: mod.min_select ?? (mod.is_required ? 1 : 0),
+        max_select: mod.max_select ?? 1,
+        options: [],
+      });
+    }
+
+    const group = groupsMap.get(groupName)!;
+    if (!Array.isArray(group.options)) {
+      group.options = [];
+    }
+    group.options.push({
+      id: mod.id ? String(mod.id) : `opt-${index + 1}`,
       name: mod.name ?? "",
-      price: String(mod.price ?? ""),
-      type: mod.type ?? "extra",
-      group_name: mod.group_name ?? "Add-ons",
+      price: String(mod.price ?? "0"),
+      type: mod.type ?? group.type ?? "extra",
       description: mod.description ?? "",
-      is_required: Boolean(mod.is_required),
-    }),
-  );
+    });
+  });
+
+  const modifier_groups = Array.from(groupsMap.values());
 
   return {
     name: item.name ?? "",
@@ -111,7 +149,7 @@ export function mapApiMenuItemToFormValues(
     customSchedule: defaultMenuAvailability.map((row) => ({ ...row })),
     images: [],
     videos: [],
-    modifiers,
+    modifier_groups,
   };
 }
 
@@ -165,23 +203,57 @@ export function buildMenuItemFormData(
     }
   }
 
-  // Modifiers (Add-ons & Options)
-  if (values.modifiers && values.modifiers.length > 0) {
-    const formattedModifiers = values.modifiers
-      .filter((m) => m.name.trim())
-      .map((m, index) => ({
-        name: m.name.trim(),
-        price: Number.parseFloat(m.price) || 0,
-        type: m.type?.trim() || "extra",
-        description: m.description?.trim() || null,
-        group_name: m.group_name?.trim() || "Add-ons",
-        is_required: Boolean(m.is_required),
-        min_select: 0,
-        max_select: 1,
-        sort_order: index,
-        is_active: true,
-      }));
-    formData.append("modifiers", JSON.stringify(formattedModifiers));
+  // Modifiers (Add-on Groups & Options)
+  if (values.modifier_groups && values.modifier_groups.length > 0) {
+    const formattedModifiers: Array<{
+      name: string;
+      price: number;
+      type: string;
+      description: string | null;
+      group_name: string;
+      is_required: boolean;
+      min_select: number;
+      max_select: number;
+      sort_order: number;
+      is_active: boolean;
+    }> = [];
+
+    let sortOrder = 0;
+
+    values.modifier_groups.forEach((group) => {
+      const groupName = group.name?.trim() || "Add-ons";
+      const isRequired = Boolean(group.is_required);
+      const minSelect = isRequired
+        ? Math.max(1, Number(group.min_select) || 1)
+        : 0;
+      const maxSelect = Math.max(1, Number(group.max_select) || 1);
+      const groupType = group.type?.trim() || "extra";
+
+      (group.options || []).forEach((opt) => {
+        if (!opt.name?.trim()) {
+          return;
+        }
+
+        formattedModifiers.push({
+          name: opt.name.trim(),
+          price: Number.parseFloat(opt.price) || 0,
+          type: opt.type?.trim() || groupType,
+          description: opt.description?.trim() || null,
+          group_name: groupName,
+          is_required: isRequired,
+          min_select: minSelect,
+          max_select: maxSelect,
+          sort_order: sortOrder++,
+          is_active: true,
+        });
+      });
+    });
+
+    if (formattedModifiers.length > 0) {
+      formData.append("modifiers", JSON.stringify(formattedModifiers));
+    } else if (options.isUpdate) {
+      formData.append("modifiers", JSON.stringify([]));
+    }
   } else if (options.isUpdate) {
     formData.append("modifiers", JSON.stringify([]));
   }

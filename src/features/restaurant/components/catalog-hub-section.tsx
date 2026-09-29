@@ -13,9 +13,10 @@ import {
 type CatalogHubSectionProps = {
   hub: Hub
   view: "grid" | "list"
+  onEditItem?: (menuId: string) => void
 }
 
-export function CatalogHubSection({ hub, view }: CatalogHubSectionProps) {
+export function CatalogHubSection({ hub, view, onEditItem }: CatalogHubSectionProps) {
   return (
     <Collapsible defaultOpen className="group/collapsible">
       <div className="flex w-full items-center gap-2 py-1">
@@ -34,13 +35,13 @@ export function CatalogHubSection({ hub, view }: CatalogHubSectionProps) {
         {view === "grid" ? (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {hub.menus.map((menu) => (
-              <MenuCardGrid key={menu.id} menu={menu} hubId={hub.id} />
+              <MenuCardGrid key={menu.id} menu={menu} hubId={hub.id} onEditItem={onEditItem} />
             ))}
           </div>
         ) : (
           <div className="flex flex-col gap-6">
             {hub.menus.map((menu) => (
-              <MenuCardList key={menu.id} menu={menu} hubId={hub.id} />
+              <MenuCardList key={menu.id} menu={menu} hubId={hub.id} onEditItem={onEditItem} />
             ))}
           </div>
         )}

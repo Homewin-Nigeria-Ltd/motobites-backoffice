@@ -13,6 +13,8 @@ import { Input } from "@/components/ui/input"
 
 export function MenuCatalogSection() {
   const [view, setView] = useState<"grid" | "list">("grid")
+  const [menuSheetOpen, setMenuSheetOpen] = useState(false)
+  const [editingMenuItemId, setEditingMenuItemId] = useState<string>()
   const { data: hubs = [], isPending } = useMenuHubs()
 
   return (
@@ -59,16 +61,16 @@ export function MenuCatalogSection() {
                 aria-pressed={view === "grid"}
               />
             </div>
-            <AddMenuSheet
-              trigger={
-                <Button
-                  className="h-10 px-4"
-                  icon={{ name: "add", position: "left" }}
-                >
-                  Add New Item
-                </Button>
-              }
-            />
+            <Button
+              className="h-10 px-4"
+              icon={{ name: "add", position: "left" }}
+              onClick={() => {
+                setEditingMenuItemId(undefined)
+                setMenuSheetOpen(true)
+              }}
+            >
+              Add New Item
+            </Button>
           </div>
         </div>
       </div>
@@ -83,7 +85,15 @@ export function MenuCatalogSection() {
             </div>
           ) : (
             hubs.map((hub) => (
-              <CatalogHubSection key={hub.id} hub={hub} view={view} />
+              <CatalogHubSection
+                key={hub.id}
+                hub={hub}
+                view={view}
+                onEditItem={(menuId) => {
+                  setEditingMenuItemId(menuId)
+                  setMenuSheetOpen(true)
+                }}
+              />
             ))
           )}
         </div>
@@ -92,6 +102,17 @@ export function MenuCatalogSection() {
           <PaginationControls page={1} totalPages={6} />
         </div>
       </div>
+
+      <AddMenuSheet
+        open={menuSheetOpen}
+        onOpenChange={(open) => {
+          setMenuSheetOpen(open)
+          if (!open) {
+            setEditingMenuItemId(undefined)
+          }
+        }}
+        menuItemId={editingMenuItemId}
+      />
     </div>
   )
 }
