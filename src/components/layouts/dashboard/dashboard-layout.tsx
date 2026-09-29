@@ -9,6 +9,7 @@ import { ScrollToTop } from "@/components/layouts/dashboard/scroll-to-top"
 import { BranchProvider } from "@/context/branch-context"
 import type { NavItem, SupportItem } from "@/config/sidebar"
 import type { AuthUser } from "@/features/auth"
+import { useAdminNotificationsRealtime } from "@/features/notification"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 
 export function DashboardLayout({
@@ -30,6 +31,8 @@ export function DashboardLayout({
     kitchenSegment != null && kitchenSegment !== "branches"
   const shouldShowHeader = showDashboardHeader ?? !isMenuDetailPage
   const scrollContainerRef = useRef<HTMLDivElement>(null)
+
+  useAdminNotificationsRealtime()
 
   return (
     <BranchProvider>
