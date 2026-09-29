@@ -12,6 +12,12 @@ type NotificationCategoryConfig = {
 }
 
 const CATEGORY_CONFIG: Record<string, NotificationCategoryConfig> = {
+  payments: {
+    label: "PAYMENTS",
+    actionLabel: "View Payment",
+    href: ORDER_PAGE,
+    accent: "primary",
+  },
   order_management: {
     label: "ORDER MANAGEMENT",
     actionLabel: "Open Order",
@@ -217,8 +223,8 @@ function resolveCategoryKey({
   message: string
   target: string
 }) {
-  if (isPaymentSuccessfulNotification(metadata, message)) {
-    return "order_management"
+  if (isPaymentSuccessfulNotification(metadata, message) || category === "payments") {
+    return "payments"
   }
 
   if (isMenuManagementNotification(category, metadata, message, target)) {
@@ -298,8 +304,9 @@ export function getNotificationDisplay(
   if (config) {
     const isReassignment = isReassignmentNotification(item.metadata)
     const actionLabel =
-      categoryKey === "order_management" && isReassignment
-        ? item.action.label
+      (categoryKey === "order_management" && isReassignment) ||
+      categoryKey === "payments"
+        ? item.action.label || config.actionLabel
         : config.actionLabel
 
     let href = resolveHref(
@@ -309,7 +316,7 @@ export function getNotificationDisplay(
       config.href,
     )
 
-    if (categoryKey === "order_management") {
+    if (categoryKey === "order_management" || categoryKey === "payments") {
       const orderId = getOrderIdFromNotification(
         item.metadata,
         item.action.target,
