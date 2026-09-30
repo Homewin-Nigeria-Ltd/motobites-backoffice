@@ -6,6 +6,8 @@ import Image from "next/image"
 import { OrderAssigneeDialog } from "@/features/order/components/order-assignee-dialog"
 import { OrderAssigneeField } from "@/features/order/components/order-assignee-field"
 import { OrderReceiptModal } from "@/features/order/components/order-receipt-modal"
+import { OrderRejectionDetails } from "@/features/order/components/order-rejection-details"
+import { OrderReviewActions } from "@/features/order/components/order-review-actions"
 import {
   useBroadcastRider,
   useExtendPrepTime,
@@ -20,6 +22,7 @@ import {
   formatOrderReviewRemark,
   formatOrderReviewText,
 } from "@/features/order/utils/order-detail"
+import { canReviewOrder } from "@/features/order/utils/order-rejection"
 import { formatOrderStatusKey } from "@/features/order/utils/order-status"
 import { BaseModal } from "@/components/ui/base-modal"
 import { Badge } from "@/components/ui/badge"
@@ -224,6 +227,19 @@ export function OrderDetailsModal({
             </div>
           </div>
         </div>
+
+        {canReviewOrder(order) ? (
+          <div className={detailField}>
+            <Label className={detailLabel}>Accept / Decline Order</Label>
+            <OrderReviewActions
+              orderId={orderId}
+              onAccepted={() => onOpenChange(false)}
+              onRejected={() => onOpenChange(false)}
+            />
+          </div>
+        ) : null}
+
+        <OrderRejectionDetails order={order} />
 
         <div className={detailGrid2}>
           <div className={detailField}>

@@ -1,4 +1,4 @@
-import { api } from "@/lib/api/client"
+import { api, request } from "@/lib/api/client"
 import type { OrderAssigneeType, OrderDetailApiResponse } from "../types"
 import { orderEndpoints } from "./endpoints"
 
@@ -19,6 +19,15 @@ export type ExtendPrepTimeInput = {
 
 export type BroadcastRiderInput = {
   orderId: string
+}
+
+export type AcceptOrderInput = {
+  orderId: string
+}
+
+export type RejectOrderInput = {
+  orderId: string
+  reason: string
 }
 
 function getAssignEndpoint(orderId: string, type: OrderAssigneeType) {
@@ -67,5 +76,19 @@ export const orderMutations = {
         orderEndpoints.broadcastRider(orderId),
         {}
       ),
+  },
+
+  accept: {
+    mutationFn: ({ orderId }: AcceptOrderInput) =>
+      request<OrderDetailApiResponse>(orderEndpoints.accept(orderId), {
+        method: "PATCH",
+      }),
+  },
+
+  reject: {
+    mutationFn: ({ orderId, reason }: RejectOrderInput) =>
+      api.patch<OrderDetailApiResponse>(orderEndpoints.reject(orderId), {
+        reason,
+      }),
   },
 } as const

@@ -16,6 +16,7 @@ const emptyTabCounts: Record<OrderTab, number> = {
   processing: 0,
   transit: 0,
   completed: 0,
+  rejected: 0,
   performance: 0,
 }
 
@@ -72,6 +73,7 @@ export function useOrderTabCounts(fulfillment_branch_id?: number | null) {
         processing: query.data.processing,
         transit: query.data.transit,
         completed: query.data.completed,
+        rejected: query.data.rejected ?? 0,
         performance: 0,
       }
     : emptyTabCounts

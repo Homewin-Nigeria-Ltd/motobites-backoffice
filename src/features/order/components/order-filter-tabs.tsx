@@ -13,6 +13,7 @@ const tabLabels: Record<OrderTab, string> = {
   processing: "Processing Orders",
   transit: "Transit Orders",
   completed: "Completed Orders",
+  rejected: "Rejected Orders",
   performance: "Performance",
 }
 

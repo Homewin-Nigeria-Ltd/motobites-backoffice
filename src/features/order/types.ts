@@ -3,6 +3,7 @@ export const orderTabs = [
   "processing",
   "transit",
   "completed",
+  "rejected",
   "performance",
 ] as const
 
@@ -19,6 +20,20 @@ export type ApiOrderFulfillmentBranch = {
   name: string
   address?: string | null
 } | null
+
+export type ApiOrderRejectedBy =
+  | string
+  | {
+      id?: number
+      name?: string
+    }
+  | null
+
+export type ApiOrderRejection = {
+  reason: string
+  rejected_at: string
+  rejected_by?: ApiOrderRejectedBy
+}
 
 export type ApiOrder = {
   id: string
@@ -38,6 +53,10 @@ export type ApiOrder = {
   fulfillment_branch?: ApiOrderFulfillmentBranch
   map: unknown
   created_at: string
+  rejection_reason?: string | null
+  rejected_at?: string | null
+  rejected_by?: ApiOrderRejectedBy
+  rejection?: ApiOrderRejection | null
 }
 
 export type ApiOrderGroup = {
@@ -51,6 +70,7 @@ export type ApiOrderTabCounts = {
   processing: number
   transit: number
   completed: number
+  rejected?: number
 }
 
 export type OrderTabCountsApiResponse = {
@@ -176,6 +196,10 @@ export type ApiOrderDetailData = {
   }
   fulfillment_branch?: ApiOrderFulfillmentBranch
   created_at: string
+  rejection_reason?: string | null
+  rejected_at?: string | null
+  rejected_by?: ApiOrderRejectedBy
+  rejection?: ApiOrderRejection | null
 }
 
 export type OrderDetailApiResponse = {
