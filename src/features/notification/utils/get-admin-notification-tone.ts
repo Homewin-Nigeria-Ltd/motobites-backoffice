@@ -4,23 +4,16 @@ import {
 } from "../constants"
 
 export function getAdminNotificationTone(category?: string | null) {
-  const key = category?.trim().toLowerCase().replace(/-/g, "_") ?? ""
-
-  if (key === "incoming_orders" || key === "incoming_order") {
-    return ADMIN_NOTIFICATION_TONES.tone1
+  switch (category) {
+    case "new_order":
+      return ADMIN_NOTIFICATION_TONES.tone1
+    case "order_ready":
+      return ADMIN_NOTIFICATION_TONES.tone2
+    case "delivery_pickup":
+      return ADMIN_NOTIFICATION_TONES.tone3
+    case "late_order":
+      return ADMIN_NOTIFICATION_TONES.tone4
+    default:
+      return ADMIN_NOTIFICATION_SOUND_SRC
   }
-
-  if (key === "ready") {
-    return ADMIN_NOTIFICATION_TONES.tone2
-  }
-
-  if (key === "pickup" || key === "pick_up") {
-    return ADMIN_NOTIFICATION_TONES.tone3
-  }
-
-  if (key === "late_order") {
-    return ADMIN_NOTIFICATION_TONES.tone4
-  }
-
-  return ADMIN_NOTIFICATION_SOUND_SRC
 }
