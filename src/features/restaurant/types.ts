@@ -316,6 +316,7 @@ export type ApiMenuItem = {
   is_customer_available: boolean
   unavailable_today: boolean
   is_popular: boolean
+  is_combo?: boolean
   availability_type: string
   availability_start?: string | null
   availability_end?: string | null
