@@ -125,6 +125,7 @@ function AddMenuSheetForm({
       images: z.array(z.any()).default([]),
       videos: z.array(z.any()).default([]),
       modifier_groups: z.array(modifierGroupSchema).default([]),
+      is_combo: z.boolean().default(false),
     })
     .superRefine((data, ctx) => {
       const hasNewImages = Array.isArray(data.images) && data.images.length > 0;
@@ -443,6 +444,25 @@ function AddMenuSheetForm({
               />
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
+          )}
+        />
+      </section>
+
+      <section>
+        <Controller
+          name="is_combo"
+          control={control}
+          render={({ field }) => (
+            <div className="flex items-center justify-between rounded-lg border border-border px-4 py-3">
+              <FieldLabel htmlFor="is_combo" className="cursor-pointer">
+                Combo item
+              </FieldLabel>
+              <Switch
+                id="is_combo"
+                checked={Boolean(field.value)}
+                onCheckedChange={field.onChange}
+              />
+            </div>
           )}
         />
       </section>
