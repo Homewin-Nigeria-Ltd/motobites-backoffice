@@ -26,7 +26,7 @@ export function IncomingOrderAlertModal({
           key={alert.id}
           className="absolute w-full max-w-lg overflow-hidden rounded-2xl border border-border bg-popover shadow-xl"
           style={{
-            zIndex: index + 1,
+            zIndex: alerts.length - index,
             transform: `translate(${index * 14}px, ${index * 14}px)`,
           }}
         >
