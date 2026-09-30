@@ -5,6 +5,10 @@ export const orderEndpoints = {
     `/api/proxy/admin/order-management/orders/${orderId}`,
   updateStatus: (orderId: string) =>
     `/api/proxy/admin/order-management/orders/${orderId}/status`,
+  accept: (orderId: string) =>
+    `/api/proxy/admin/order-management/orders/${orderId}/accept`,
+  reject: (orderId: string) =>
+    `/api/proxy/admin/order-management/orders/${orderId}/reject`,
   assignees: "/api/proxy/admin/order-management/assignees",
   assignChef: (orderId: string) =>
     `/api/proxy/admin/order-management/orders/${orderId}/assign-chef`,

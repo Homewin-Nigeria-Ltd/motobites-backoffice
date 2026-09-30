@@ -2,6 +2,7 @@
 
 import Image from "next/image"
 
+import { OrderRejectionDetails } from "@/features/order/components/order-rejection-details"
 import type { ApiOrder } from "@/features/order/types"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -67,6 +68,7 @@ export function OrderCard({ order, onViewDetails }: OrderCardProps) {
         >
           {order.display_status}
         </Badge>
+        <OrderRejectionDetails order={order} />
       </CardContent>
       <CardFooter className="pt-4 pb-5">
         <Button
