@@ -66,6 +66,12 @@ function addField(
   }
 }
 
+export function getNotificationCategory(event: unknown) {
+  return walk(event)
+    .map((node) => asString(node.category))
+    .find(Boolean)
+}
+
 export function getIncomingOrderAlert(event: unknown): IncomingOrderAlert | null {
   const nodes = walk(event)
   const orderId = nodes

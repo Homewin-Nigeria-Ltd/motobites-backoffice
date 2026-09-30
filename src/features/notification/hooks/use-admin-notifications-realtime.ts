@@ -12,9 +12,10 @@ import {
 } from "../constants"
 import {
   getIncomingOrderAlert,
+  getNotificationCategory,
   type IncomingOrderAlert,
 } from "../utils/incoming-order-alert"
-import { playNotificationSound } from "../utils/play-notification-sound"
+import { playNotificationSoundForCategory } from "../utils/play-notification-sound"
 
 export function useAdminNotificationsRealtime(enabled = true) {
   const queryClient = useQueryClient()
@@ -33,7 +34,7 @@ export function useAdminNotificationsRealtime(enabled = true) {
     const channel = echo.private(ADMIN_NOTIFICATIONS_CHANNEL)
 
     const handleCreated = (event: unknown) => {
-      playNotificationSound()
+      playNotificationSoundForCategory(getNotificationCategory(event))
       void queryClient.invalidateQueries({ queryKey: notificationKeys.all })
 
       const alert = getIncomingOrderAlert(event)
