@@ -120,3 +120,63 @@ export function useBroadcastRider() {
     isPending: mutation.isPending,
   }
 }
+
+export function useAcceptOrder() {
+  const queryClient = useQueryClient()
+
+  const mutation = useMutation({
+    ...orderMutations.accept,
+    onSuccess: (response, { orderId }) => {
+      if (response.data) {
+        queryClient.setQueryData(orderKeys.detail(orderId), response.data)
+      }
+
+      queryClient.invalidateQueries({ queryKey: orderKeys.all })
+      toast.success(response.message ?? "Order accepted")
+    },
+    onError: (error) => {
+      const message =
+        error instanceof ApiError
+          ? error.message
+          : "Failed to accept order. Please try again."
+      toast.error(message)
+    },
+  })
+
+  return {
+    acceptOrder: mutation.mutate,
+    acceptOrderAsync: mutation.mutateAsync,
+    isPending: mutation.isPending,
+    pendingOrderId: mutation.isPending ? mutation.variables?.orderId : null,
+  }
+}
+
+export function useRejectOrder() {
+  const queryClient = useQueryClient()
+
+  const mutation = useMutation({
+    ...orderMutations.reject,
+    onSuccess: (response, { orderId }) => {
+      if (response.data) {
+        queryClient.setQueryData(orderKeys.detail(orderId), response.data)
+      }
+
+      queryClient.invalidateQueries({ queryKey: orderKeys.all })
+      toast.success(response.message ?? "Order rejected")
+    },
+    onError: (error) => {
+      const message =
+        error instanceof ApiError
+          ? error.message
+          : "Failed to reject order. Please try again."
+      toast.error(message)
+    },
+  })
+
+  return {
+    rejectOrder: mutation.mutate,
+    rejectOrderAsync: mutation.mutateAsync,
+    isPending: mutation.isPending,
+    pendingOrderId: mutation.isPending ? mutation.variables?.orderId : null,
+  }
+}
