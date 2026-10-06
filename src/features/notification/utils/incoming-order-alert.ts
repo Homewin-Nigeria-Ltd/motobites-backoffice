@@ -1,5 +1,12 @@
 import { formatKoboAmount } from "@/features/order/utils/currency"
 
+export type IncomingOrderAlertItem = {
+  id: string
+  name: string
+  image: string | null
+  quantity: number
+}
+
 export type IncomingOrderAlert = {
   id: string
   orderId: string
@@ -7,6 +14,7 @@ export type IncomingOrderAlert = {
   message?: string
   canReview: boolean
   fields: { label: string; value: string }[]
+  items: IncomingOrderAlertItem[]
 }
 
 function asRecord(value: unknown): Record<string, unknown> | null {
@@ -66,6 +74,41 @@ function addField(
   }
 }
 
+function parseAlertItem(
+  value: unknown,
+  fallbackId: string,
+): IncomingOrderAlertItem | null {
+  const record = asRecord(value)
+  if (!record) {
+    return null
+  }
+
+  const name = asString(record.name)
+  if (!name) {
+    return null
+  }
+
+  const quantity = Number(record.quantity)
+
+  return {
+    id: asString(record.id) ?? fallbackId,
+    name,
+    image: asString(record.image),
+    quantity: Number.isFinite(quantity) && quantity > 0 ? quantity : 1,
+  }
+}
+
+function getAlertItems(metadata: Record<string, unknown>): IncomingOrderAlertItem[] {
+  if (Array.isArray(metadata.items) && metadata.items.length > 0) {
+    return metadata.items
+      .map((item, index) => parseAlertItem(item, `item-${index + 1}`))
+      .filter((item): item is IncomingOrderAlertItem => item != null)
+  }
+
+  const menuItem = parseAlertItem(metadata.menu_item, "menu-item")
+  return menuItem ? [menuItem] : []
+}
+
 export function getNotificationCategory(event: unknown) {
   return walk(event)
     .map((node) => asString(node.category))
@@ -120,5 +163,6 @@ export function getIncomingOrderAlert(event: unknown): IncomingOrderAlert | null
     message: asString(notification.message) ?? undefined,
     canReview: !status || status === "pending",
     fields,
+    items: getAlertItems(metadata),
   }
 }
