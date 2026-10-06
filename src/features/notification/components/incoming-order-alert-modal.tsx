@@ -1,14 +1,62 @@
 "use client"
 
+import Image from "next/image"
+
 import type { IncomingOrderAlert } from "@/features/notification/utils/incoming-order-alert"
 import { OrderReviewActions } from "@/features/order/components/order-review-actions"
+import { useOrderDetail } from "@/features/order/hooks/use-order-queries"
 import { Button } from "@/components/ui/button"
 import { Icons } from "@/components/ui/icons"
 import { Label } from "@/components/ui/label"
+import { toImageSrc } from "@/lib/image-url"
 
 type IncomingOrderAlertModalProps = {
   alerts: IncomingOrderAlert[]
   onDismiss: (id: string) => void
+}
+
+function IncomingOrderItems({ orderId }: { orderId: string }) {
+  const { data: order } = useOrderDetail(orderId, true)
+
+  if (!order) {
+    return null
+  }
+
+  const items =
+    order.items?.length > 0
+      ? order.items
+      : [
+          {
+            id: order.id,
+            name: order.item.name,
+            quantity: 1,
+            image: order.item.image,
+          },
+        ]
+
+  return (
+    <div className="space-y-2">
+      {items.map((item) => (
+        <div key={item.id} className="flex items-center gap-3">
+          <div className="relative size-12 shrink-0 overflow-hidden rounded-lg bg-muted">
+            <Image
+              src={toImageSrc(item.image)}
+              alt={item.name}
+              fill
+              className="object-cover"
+              sizes="48px"
+            />
+          </div>
+          <div className="min-w-0">
+            <p className="truncate text-sm font-medium text-foreground">
+              {item.name}
+            </p>
+            <p className="text-xs text-muted-foreground">Qty {item.quantity}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  )
 }
 
 export function IncomingOrderAlertModal({
@@ -43,12 +91,13 @@ export function IncomingOrderAlertModal({
               <Icons.close size={16} />
             </Button>
           </div>
-          <div className="space-y-2 px-4 py-3">
+          <div className="space-y-3 px-4 py-3">
             {alert.message ? (
               <p className="text-sm leading-snug text-muted-foreground">
                 {alert.message}
               </p>
             ) : null}
+            <IncomingOrderItems orderId={alert.orderId} />
             <div className="grid grid-cols-2 gap-x-4 gap-y-2">
               {alert.fields.map((field) => (
                 <div key={field.label} className="min-w-0 space-y-0.5">
