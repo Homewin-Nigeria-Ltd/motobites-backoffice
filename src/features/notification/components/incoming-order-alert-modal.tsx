@@ -5,6 +5,7 @@ import { OrderReviewActions } from "@/features/order/components/order-review-act
 import { Button } from "@/components/ui/button"
 import { Icons } from "@/components/ui/icons"
 import { Label } from "@/components/ui/label"
+import { toImageSrc } from "@/lib/image-url"
 
 type IncomingOrderAlertModalProps = {
   alerts: IncomingOrderAlert[]
@@ -43,11 +44,34 @@ export function IncomingOrderAlertModal({
               <Icons.close size={16} />
             </Button>
           </div>
-          <div className="space-y-2 px-4 py-3">
+          <div className="space-y-3 px-4 py-3">
             {alert.message ? (
               <p className="text-sm leading-snug text-muted-foreground">
                 {alert.message}
               </p>
+            ) : null}
+            {alert.items.length > 0 ? (
+              <div className="space-y-2">
+                {alert.items.map((item) => (
+                  <div key={item.id} className="flex items-center gap-3">
+                    <div className="size-12 shrink-0 overflow-hidden rounded-lg bg-muted">
+                      <img
+                        src={toImageSrc(item.image)}
+                        alt={item.name}
+                        className="size-full object-cover"
+                      />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-medium text-foreground">
+                        {item.name}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Qty {item.quantity}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
             ) : null}
             <div className="grid grid-cols-2 gap-x-4 gap-y-2">
               {alert.fields.map((field) => (
