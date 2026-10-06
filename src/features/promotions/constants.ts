@@ -63,6 +63,13 @@ export const offerDetailOptions = [
     discountType: "percentage",
     discountValue: 30,
   },
+  {
+    value: "percentage:100",
+    label: "100% off",
+    detailsLabel: "100% of",
+    discountType: "percentage",
+    discountValue: 100,
+  },
 ] as const
 
 export type OfferDetailValue = (typeof offerDetailOptions)[number]["value"]
