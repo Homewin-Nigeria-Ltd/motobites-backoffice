@@ -337,7 +337,7 @@ export function OfflineOrderPaymentSection() {
             </h2>
             <div className="space-y-2">
               <Label htmlFor="offline-order-delivery-charge">
-                Delivery fee (optional)
+                Delivery fee
               </Label>
               <Input
                 id="offline-order-delivery-charge"

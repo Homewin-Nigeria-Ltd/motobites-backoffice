@@ -382,7 +382,7 @@ export function BulkOrderPaymentSection() {
             </h2>
             <div className="space-y-2">
               <Label htmlFor="bulk-order-delivery-charge">
-                Delivery fee (optional)
+                Delivery fee
               </Label>
               <Input
                 id="bulk-order-delivery-charge"
