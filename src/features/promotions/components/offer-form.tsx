@@ -7,6 +7,7 @@ import { Controller, useForm, useWatch } from "react-hook-form"
 
 import {
   offerDetailOptions,
+  offerDiscountModeOptions,
   offerRestrictionOptions,
   PROMOTIONS_ROUTES,
 } from "@/features/promotions/constants"
@@ -77,6 +78,7 @@ export function OfferForm(props: OfferFormProps) {
   })
 
   const restriction = useWatch({ control: form.control, name: "restriction" })
+  const discountMode = useWatch({ control: form.control, name: "discountMode" })
   const startDate = useWatch({ control: form.control, name: "startDate" })
 
   const onSubmit = form.handleSubmit((values) => {
@@ -144,35 +146,93 @@ export function OfferForm(props: OfferFormProps) {
         )}
       />
 
+      <Controller
+        control={form.control}
+        name="discountMode"
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel>Discount Type</FieldLabel>
+            <RadioGroup
+              value={field.value}
+              onValueChange={field.onChange}
+              disabled={isPending}
+              className="flex flex-wrap gap-6"
+            >
+              {offerDiscountModeOptions.map((option) => (
+                <div key={option.value} className="flex items-center gap-3">
+                  <RadioGroupItem
+                    value={option.value}
+                    id={`offer-discount-mode-${option.value}`}
+                  />
+                  <Label
+                    htmlFor={`offer-discount-mode-${option.value}`}
+                    className="cursor-pointer text-sm font-medium text-foreground"
+                  >
+                    {option.label}
+                  </Label>
+                </div>
+              ))}
+            </RadioGroup>
+            {fieldState.error ? (
+              <FieldError>{fieldState.error.message}</FieldError>
+            ) : null}
+          </Field>
+        )}
+      />
+
       <div className="grid gap-4 md:grid-cols-3">
-        <Controller
-          control={form.control}
-          name="details"
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel>Details</FieldLabel>
-              <Select
-                value={field.value}
-                onValueChange={field.onChange}
-                disabled={isPending}
-              >
-                <SelectTrigger className={selectTriggerClassName}>
-                  <SelectValue placeholder="Select details" />
-                </SelectTrigger>
-                <SelectContent>
-                  {offerDetailOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {fieldState.error ? (
-                <FieldError>{fieldState.error.message}</FieldError>
-              ) : null}
-            </Field>
-          )}
-        />
+        {discountMode === "flat" ? (
+          <Controller
+            control={form.control}
+            name="flatAmount"
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel>Amount</FieldLabel>
+                <Input
+                  {...field}
+                  type="number"
+                  min="1"
+                  step="1"
+                  placeholder="e.g. 500"
+                  disabled={isPending}
+                  className="h-11"
+                />
+                {fieldState.error ? (
+                  <FieldError>{fieldState.error.message}</FieldError>
+                ) : null}
+              </Field>
+            )}
+          />
+        ) : (
+          <Controller
+            control={form.control}
+            name="details"
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel>Details</FieldLabel>
+                <Select
+                  value={field.value}
+                  onValueChange={field.onChange}
+                  disabled={isPending}
+                >
+                  <SelectTrigger className={selectTriggerClassName}>
+                    <SelectValue placeholder="Select details" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {offerDetailOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {fieldState.error ? (
+                  <FieldError>{fieldState.error.message}</FieldError>
+                ) : null}
+              </Field>
+            )}
+          />
+        )}
 
         <Controller
           control={form.control}

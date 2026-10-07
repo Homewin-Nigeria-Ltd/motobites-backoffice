@@ -28,6 +28,7 @@ const defaultCheckout: OfflineOrderCheckoutDraft = {
   branchName: "",
   managerVerificationNotes: "",
   promoCode: "",
+  deliveryCharge: "",
 }
 
 export function useOfflineOrderCheckout() {
@@ -42,6 +43,7 @@ export function useOfflineOrderCheckout() {
     ...storedCheckout,
     paymentMethod: normalizePaymentMethodFromApi(storedCheckout.paymentMethod),
     orderSource: normalizeOrderSourceFromApi(storedCheckout.orderSource),
+    deliveryCharge: storedCheckout.deliveryCharge ?? "",
   }
 
   const updateCheckout = useCallback(
@@ -99,6 +101,11 @@ export function useOfflineOrderCheckout() {
     [updateCheckout],
   )
 
+  const setDeliveryCharge = useCallback(
+    (deliveryCharge: string) => updateCheckout({ deliveryCharge }),
+    [updateCheckout],
+  )
+
   const resetCheckout = useCallback(() => {
     setStoredCheckout(defaultCheckout)
   }, [setStoredCheckout])
@@ -113,6 +120,7 @@ export function useOfflineOrderCheckout() {
     setBranch,
     setManagerVerificationNotes,
     setPromoCode,
+    setDeliveryCharge,
     resetCheckout,
   }
 }
