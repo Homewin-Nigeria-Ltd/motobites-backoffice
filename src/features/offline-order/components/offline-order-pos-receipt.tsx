@@ -153,6 +153,11 @@ export function OfflineOrderPosReceipt({
               valueNoWrap
             />
           ) : null}
+          <ReceiptRow
+            label="Delivery Fee"
+            value={formatPosAmount(receipt.deliveryCharge ?? 0)}
+            valueNoWrap
+          />
         </div>
 
         <div className="my-3 border-t border-double border-black" />

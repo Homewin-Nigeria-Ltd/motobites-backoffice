@@ -1,17 +1,66 @@
 // import { WALK_IN_SERVICE_FEE } from "../constants"
 
-export function calculateOfflineOrderTotals(subtotal: number) {
+export function parseOfflineOrderAmountInput(value?: string | number | null) {
+  const amount = typeof value === "number" ? value : Number(value)
+
+  if (!Number.isFinite(amount) || amount <= 0) {
+    return 0
+  }
+
+  return amount
+}
+
+export function calculateOfflineOrderTotals(
+  subtotal: number,
+  deliveryCharge = 0,
+) {
   // Service charge is paused for now.
   // const serviceFee = WALK_IN_SERVICE_FEE
   const serviceFee = 0
-  const total = subtotal + serviceFee
+  const total = subtotal + serviceFee + deliveryCharge
 
-  return { subtotal, serviceFee, total }
+  return { subtotal, serviceFee, deliveryCharge, total }
 }
 
 export function formatOfflineOrderAmount(amount?: number | null) {
   const value = amount ?? 0
   return `₦${value.toLocaleString()}`
+}
+
+function coerceOfflineOrderAmount(value: unknown): number | null {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return value
+  }
+
+  if (typeof value === "string" && value.trim()) {
+    const amount = Number(value)
+
+    if (Number.isFinite(amount)) {
+      return amount
+    }
+  }
+
+  return null
+}
+
+export function resolveOfflineOrderDeliveryCharge(order: {
+  delivery_fee?: number | string | null
+  delivery_charge?: number | string | null
+  delivery_amount?: number | string | null
+  delivery_fee_kobo?: number | string | null
+  delivery_charge_kobo?: number | string | null
+  delivery_amount_kobo?: number | string | null
+}) {
+  return resolveOfflineOrderAmount(
+    coerceOfflineOrderAmount(
+      order.delivery_fee ?? order.delivery_charge ?? order.delivery_amount,
+    ),
+    coerceOfflineOrderAmount(
+      order.delivery_fee_kobo ??
+        order.delivery_charge_kobo ??
+        order.delivery_amount_kobo,
+    ),
+  )
 }
 
 export function mapOfflineOrderPreviewTotals(

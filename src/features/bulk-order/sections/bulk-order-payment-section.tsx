@@ -17,7 +17,11 @@ import { OfflineOrderEmptyState } from "@/features/offline-order/components/offl
 import { OfflineOrderPaymentMethodCards } from "@/features/offline-order/components/offline-order-payment-method-cards"
 import { OfflineOrderPreviewCard } from "@/features/offline-order/components/offline-order-preview-card"
 import { OfflineOrderStaffField } from "@/features/offline-order/components/offline-order-staff-field"
-import { mapSalesDashboardOrderToReceipt } from "@/features/offline-order/utils/map-offline-order-receipt"
+import {
+  applyReceiptDeliveryFallback,
+  mapSalesDashboardOrderToReceipt,
+} from "@/features/offline-order/utils/map-offline-order-receipt"
+import { parseOfflineOrderAmountInput } from "@/features/offline-order/utils/order-totals"
 import { ApiError } from "@/lib/api/client"
 import { toast } from "@/lib/toast"
 
@@ -61,6 +65,7 @@ export function BulkOrderPaymentSection() {
     setTakenBy,
     setBranch,
     setPromoCode,
+    setDeliveryCharge,
     resetCheckout,
   } = useBulkOrderCheckout()
   const { savedOrderCount } = useSavedBulkOrders()
@@ -77,10 +82,11 @@ export function BulkOrderPaymentSection() {
     serviceFee: number
     total: number
   } | null>(null)
+  const deliveryCharge = parseOfflineOrderAmountInput(checkout.deliveryCharge)
   const previewTotals = previewOrder.data?.data
     ? mapBulkOrderPreviewTotals(previewOrder.data.data, subtotal)
     : null
-  const totals = appliedPromo ??
+  const baseTotals = appliedPromo ??
     previewTotals ?? {
       subtotal,
       discount: 0,
@@ -88,6 +94,13 @@ export function BulkOrderPaymentSection() {
       serviceFee: 0,
       total: subtotal,
     }
+  const totals = {
+    ...baseTotals,
+    total: Math.max(
+      0,
+      baseTotals.subtotal - baseTotals.discount + baseTotals.serviceFee + deliveryCharge,
+    ),
+  }
 
   useEffect(() => {
     if (!user || checkout.takenById) {
@@ -175,10 +188,14 @@ export function BulkOrderPaymentSection() {
       })
 
       const receipt = placedReceipt.orderId
-        ? mapSalesDashboardOrderToReceipt(
-            await queryClient.fetchQuery(
-              bulkOrderQueries.order(placedReceipt.orderId),
+        ? applyReceiptDeliveryFallback(
+            mapSalesDashboardOrderToReceipt(
+              await queryClient.fetchQuery(
+                bulkOrderQueries.order(placedReceipt.orderId),
+              ),
+              checkout,
             ),
+            placedReceipt.deliveryCharge,
           )
         : placedReceipt
 
@@ -358,6 +375,27 @@ export function BulkOrderPaymentSection() {
               </div>
             </div>
           </section>
+
+          <section className="space-y-3 rounded-2xl border border-border bg-background p-5">
+            <h2 className="text-base font-semibold text-foreground">
+              Delivery Fee
+            </h2>
+            <div className="space-y-2">
+              <Label htmlFor="bulk-order-delivery-charge">
+                Delivery fee (optional)
+              </Label>
+              <Input
+                id="bulk-order-delivery-charge"
+                type="number"
+                min="0"
+                step="1"
+                value={checkout.deliveryCharge}
+                onChange={(event) => setDeliveryCharge(event.target.value)}
+                placeholder="0"
+                className="h-10"
+              />
+            </div>
+          </section>
         </div>
 
         <div className="space-y-4 lg:sticky lg:top-6 lg:self-start">
@@ -371,6 +409,7 @@ export function BulkOrderPaymentSection() {
             discountPercentage={
               appliedPromo?.discountPercentage ?? totals.discountPercentage
             }
+            deliveryCharge={deliveryCharge}
           />
 
           <div className="space-y-3">

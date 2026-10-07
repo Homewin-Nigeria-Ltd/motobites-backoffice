@@ -1,4 +1,5 @@
 import type { OfflineOrderCheckoutDraft } from "@/features/offline-order/types"
+import { parseOfflineOrderAmountInput } from "@/features/offline-order/utils/order-totals"
 
 import type {
   BulkOrderAllocationRole,
@@ -196,6 +197,7 @@ export function buildBulkOrderPayload(
   const notes = checkout.managerVerificationNotes.trim()
   const promoCode = checkout.promoCode?.trim() ?? ""
   const branchId = checkout.branchId ? Number(checkout.branchId) : undefined
+  const deliveryCharge = parseOfflineOrderAmountInput(checkout.deliveryCharge)
 
   return {
     items: buildGroupedItems(items),
@@ -209,6 +211,7 @@ export function buildBulkOrderPayload(
       : {}),
     ...(notes ? { notes } : {}),
     ...(promoCode ? { promo_code: promoCode, coupon_code: promoCode } : {}),
+    ...(deliveryCharge > 0 ? { delivery_amount: deliveryCharge } : {}),
   }
 }
 

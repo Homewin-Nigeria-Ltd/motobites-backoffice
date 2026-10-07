@@ -5,6 +5,7 @@ import type {
   CreateOfflineOrderPayload,
   SaveOfflineOrderPayload,
 } from "../types"
+import { parseOfflineOrderAmountInput } from "./order-totals"
 
 function buildOrderItemPayload(
   item: OfflineOrderCartItem,
@@ -41,6 +42,7 @@ export function buildOfflineOrderPayload(
   const notes = checkout.managerVerificationNotes.trim()
   const promoCode = checkout.promoCode?.trim() ?? ""
   const branchId = checkout.branchId ? Number(checkout.branchId) : undefined
+  const deliveryCharge = parseOfflineOrderAmountInput(checkout.deliveryCharge)
 
   return {
     items: items.map(buildOrderItemPayload),
@@ -51,6 +53,7 @@ export function buildOfflineOrderPayload(
     ...(branchId ? { fulfillment_branch_id: branchId, branch_id: branchId } : {}),
     ...(notes ? { notes } : {}),
     ...(promoCode ? { promo_code: promoCode, coupon_code: promoCode } : {}),
+    ...(deliveryCharge > 0 ? { delivery_amount: deliveryCharge } : {}),
   }
 }
 
