@@ -27,6 +27,26 @@ export const offerRestrictionOptions = [
 export type OfferRestriction =
   (typeof offerRestrictionOptions)[number]["value"]
 
+export const offerDiscountModeOptions = [
+  { value: "percentage", label: "Percentage" },
+  { value: "flat", label: "Flat rate" },
+] as const
+
+export type OfferDiscountMode =
+  (typeof offerDiscountModeOptions)[number]["value"]
+
+export function isFlatDiscountType(discountType?: string | null) {
+  return (
+    discountType === "flat_amount" ||
+    discountType === "flat" ||
+    discountType === "fixed"
+  )
+}
+
+export function formatFlatOfferDetails(amount: number) {
+  return `₦${amount.toLocaleString()} off`
+}
+
 export const offerDetailOptions = [
   {
     value: "percentage:10",

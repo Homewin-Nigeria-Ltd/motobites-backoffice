@@ -14,7 +14,9 @@ import { normalizePaymentMethodFromApi } from "./order-checkout"
 import {
   calculateOfflineOrderTotals,
   generateOfflineOrderNumber,
+  parseOfflineOrderAmountInput,
   resolveOfflineOrderAmount,
+  resolveOfflineOrderDeliveryCharge,
 } from "./order-totals"
 
 type MapOfflineOrderReceiptInput = {
@@ -54,8 +56,23 @@ function resolvePaymentMethod(order: ApiSalesDashboardOrder) {
   return normalizePaymentMethodFromApi(method)
 }
 
+export function applyReceiptDeliveryFallback(
+  receipt: OfflineOrderReceipt,
+  fallbackDeliveryCharge = 0,
+): OfflineOrderReceipt {
+  if (receipt.deliveryCharge > 0 || fallbackDeliveryCharge <= 0) {
+    return receipt
+  }
+
+  return {
+    ...receipt,
+    deliveryCharge: fallbackDeliveryCharge,
+  }
+}
+
 export function mapSalesDashboardOrderToReceipt(
   order: ApiSalesDashboardOrder,
+  checkout?: Pick<OfflineOrderCheckoutDraft, "deliveryCharge"> | null,
 ): OfflineOrderReceipt {
   const items = mapSalesDashboardOrderItemsToCart(order)
   const subtotal =
@@ -66,6 +83,9 @@ export function mapSalesDashboardOrderToReceipt(
   //   resolveOfflineOrderAmount(order.service_fee, order.service_fee_kobo) ||
   //   calculateOfflineOrderTotals(subtotal).serviceFee
   const serviceFee = 0
+  const deliveryCharge =
+    resolveOfflineOrderDeliveryCharge(order) ||
+    parseOfflineOrderAmountInput(checkout?.deliveryCharge)
   const discount =
     resolveOfflineOrderAmount(null, order.discount_kobo) ||
     resolveOfflineOrderAmount(order.discount ?? order.discount_amount, null)
@@ -77,7 +97,7 @@ export function mapSalesDashboardOrderToReceipt(
   const total =
     resolveOfflineOrderAmount(null, order.total_kobo) ||
     resolveOfflineOrderAmount(order.total, null) ||
-    subtotal
+    Math.max(0, subtotal - discount + deliveryCharge)
 
   return {
     orderId: resolveOrderId(order),
@@ -90,6 +110,7 @@ export function mapSalesDashboardOrderToReceipt(
     branchName: order.fulfillment_branch?.name ?? null,
     subtotal,
     serviceFee,
+    deliveryCharge,
     discount,
     discountPercentage,
     total,
@@ -118,6 +139,9 @@ export function mapOfflineOrderReceipt({
   // Service charge is paused for now.
   // const serviceFee = apiOrder.service_fee ?? localTotals.serviceFee
   const serviceFee = 0
+  const deliveryCharge =
+    resolveOfflineOrderDeliveryCharge(apiOrder) ||
+    parseOfflineOrderAmountInput(checkout.deliveryCharge)
   const discount =
     resolveOfflineOrderAmount(null, apiOrder.discount_kobo) ||
     resolveOfflineOrderAmount(
@@ -132,7 +156,7 @@ export function mapOfflineOrderReceipt({
   const total =
     resolveOfflineOrderAmount(null, apiOrder.total_kobo) ||
     resolveOfflineOrderAmount(apiOrder.total ?? apiOrder.total_amount, null) ||
-    subtotal
+    Math.max(0, subtotal - discount + deliveryCharge)
 
   return {
     orderId: resolveOrderId(apiOrder),
@@ -155,6 +179,7 @@ export function mapOfflineOrderReceipt({
     branchName: checkout.branchName || null,
     subtotal,
     serviceFee,
+    deliveryCharge,
     discount,
     discountPercentage,
     total,

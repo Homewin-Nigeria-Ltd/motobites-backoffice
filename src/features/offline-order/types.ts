@@ -199,6 +199,11 @@ export type ApiSalesDashboardOrder = {
   subtotal_kobo?: number
   service_fee?: number
   service_fee_kobo?: number
+  delivery_amount?: number
+  delivery_fee?: number
+  delivery_charge?: number
+  delivery_fee_kobo?: number
+  delivery_charge_kobo?: number
   total?: number
   total_kobo?: number
   total_amount?: number
@@ -622,6 +627,7 @@ export type CreateOfflineOrderPayload = {
   notes?: string
   promo_code?: string
   coupon_code?: string
+  delivery_amount?: number
 }
 
 export type SaveOfflineOrderPayload = {
@@ -635,6 +641,7 @@ export type SaveOfflineOrderPayload = {
   notes?: string
   promo_code?: string
   coupon_code?: string
+  delivery_amount?: number
 }
 
 export type ApiOfflineOrder = {
@@ -648,6 +655,10 @@ export type ApiOfflineOrder = {
   subtotal?: number
   subtotal_kobo?: number
   service_fee?: number
+  delivery_amount?: number
+  delivery_fee?: number
+  delivery_charge?: number
+  delivery_fee_kobo?: number
   total?: number
   total_kobo?: number
   total_amount?: number
@@ -673,6 +684,10 @@ export type ApiOfflineOrderPreview = {
   discount_percentage?: number
   service_fee?: number
   service_fee_kobo?: number
+  delivery_amount?: number
+  delivery_fee?: number
+  delivery_charge?: number
+  delivery_fee_kobo?: number
   total?: number
   total_kobo?: number
   total_amount?: number
@@ -720,6 +735,7 @@ export type OfflineOrderCheckoutDraft = {
   branchName?: string | null
   managerVerificationNotes: string
   promoCode: string
+  deliveryCharge: string
 }
 
 export type OfflineOrderSavedOrder = {
@@ -744,6 +760,7 @@ export type OfflineOrderReceipt = {
   branchName?: string | null
   subtotal: number
   serviceFee: number
+  deliveryCharge: number
   discount: number
   discountPercentage?: number
   total: number

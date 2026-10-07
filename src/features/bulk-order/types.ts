@@ -99,6 +99,7 @@ export type CreateBulkOrderPayload = {
   notes?: string
   promo_code?: string
   coupon_code?: string
+  delivery_amount?: number
 }
 
 export type SaveBulkOrderPayload = CreateBulkOrderPayload
@@ -124,6 +125,10 @@ export type ApiBulkOrderPreview = {
   discount_percentage?: number
   service_fee?: number
   service_fee_kobo?: number
+  delivery_amount?: number
+  delivery_fee?: number
+  delivery_charge?: number
+  delivery_fee_kobo?: number
   tax?: number
   tax_kobo?: number
   service_tax?: number

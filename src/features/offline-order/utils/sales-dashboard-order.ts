@@ -13,7 +13,10 @@ import {
   normalizeOrderSourceFromApi,
   normalizePaymentMethodFromApi,
 } from "./order-checkout"
-import { resolveOfflineOrderAmount } from "./order-totals"
+import {
+  resolveOfflineOrderAmount,
+  resolveOfflineOrderDeliveryCharge,
+} from "./order-totals"
 
 export function getSalesDashboardOrderStatus(order: ApiSalesDashboardOrder) {
   return (order.status ?? order.display_status ?? "").toLowerCase()
@@ -338,6 +341,10 @@ export function mapSalesDashboardOrderToCheckout(
     takenByName: getSalesDashboardOrderAssignedTo(order),
     managerVerificationNotes: "",
     promoCode: order.promo_code?.trim() || order.coupon_code?.trim() || "",
+    deliveryCharge: (() => {
+      const amount = resolveOfflineOrderDeliveryCharge(order)
+      return amount > 0 ? String(amount) : ""
+    })(),
   }
 }
 

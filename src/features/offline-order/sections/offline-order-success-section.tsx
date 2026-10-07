@@ -19,6 +19,7 @@ import {
   canUserViewReceiptReprintCount,
   getSalesDashboardOrderReceiptReprintCount,
 } from "@/features/offline-order/utils/receipt-reprint"
+import { applyReceiptDeliveryFallback } from "@/features/offline-order/utils/map-offline-order-receipt"
 import { isCompletedSalesDashboardOrder } from "@/features/offline-order/utils/sales-dashboard-order"
 
 export function OfflineOrderSuccessSection() {
@@ -37,7 +38,12 @@ export function OfflineOrderSuccessSection() {
     isError,
   } = useOfflineOrderReceiptDetail(orderId)
   const { mutate: recordReceiptReprint } = useRecordReceiptReprint()
-  const receipt = fetchedReceipt ?? storedReceipt
+  const receipt = fetchedReceipt
+    ? applyReceiptDeliveryFallback(
+        fetchedReceipt,
+        storedReceipt?.deliveryCharge,
+      )
+    : storedReceipt
   const hasAutoPrintedRef = useRef(false)
   const showReprintCount =
     order != null &&

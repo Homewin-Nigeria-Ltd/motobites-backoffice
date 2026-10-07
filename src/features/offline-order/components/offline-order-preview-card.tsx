@@ -20,6 +20,7 @@ type OfflineOrderPreviewCardProps = {
   promoCode?: string
   discount?: number
   discountPercentage?: number
+  deliveryCharge?: number
 }
 
 export function OfflineOrderPreviewCard({
@@ -30,6 +31,7 @@ export function OfflineOrderPreviewCard({
   promoCode,
   discount = 0,
   discountPercentage = 0,
+  deliveryCharge = 0,
 }: OfflineOrderPreviewCardProps) {
   return (
     <Card className="gap-0 overflow-hidden py-0">
@@ -94,6 +96,12 @@ export function OfflineOrderPreviewCard({
                 {discountPercentage > 0 ? ` (${discountPercentage}%)` : ""}
               </span>
               <span>-{formatOfflineOrderAmount(discount)}</span>
+            </div>
+          ) : null}
+          {deliveryCharge > 0 ? (
+            <div className="flex items-center justify-between">
+              <span className="text-muted-foreground">Delivery Fee</span>
+              <span>{formatOfflineOrderAmount(deliveryCharge)}</span>
             </div>
           ) : null}
           {/* Service charge is paused for now.

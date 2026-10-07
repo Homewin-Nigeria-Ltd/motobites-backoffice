@@ -28,10 +28,14 @@ import {
   useOfflineOrderReceipt,
 } from "@/features/offline-order/hooks/use-offline-order-storage"
 import { buildOfflineOrderPayload } from "@/features/offline-order/utils/build-offline-order-payload"
-import { mapSalesDashboardOrderToReceipt } from "@/features/offline-order/utils/map-offline-order-receipt"
+import {
+  applyReceiptDeliveryFallback,
+  mapSalesDashboardOrderToReceipt,
+} from "@/features/offline-order/utils/map-offline-order-receipt"
 import {
   calculateOfflineOrderTotals,
   mapOfflineOrderPreviewTotals,
+  parseOfflineOrderAmountInput,
 } from "@/features/offline-order/utils/order-totals"
 import { ApiError } from "@/lib/api/client"
 import { toast } from "@/lib/toast"
@@ -52,6 +56,7 @@ export function OfflineOrderPaymentSection() {
     setTakenBy,
     setBranch,
     setPromoCode,
+    setDeliveryCharge,
     resetCheckout,
   } = useOfflineOrderCheckout()
   const { savedOrderCount } = useSalesDashboardSavedOrders()
@@ -68,8 +73,18 @@ export function OfflineOrderPaymentSection() {
     serviceFee: number
     total: number
   } | null>(null)
-  const cartTotals = calculateOfflineOrderTotals(subtotal)
-  const totals = appliedPromo ?? cartTotals
+  const deliveryCharge = parseOfflineOrderAmountInput(checkout.deliveryCharge)
+  const cartTotals = calculateOfflineOrderTotals(subtotal, deliveryCharge)
+  const totals = appliedPromo
+    ? {
+        ...appliedPromo,
+        deliveryCharge,
+        total: Math.max(
+          0,
+          appliedPromo.subtotal - appliedPromo.discount + deliveryCharge,
+        ),
+      }
+    : cartTotals
 
   useEffect(() => {
     if (!user || checkout.takenById) {
@@ -132,10 +147,14 @@ export function OfflineOrderPaymentSection() {
       })
 
       const receipt = placedReceipt.orderId
-        ? mapSalesDashboardOrderToReceipt(
-            await queryClient.fetchQuery(
-              offlineOrderQueries.order(placedReceipt.orderId),
+        ? applyReceiptDeliveryFallback(
+            mapSalesDashboardOrderToReceipt(
+              await queryClient.fetchQuery(
+                offlineOrderQueries.order(placedReceipt.orderId),
+              ),
+              checkout,
             ),
+            placedReceipt.deliveryCharge,
           )
         : placedReceipt
 
@@ -311,6 +330,27 @@ export function OfflineOrderPaymentSection() {
               </div>
             </div>
           </section>
+
+          <section className="space-y-3 rounded-2xl border border-border bg-background p-5">
+            <h2 className="text-base font-semibold text-foreground">
+              Delivery Fee
+            </h2>
+            <div className="space-y-2">
+              <Label htmlFor="offline-order-delivery-charge">
+                Delivery fee
+              </Label>
+              <Input
+                id="offline-order-delivery-charge"
+                type="number"
+                min="0"
+                step="1"
+                value={checkout.deliveryCharge}
+                onChange={(event) => setDeliveryCharge(event.target.value)}
+                placeholder="0"
+                className="h-10"
+              />
+            </div>
+          </section>
         </div>
 
         <div className="space-y-4 lg:sticky lg:top-6 lg:self-start">
@@ -322,6 +362,7 @@ export function OfflineOrderPaymentSection() {
             promoCode={appliedPromo?.code}
             discount={appliedPromo?.discount}
             discountPercentage={appliedPromo?.discountPercentage}
+            deliveryCharge={deliveryCharge}
           />
 
           <div className="space-y-3">

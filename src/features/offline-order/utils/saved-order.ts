@@ -1,8 +1,12 @@
 import type {
   OfflineOrderCartItem,
+  OfflineOrderCheckoutDraft,
   OfflineOrderSavedOrder,
 } from "../types"
-import { calculateOfflineOrderTotals } from "./order-totals"
+import {
+  calculateOfflineOrderTotals,
+  parseOfflineOrderAmountInput,
+} from "./order-totals"
 
 export function getSavedOrderItemCount(items: OfflineOrderCartItem[]) {
   return items.reduce((sum, item) => sum + item.quantity, 0)
@@ -12,8 +16,14 @@ export function getSavedOrderSubtotal(items: OfflineOrderCartItem[]) {
   return items.reduce((sum, item) => sum + item.price * item.quantity, 0)
 }
 
-export function getSavedOrderTotal(items: OfflineOrderCartItem[]) {
-  return calculateOfflineOrderTotals(getSavedOrderSubtotal(items)).total
+export function getSavedOrderTotal(
+  items: OfflineOrderCartItem[],
+  checkout?: OfflineOrderCheckoutDraft,
+) {
+  return calculateOfflineOrderTotals(
+    getSavedOrderSubtotal(items),
+    parseOfflineOrderAmountInput(checkout?.deliveryCharge),
+  ).total
 }
 
 export function getSavedOrderCustomerName(order: OfflineOrderSavedOrder) {
@@ -74,7 +84,9 @@ export function sortSavedOrders(
   switch (sort) {
     case "total_amount":
       return next.sort(
-        (a, b) => getSavedOrderTotal(b.items) - getSavedOrderTotal(a.items),
+        (a, b) =>
+          getSavedOrderTotal(b.items, b.checkout) -
+          getSavedOrderTotal(a.items, a.checkout),
       )
     case "customer":
       return next.sort((a, b) =>

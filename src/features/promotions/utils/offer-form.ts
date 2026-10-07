@@ -1,5 +1,6 @@
 import {
   getOfferDetailOptionByDiscount,
+  isFlatDiscountType,
   offerRestrictionOptions,
 } from "../constants"
 import type { CreateOfferFormValues } from "../schemas/create-offer.schema"
@@ -16,10 +17,10 @@ function resolveOfferDescription(offer: ApiOffer) {
 }
 
 export function mapApiOfferToFormValues(offer: ApiOffer): CreateOfferFormValues {
-  const detailOption = getOfferDetailOptionByDiscount(
-    offer.discount_type,
-    offer.discount_value
-  )
+  const isFlat = isFlatDiscountType(offer.discount_type)
+  const detailOption = isFlat
+    ? undefined
+    : getOfferDetailOptionByDiscount(offer.discount_type, offer.discount_value)
   const restriction = offerRestrictionOptions.some(
     (option) => option.value === offer.restriction
   )
@@ -31,7 +32,12 @@ export function mapApiOfferToFormValues(offer: ApiOffer): CreateOfferFormValues 
   return {
     promotionName: offer.promotion_name || offer.name || offer.title,
     promotionDescription: resolveOfferDescription(offer),
+    discountMode: isFlat ? "flat" : "percentage",
     details: detailOption?.value ?? "percentage:20",
+    flatAmount:
+      isFlat && offer.discount_value != null
+        ? String(offer.discount_value / 100)
+        : "",
     startDate: offer.start_date || offer.promo_start,
     endDate: offer.end_date || offer.promo_end,
     promoCode: offer.promo_code || offer.promotion_code || offer.code,

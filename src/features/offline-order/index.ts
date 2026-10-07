@@ -117,6 +117,7 @@ export {
   buildSaveOfflineOrderPayload,
 } from "./utils/build-offline-order-payload"
 export {
+  applyReceiptDeliveryFallback,
   mapOfflineOrderReceipt,
   mapSalesDashboardOrderToReceipt,
 } from "./utils/map-offline-order-receipt"

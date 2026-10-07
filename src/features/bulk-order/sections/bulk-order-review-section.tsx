@@ -28,6 +28,7 @@ const emptyCheckout: OfflineOrderCheckoutDraft = {
   branchName: "",
   managerVerificationNotes: "",
   promoCode: "",
+  deliveryCharge: "",
 }
 
 export function BulkOrderReviewSection() {

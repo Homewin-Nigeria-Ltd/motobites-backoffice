@@ -9,7 +9,10 @@ import { Button } from "@/components/ui/button"
 import { Icons } from "@/components/ui/icons"
 import { OfflineOrderBackButton } from "@/features/offline-order/components/offline-order-back-button"
 import { OfflineOrderPosReceipt } from "@/features/offline-order/components/offline-order-pos-receipt"
-import { mapSalesDashboardOrderToReceipt } from "@/features/offline-order/utils/map-offline-order-receipt"
+import {
+  applyReceiptDeliveryFallback,
+  mapSalesDashboardOrderToReceipt,
+} from "@/features/offline-order/utils/map-offline-order-receipt"
 import { getSalesDashboardOrderReference } from "@/features/offline-order/utils/sales-dashboard-order"
 
 import { useBulkOrder } from "../hooks/use-bulk-order-queries"
@@ -23,7 +26,12 @@ export function BulkOrderSuccessSection() {
   const { receipt: storedReceipt, clearReceipt } = useBulkOrderReceipt()
   const { data: order, isLoading, isError } = useBulkOrder(orderId)
   const fetchedReceipt = order ? mapSalesDashboardOrderToReceipt(order) : null
-  const receipt = fetchedReceipt ?? storedReceipt
+  const receipt = fetchedReceipt
+    ? applyReceiptDeliveryFallback(
+        fetchedReceipt,
+        storedReceipt?.deliveryCharge,
+      )
+    : storedReceipt
   const hasAutoPrintedRef = useRef(false)
   const orderNumber =
     receipt?.orderNumber ??
