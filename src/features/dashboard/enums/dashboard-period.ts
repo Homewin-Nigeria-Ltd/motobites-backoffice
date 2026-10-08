@@ -3,6 +3,7 @@ export enum DashboardPeriod {
   Week = "week",
   ThreeMonths = "3months",
   Year = "year",
+  AllTime = "all_time",
 }
 
 export const DASHBOARD_PERIOD_OPTIONS: {
@@ -13,4 +14,5 @@ export const DASHBOARD_PERIOD_OPTIONS: {
   { value: DashboardPeriod.Week, label: "Last weeks" },
   { value: DashboardPeriod.ThreeMonths, label: "Last 3 months" },
   { value: DashboardPeriod.Year, label: "Last year" },
+  { value: DashboardPeriod.AllTime, label: "All time" },
 ]
