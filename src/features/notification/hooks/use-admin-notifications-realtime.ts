@@ -15,7 +15,11 @@ import {
   getNotificationCategory,
   type IncomingOrderAlert,
 } from "../utils/incoming-order-alert"
-import { playNotificationSoundForCategory } from "../utils/play-notification-sound"
+import {
+  playNotificationSoundForCategory,
+  startIncomingOrderSoundLoop,
+  stopIncomingOrderSoundLoop,
+} from "../utils/play-notification-sound"
 
 export function useAdminNotificationsRealtime(enabled = true) {
   const queryClient = useQueryClient()
@@ -34,21 +38,26 @@ export function useAdminNotificationsRealtime(enabled = true) {
     const channel = echo.private(ADMIN_NOTIFICATIONS_CHANNEL)
 
     const handleCreated = (event: unknown) => {
-      playNotificationSoundForCategory(getNotificationCategory(event))
       void queryClient.invalidateQueries({ queryKey: notificationKeys.all })
 
       const alert = getIncomingOrderAlert(event)
-      if (!alert) {
+      if (alert) {
+        setIncoming((current) => {
+          if (current.some((item) => item.id === alert.id || item.orderId === alert.orderId)) {
+            return current
+          }
+
+          return [...current, alert]
+        })
+
+        if (!alert.canReview) {
+          playNotificationSoundForCategory(getNotificationCategory(event))
+        }
+
         return
       }
 
-      setIncoming((current) => {
-        if (current.some((item) => item.id === alert.id || item.orderId === alert.orderId)) {
-          return current
-        }
-
-        return [...current, alert]
-      })
+      playNotificationSoundForCategory(getNotificationCategory(event))
     }
 
     channel.listen(ADMIN_NOTIFICATION_CREATED_EVENT, handleCreated)
@@ -58,6 +67,21 @@ export function useAdminNotificationsRealtime(enabled = true) {
       echo.leave(ADMIN_NOTIFICATIONS_CHANNEL)
     }
   }, [enabled, queryClient])
+
+  useEffect(() => {
+    if (incoming.some((alert) => alert.canReview)) {
+      startIncomingOrderSoundLoop()
+      return
+    }
+
+    stopIncomingOrderSoundLoop()
+  }, [incoming])
+
+  useEffect(() => {
+    return () => {
+      stopIncomingOrderSoundLoop()
+    }
+  }, [])
 
   return {
     incoming,

@@ -64,6 +64,7 @@ function mapPeriodToInterval(period: DashboardPeriod): TrendInterval {
     case DashboardPeriod.ThreeMonths:
       return "weekly"
     case DashboardPeriod.Year:
+    case DashboardPeriod.AllTime:
       return "monthly"
   }
 }
