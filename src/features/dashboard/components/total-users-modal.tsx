@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import Link from "next/link"
 import { useQuery } from "@tanstack/react-query"
 import {
   LineChart,
@@ -21,14 +22,7 @@ import { DashboardPeriod } from "../enums"
 import { dashboardQueries } from "../api/queries"
 import { formatCompactCount, formatDashboardCount } from "../utils/format"
 import { cn } from "@/lib/utils"
-import {
-  User,
-  TrendingDown,
-  TrendingUp,
-  AlertCircle,
-  RefreshCw,
-  X,
-} from "lucide-react"
+import { Icons } from "@/components/ui/icons"
 import type { TotalUsersCardData } from "../types"
 
 type TotalUsersModalProps = {
@@ -77,18 +71,14 @@ export function TotalUsersModal({
   dateRange,
   fulfillmentBranchId,
 }: TotalUsersModalProps) {
-  const [selectedPeriod, setSelectedPeriod] =
-    React.useState<DashboardPeriod>(currentPeriod)
-  const [selectedInterval, setSelectedInterval] = React.useState<TrendInterval>(
-    () => mapPeriodToInterval(currentPeriod)
-  )
+  const [internalPeriod, setInternalPeriod] =
+    React.useState<DashboardPeriod | null>(null)
+  const [internalInterval, setInternalInterval] =
+    React.useState<TrendInterval | null>(null)
 
-  React.useEffect(() => {
-    if (open) {
-      setSelectedPeriod(currentPeriod)
-      setSelectedInterval(mapPeriodToInterval(currentPeriod))
-    }
-  }, [open, currentPeriod])
+  const selectedPeriod = internalPeriod ?? currentPeriod
+  const selectedInterval =
+    internalInterval ?? mapPeriodToInterval(currentPeriod)
 
   const fromString = dateRange?.from?.toISOString()
   const toString = dateRange?.to?.toISOString()
@@ -109,13 +99,21 @@ export function TotalUsersModal({
   const cardData = (data as unknown as TotalUsersCardData) || null
 
   const handlePeriodTabChange = (periodKey: DashboardPeriod) => {
-    setSelectedPeriod(periodKey)
-    setSelectedInterval(mapPeriodToInterval(periodKey))
+    setInternalPeriod(periodKey)
+    setInternalInterval(mapPeriodToInterval(periodKey))
   }
 
   const handleIntervalChange = (interval: TrendInterval) => {
-    setSelectedInterval(interval)
-    setSelectedPeriod(mapIntervalToPeriod(interval))
+    setInternalInterval(interval)
+    setInternalPeriod(mapIntervalToPeriod(interval))
+  }
+
+  const handleOpenChange = (nextOpen: boolean) => {
+    if (!nextOpen) {
+      setInternalPeriod(null)
+      setInternalInterval(null)
+    }
+    onOpenChange(nextOpen)
   }
 
   const headlineValue = cardData?.headline?.value ?? cardData?.summary?.total_registered_users ?? 0
@@ -123,7 +121,7 @@ export function TotalUsersModal({
   const isHeadlinePositive = headlineChange >= 0
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent
         className="max-h-[92vh] max-w-5xl overflow-y-auto rounded-3xl border border-border/80 bg-background/95 p-6 shadow-2xl backdrop-blur-xl sm:p-8"
         showCloseButton={false}
@@ -137,7 +135,7 @@ export function TotalUsersModal({
         <div className="flex flex-col gap-4 border-b border-border/60 pb-6 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-start gap-4">
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-amber-200/80 bg-amber-50 text-amber-600 shadow-xs dark:border-amber-900/50 dark:bg-amber-950/40 dark:text-amber-400">
-              <User className="h-6 w-6" />
+              <Icons.account className="h-6 w-6" />
             </div>
 
             <div>
@@ -157,9 +155,9 @@ export function TotalUsersModal({
                   )}
                 >
                   {isHeadlinePositive ? (
-                    <TrendingUp className="h-3 w-3" />
+                    <Icons.performance className="h-3 w-3" />
                   ) : (
-                    <TrendingDown className="h-3 w-3" />
+                    <Icons.arrowDownRight className="h-3 w-3" />
                   )}
                   {headlineChange > 0 ? `+${headlineChange.toFixed(1)}%` : `${headlineChange.toFixed(1)}%`}
                 </span>
@@ -193,11 +191,11 @@ export function TotalUsersModal({
             {/* Close Button */}
             <button
               type="button"
-              onClick={() => onOpenChange(false)}
+              onClick={() => handleOpenChange(false)}
               className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-border bg-background text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
               aria-label="Close modal"
             >
-              <X className="h-4 w-4" />
+              <Icons.close className="h-4 w-4" />
             </button>
           </div>
         </div>
@@ -206,7 +204,7 @@ export function TotalUsersModal({
         {isError && (
           <div className="my-4 flex items-center justify-between rounded-2xl border border-destructive/20 bg-destructive/5 p-4 text-sm text-destructive">
             <div className="flex items-center gap-3">
-              <AlertCircle className="h-5 w-5 shrink-0" />
+              <Icons.alertCircle className="h-5 w-5 shrink-0" />
               <span>
                 {error instanceof Error
                   ? error.message
@@ -219,7 +217,7 @@ export function TotalUsersModal({
               onClick={() => refetch()}
               className="gap-1.5 border-destructive/30 hover:bg-destructive/10"
             >
-              <RefreshCw className="h-3.5 w-3.5" />
+              <Icons.rotateCcw className="h-3.5 w-3.5" />
               Try Again
             </Button>
           </div>
@@ -588,12 +586,13 @@ export function TotalUsersModal({
                 </div>
 
                 <div className="mt-4 border-t border-border/50 pt-3 text-center">
-                  <a
-                    href="/users"
+                  <Link
+                    href="/customers"
                     className="text-xs font-semibold text-amber-600 underline underline-offset-4 hover:text-amber-700 dark:text-amber-500"
+                    onClick={() => handleOpenChange(false)}
                   >
                     View All Customers
-                  </a>
+                  </Link>
                 </div>
               </div>
             </div>
