@@ -14,14 +14,23 @@ import {
   useUpdateOrderStatus,
 } from "@/features/order/hooks/use-order-mutations"
 import { useOrderDetail } from "@/features/order/hooks/use-order-queries"
-import type { OrderAssigneeType } from "@/features/order/types"
+import type {
+  ApiOrderPaymentBreakdown,
+  OrderAssigneeType,
+} from "@/features/order/types"
 import {
   OrderStatus,
 } from "@/features/order/enums/order-status"
 import {
   formatOrderReviewRemark,
   formatOrderReviewText,
+  getOrderItemAddons,
+  getPaymentBreakdownLines,
 } from "@/features/order/utils/order-detail"
+import {
+  formatKoboAmount,
+  formatNairaAmount,
+} from "@/features/order/utils/currency"
 import { canReviewOrder } from "@/features/order/utils/order-rejection"
 import { formatOrderStatusKey } from "@/features/order/utils/order-status"
 import { BaseModal } from "@/components/ui/base-modal"
@@ -150,6 +159,52 @@ export function OrderDetailsModal({
       </div>
 
       <div className="flex flex-col gap-8">
+        {order.items?.length ? (
+          <div className={detailField}>
+            <Label className={detailLabel}>Ordered Items</Label>
+            <ul className="space-y-3">
+              {order.items.map((item) => {
+                const addons = getOrderItemAddons(item)
+
+                return (
+                  <li key={item.id} className="space-y-1">
+                    <div className="flex items-start justify-between gap-3">
+                      <p className={cn(detailValue, "font-medium")}>
+                        {item.name} × {item.quantity}
+                      </p>
+                      <p className={cn(detailValue, "shrink-0 font-medium")}>
+                        {formatNairaAmount(item.subtotal)}
+                      </p>
+                    </div>
+                    {addons.length > 0 ? (
+                      <ul className="space-y-0.5 pl-3">
+                        {addons.map((addon) => (
+                          <li
+                            key={String(addon.id)}
+                            className="flex justify-between gap-3 text-sm text-muted-foreground"
+                          >
+                            <span>
+                              {addon.name}
+                              {addon.quantity && addon.quantity > 1
+                                ? ` × ${addon.quantity}`
+                                : ""}
+                            </span>
+                            {typeof addon.price === "number" ? (
+                              <span className="shrink-0">
+                                {formatNairaAmount(addon.price)}
+                              </span>
+                            ) : null}
+                          </li>
+                        ))}
+                      </ul>
+                    ) : null}
+                  </li>
+                )
+              })}
+            </ul>
+          </div>
+        ) : null}
+
         <div className={detailGrid2}>
           <div className={detailField}>
             <Label className={detailLabel}>Customer Name</Label>
@@ -227,6 +282,10 @@ export function OrderDetailsModal({
             </div>
           </div>
         </div>
+
+        {order.payment_breakdown ? (
+          <OrderPaymentBreakdown breakdown={order.payment_breakdown} />
+        ) : null}
 
         {canReviewOrder(order) ? (
           <div className={detailField}>
@@ -392,5 +451,106 @@ export function OrderDetailsModal({
       orderId={orderId}
     />
     </>
+  )
+}
+
+function BreakdownRow({
+  label,
+  kobo,
+  currency,
+  negative,
+  strong,
+}: {
+  label: string
+  kobo: number
+  currency: string
+  negative?: boolean
+  strong?: boolean
+}) {
+  return (
+    <div className="flex items-start justify-between gap-3">
+      <span className={strong ? "font-medium text-foreground" : "text-muted-foreground"}>
+        {label}
+      </span>
+      <span
+        className={cn(
+          "shrink-0",
+          strong ? "font-medium text-foreground" : "text-foreground"
+        )}
+      >
+        {negative ? "−" : ""}
+        {formatKoboAmount(kobo, currency)}
+      </span>
+    </div>
+  )
+}
+
+function OrderPaymentBreakdown({
+  breakdown,
+}: {
+  breakdown: ApiOrderPaymentBreakdown
+}) {
+  const { currency, charges, reductions, amountDueKobo, payment } =
+    getPaymentBreakdownLines(breakdown)
+
+  return (
+    <div className={detailField}>
+      <Label className={detailLabel}>Payment Breakdown</Label>
+      <div className={cn(detailValue, "space-y-1.5")}>
+        {charges.map((line) => (
+          <BreakdownRow
+            key={line.label}
+            label={line.label}
+            kobo={line.kobo}
+            currency={currency}
+          />
+        ))}
+        {reductions.map((line) => (
+          <BreakdownRow
+            key={line.label}
+            label={line.label}
+            kobo={line.kobo}
+            currency={currency}
+            negative
+          />
+        ))}
+        {typeof amountDueKobo === "number" ? (
+          <BreakdownRow
+            label="Amount due"
+            kobo={amountDueKobo}
+            currency={currency}
+            strong
+          />
+        ) : null}
+        {payment ? (
+          <>
+            {typeof payment.charged_amount_kobo === "number" ? (
+              <BreakdownRow
+                label={
+                  payment.channel
+                    ? `Charged (${payment.channel})`
+                    : "Charged"
+                }
+                kobo={payment.charged_amount_kobo}
+                currency={currency}
+                strong
+              />
+            ) : null}
+            {payment.status ? (
+              <p className="text-sm text-muted-foreground">
+                Payment status:{" "}
+                <span className="font-medium text-foreground">{payment.status}</span>
+              </p>
+            ) : null}
+            {payment.reference ? (
+              <p className="text-sm text-muted-foreground">
+                Reference:{" "}
+                <span className="font-medium text-foreground">{payment.reference}</span>
+              </p>
+            ) : null}
+          </>
+        ) : null}
+      </div>
+    </div>
   )
 }

@@ -129,6 +129,62 @@ export type OrderAssigneesApiResponse = {
   message?: string
 }
 
+export type ApiOrderItemAddon = {
+  id: number | string
+  name: string
+  type?: string
+  price?: number
+  quantity?: number
+}
+
+export type ApiOrderDetailItem = {
+  id: string
+  name: string
+  quantity: number
+  unit_price: number
+  subtotal: number
+  image?: string | null
+  addons?: ApiOrderItemAddon[]
+  selected_addons?: ApiOrderItemAddon[]
+  modifiers?: ApiOrderItemAddon[]
+  selected_modifiers?: ApiOrderItemAddon[]
+}
+
+export type ApiOrderPaymentBreakdown = {
+  currency?: string
+  gross_order_total_kobo?: number
+  gross_order_total?: number
+  charges?: {
+    items_subtotal_kobo?: number
+    delivery_fee_kobo?: number
+    service_fee_kobo?: number
+    rider_tip_kobo?: number
+  }
+  reductions?: {
+    promo_discount_kobo?: number
+    scheduled_delivery_discount_kobo?: number
+    welcome_bonus_kobo?: number
+    cashback_kobo?: number
+    reward_wallet_kobo?: number
+    refund_credit_kobo?: number
+    total_reductions_kobo?: number
+  }
+  amount_due_kobo?: number
+  amount_due?: number
+  calculated_amount_due_kobo?: number
+  payment?: {
+    id?: string
+    reference?: string
+    channel?: string
+    status?: string
+    charged_amount_kobo?: number
+    charged_amount?: number
+    wallet_kobo?: number
+    bnpl_kobo?: number
+    external_payment_kobo?: number
+  }
+}
+
 export type ApiOrderReview = {
   comment: string | null
   remark: string | null
@@ -181,14 +237,8 @@ export type ApiOrderDetailData = {
     customer: ApiOrderReview | null
     rider: ApiOrderReview | null
   }
-  items: Array<{
-    id: string
-    name: string
-    quantity: number
-    unit_price: number
-    subtotal: number
-    image: string | null
-  }>
+  items?: ApiOrderDetailItem[]
+  payment_breakdown?: ApiOrderPaymentBreakdown | null
   kitchen: {
     id: string | null
     name: string | null
