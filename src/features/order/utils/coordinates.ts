@@ -5,6 +5,8 @@ type OrderMapCoords = {
   delivery_lng: string
   kitchen_lat: string
   kitchen_lng: string
+  fulfillment_branch_lat?: string
+  fulfillment_branch_lng?: string
 }
 
 /** Default fallback near Ikoyi, Lagos */
@@ -42,8 +44,10 @@ export function getOrderMapCoordinates(map: OrderMapCoords | null | undefined) {
     }
   }
 
-  const kitchenLat = parseCoordinate(map.kitchen_lat)
-  const kitchenLng = parseCoordinate(map.kitchen_lng)
+  const kitchenLat =
+    parseCoordinate(map.kitchen_lat) ?? parseCoordinate(map.fulfillment_branch_lat)
+  const kitchenLng =
+    parseCoordinate(map.kitchen_lng) ?? parseCoordinate(map.fulfillment_branch_lng)
   const deliveryLat = parseCoordinate(map.delivery_lat)
   const deliveryLng = parseCoordinate(map.delivery_lng)
 

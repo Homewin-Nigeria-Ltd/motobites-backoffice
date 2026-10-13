@@ -1,5 +1,6 @@
 import type {
   ApiOrderDetailItem,
+  ApiOrderGift,
   ApiOrderItemAddon,
   ApiOrderPaymentBreakdown,
   ApiOrderReview,
@@ -54,6 +55,24 @@ export function getOrderItemAddons(item: ApiOrderDetailItem): ApiOrderItemAddon[
   return []
 }
 
+export function formatGiftAddress(
+  address: ApiOrderGift["delivery_address"]
+) {
+  if (address == null) {
+    return null
+  }
+
+  if (typeof address === "string") {
+    return address.trim() || null
+  }
+
+  const parts = [address.line1, address.line2, address.city, address.state]
+    .map((part) => part?.trim())
+    .filter((part): part is string => Boolean(part))
+
+  return parts.length > 0 ? parts.join(", ") : null
+}
+
 export type PaymentBreakdownLine = {
   label: string
   kobo: number
@@ -86,7 +105,9 @@ export function getPaymentBreakdownLines(breakdown: ApiOrderPaymentBreakdown) {
   })
   pushBreakdownLine(charges, "Delivery fee", breakdown.charges?.delivery_fee_kobo)
   pushBreakdownLine(charges, "Service fee", breakdown.charges?.service_fee_kobo)
-  pushBreakdownLine(charges, "Rider tip", breakdown.charges?.rider_tip_kobo)
+  pushBreakdownLine(charges, "Rider tip", breakdown.charges?.rider_tip_kobo, {
+    always: true,
+  })
 
   pushBreakdownLine(
     reductions,

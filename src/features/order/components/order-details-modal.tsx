@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import Image from "next/image"
+import Link from "next/link"
 
 import { OrderAssigneeDialog } from "@/features/order/components/order-assignee-dialog"
 import { OrderAssigneeField } from "@/features/order/components/order-assignee-field"
@@ -22,6 +23,7 @@ import {
   OrderStatus,
 } from "@/features/order/enums/order-status"
 import {
+  formatGiftAddress,
   formatOrderReviewRemark,
   formatOrderReviewText,
   getOrderItemAddons,
@@ -31,6 +33,7 @@ import {
   formatKoboAmount,
   formatNairaAmount,
 } from "@/features/order/utils/currency"
+import { formatDate } from "@/features/order/utils/date"
 import { canReviewOrder } from "@/features/order/utils/order-rejection"
 import { formatOrderStatusKey } from "@/features/order/utils/order-status"
 import { BaseModal } from "@/components/ui/base-modal"
@@ -146,6 +149,17 @@ export function OrderDetailsModal({
                 {order.fulfillment_branch.name}
               </Badge>
             ) : null}
+            <Badge
+              variant="secondary"
+              className={cn(
+                "w-fit rounded-full border-0 px-3 py-1 text-xs font-medium",
+                order.is_gift || order.gift
+                  ? "bg-primary/10 text-primary"
+                  : "bg-muted text-muted-foreground"
+              )}
+            >
+              {order.is_gift || order.gift ? "Gift" : "Not a gift"}
+            </Badge>
           </div>
           <h2 className="text-xl font-semibold leading-tight text-foreground">
             {order.item.name}
@@ -208,7 +222,20 @@ export function OrderDetailsModal({
         <div className={detailGrid2}>
           <div className={detailField}>
             <Label className={detailLabel}>Customer Name</Label>
-            <p className={cn(detailValue, "font-medium")}>{order.customer_name}</p>
+            {order.customer?.id != null ? (
+              <Link
+                href={`/customers/${order.customer.id}`}
+                onClick={() => onOpenChange(false)}
+                className={cn(
+                  detailValue,
+                  "font-medium text-primary underline-offset-4 hover:underline"
+                )}
+              >
+                {order.customer.name ?? order.customer_name}
+              </Link>
+            ) : (
+              <p className={cn(detailValue, "font-medium")}>{order.customer_name}</p>
+            )}
           </div>
           <div className={detailField}>
             <Label className={detailLabel}>Fulfillment Branch</Label>
@@ -216,6 +243,18 @@ export function OrderDetailsModal({
               {order.fulfillment_branch?.name ?? "Central Kitchen / All Branches"}
             </p>
           </div>
+          {order.customer?.phone ? (
+            <div className={detailField}>
+              <Label className={detailLabel}>Customer Phone</Label>
+              <p className={cn(detailValue, "font-medium")}>{order.customer.phone}</p>
+            </div>
+          ) : null}
+          {order.customer?.email ? (
+            <div className={detailField}>
+              <Label className={detailLabel}>Customer Email</Label>
+              <p className={cn(detailValue, "font-medium")}>{order.customer.email}</p>
+            </div>
+          ) : null}
           <div className={detailField}>
             <Label className={detailLabel}>Delivery Address</Label>
             <p className={cn(detailValue, "font-medium")}>{order.delivery_address}</p>
@@ -224,7 +263,84 @@ export function OrderDetailsModal({
             <Label className={detailLabel}>Amount Paid</Label>
             <p className={cn(detailValue, "font-medium")}>{order.amount_paid_formatted}</p>
           </div>
+          <div className={detailField}>
+            <Label className={detailLabel}>Rider Tip</Label>
+            <p className={cn(detailValue, "font-medium")}>
+              {typeof order.payment_breakdown?.charges?.rider_tip_kobo === "number"
+                ? formatKoboAmount(
+                    order.payment_breakdown.charges.rider_tip_kobo,
+                    order.payment_breakdown.currency
+                  )
+                : "—"}
+            </p>
+          </div>
+          <div className={detailField}>
+            <Label className={detailLabel}>Order Date</Label>
+            <p className={cn(detailValue, "font-medium")}>
+              {order.created_at ? formatDate(order.created_at) : "—"}
+            </p>
+          </div>
+          <div className={detailField}>
+            <Label className={detailLabel}>Promo Code</Label>
+            {order.promo_code ? (
+              <p className={cn(detailValue, "font-medium")}>
+                {order.promo_code.code}
+                {order.promo_code.title ? (
+                  <span className="font-normal text-muted-foreground">
+                    {" "}
+                    — {order.promo_code.title}
+                  </span>
+                ) : null}
+              </p>
+            ) : (
+              <p className={cn(detailValue, "font-medium")}>—</p>
+            )}
+          </div>
         </div>
+
+        {order.is_gift || order.gift ? (
+          <div className={detailField}>
+            <Label className={detailLabel}>Gift Details</Label>
+            <div className={detailGrid2}>
+              <div className={detailField}>
+                <Label className={detailLabel}>Recipient Name</Label>
+                <p className={cn(detailValue, "font-medium")}>
+                  {order.gift?.recipient_name || "—"}
+                </p>
+              </div>
+              <div className={detailField}>
+                <Label className={detailLabel}>Recipient Phone</Label>
+                <p className={cn(detailValue, "font-medium")}>
+                  {order.gift?.recipient_phone || "—"}
+                </p>
+              </div>
+              <div className={detailField}>
+                <Label className={detailLabel}>Recipient Email</Label>
+                <p className={cn(detailValue, "font-medium")}>
+                  {order.gift?.recipient_email || "—"}
+                </p>
+              </div>
+              <div className={detailField}>
+                <Label className={detailLabel}>Notify Recipient</Label>
+                <p className={cn(detailValue, "font-medium")}>
+                  {order.gift?.notify_recipient ? "Yes" : "No"}
+                </p>
+              </div>
+              <div className={detailField}>
+                <Label className={detailLabel}>Gift Address</Label>
+                <p className={cn(detailValue, "font-medium")}>
+                  {formatGiftAddress(order.gift?.delivery_address) || "—"}
+                </p>
+              </div>
+              <div className={detailField}>
+                <Label className={detailLabel}>Gift Message</Label>
+                <p className={cn(detailValue, "font-medium")}>
+                  {order.gift?.message || "—"}
+                </p>
+              </div>
+            </div>
+          </div>
+        ) : null}
 
         <div className={detailGrid2}>
           <div className={detailField}>
