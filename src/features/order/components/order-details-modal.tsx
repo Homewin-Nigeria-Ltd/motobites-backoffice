@@ -264,6 +264,17 @@ export function OrderDetailsModal({
             <p className={cn(detailValue, "font-medium")}>{order.amount_paid_formatted}</p>
           </div>
           <div className={detailField}>
+            <Label className={detailLabel}>Service Fee</Label>
+            <p className={cn(detailValue, "font-medium")}>
+              {typeof order.payment_breakdown?.charges?.service_fee_kobo === "number"
+                ? formatKoboAmount(
+                    order.payment_breakdown.charges.service_fee_kobo,
+                    order.payment_breakdown.currency
+                  )
+                : "—"}
+            </p>
+          </div>
+          <div className={detailField}>
             <Label className={detailLabel}>Rider Tip</Label>
             <p className={cn(detailValue, "font-medium")}>
               {typeof order.payment_breakdown?.charges?.rider_tip_kobo === "number"
