@@ -104,7 +104,9 @@ export function getPaymentBreakdownLines(breakdown: ApiOrderPaymentBreakdown) {
     always: true,
   })
   pushBreakdownLine(charges, "Delivery fee", breakdown.charges?.delivery_fee_kobo)
-  pushBreakdownLine(charges, "Service fee", breakdown.charges?.service_fee_kobo)
+  pushBreakdownLine(charges, "Service fee", breakdown.charges?.service_fee_kobo, {
+    always: true,
+  })
   pushBreakdownLine(charges, "Rider tip", breakdown.charges?.rider_tip_kobo, {
     always: true,
   })

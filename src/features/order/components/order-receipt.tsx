@@ -49,6 +49,7 @@ export function OrderReceipt({ order }: { order: ApiOrderDetailData }) {
   const totals: Array<[string, string | null]> = [
     ["Subtotal", kobo(charges?.items_subtotal_kobo)],
     ["Delivery Fee", kobo(charges?.delivery_fee_kobo ?? 0)],
+    ["Service Fee", kobo(charges?.service_fee_kobo ?? 0)],
     ["Rider Tip", (charges?.rider_tip_kobo ?? 0) > 0 ? kobo(charges?.rider_tip_kobo) : null],
     [
       "Discount",
