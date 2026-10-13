@@ -1,9 +1,11 @@
 "use client"
 
 import Image from "next/image"
+import Link from "next/link"
 
 import { OrderRejectionDetails } from "@/features/order/components/order-rejection-details"
 import type { ApiOrder } from "@/features/order/types"
+import { formatDate } from "@/features/order/utils/date"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
@@ -52,7 +54,23 @@ export function OrderCard({ order, onViewDetails }: OrderCardProps) {
         </div>
         <h3 className="text-base font-semibold text-foreground">{order.item_name}</h3>
         <div className="space-y-1.5">
-          <DetailRow label="Customer Name" value={order.customer_name} />
+          <DetailRow
+            label="Order Date"
+            value={order.created_at ? formatDate(order.created_at) : "—"}
+          />
+          <p className="text-sm text-muted-foreground">
+            <span className="font-medium text-foreground">Customer Name:</span>{" "}
+            {order.customer?.id != null || order.customer_id != null ? (
+              <Link
+                href={`/customers/${order.customer?.id ?? order.customer_id}`}
+                className="font-medium text-primary underline-offset-4 hover:underline"
+              >
+                {order.customer?.name ?? order.customer_name}
+              </Link>
+            ) : (
+              order.customer_name
+            )}
+          </p>
           <DetailRow label="Delivery Address" value={order.delivery_address} />
           {order.fulfillment_branch?.name ? (
             <DetailRow label="Branch" value={order.fulfillment_branch.name} />

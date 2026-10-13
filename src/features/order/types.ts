@@ -44,6 +44,8 @@ export type ApiOrder = {
   item_name: string
   item_image: string | null
   customer_name: string
+  customer?: ApiOrderCustomer | null
+  customer_id?: number | string | null
   delivery_address: string
   payment_method: string
   amount_paid: number
@@ -185,6 +187,35 @@ export type ApiOrderPaymentBreakdown = {
   }
 }
 
+export type ApiOrderCustomer = {
+  id: number | string
+  name?: string
+  phone?: string | null
+  email?: string | null
+}
+
+export type ApiOrderPromoCode = {
+  id: number | string
+  code: string
+  title?: string | null
+}
+
+export type ApiOrderGiftAddress = {
+  line1?: string | null
+  line2?: string | null
+  city?: string | null
+  state?: string | null
+}
+
+export type ApiOrderGift = {
+  recipient_name?: string | null
+  recipient_phone?: string | null
+  recipient_email?: string | null
+  message?: string | null
+  notify_recipient?: boolean
+  delivery_address?: ApiOrderGiftAddress | string | null
+}
+
 export type ApiOrderReview = {
   comment: string | null
   remark: string | null
@@ -204,12 +235,17 @@ export type ApiOrderDetailData = {
   }
   customer_note: string | null
   customer_name: string
+  customer?: ApiOrderCustomer | null
+  promo_code?: ApiOrderPromoCode | null
+  is_gift?: boolean
+  gift?: ApiOrderGift | null
   delivery_address: string
   amount_paid: number
   amount_paid_formatted: string
   payment: {
     method: string
     receipt_available: boolean
+    status?: string
   }
   assignments: {
     chef: ApiOrderAssignee
@@ -232,6 +268,8 @@ export type ApiOrderDetailData = {
     delivery_lng: string
     kitchen_lat: string
     kitchen_lng: string
+    fulfillment_branch_lat?: string
+    fulfillment_branch_lng?: string
   }
   reviews: {
     customer: ApiOrderReview | null
