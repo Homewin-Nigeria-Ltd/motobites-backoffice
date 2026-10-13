@@ -105,6 +105,17 @@ export function OrderReceiptModal({
               )}
             />
             <ReceiptField
+              label="Service Fee"
+              value={
+                typeof order?.payment_breakdown?.charges?.service_fee_kobo === "number"
+                  ? formatKoboAmount(
+                      order.payment_breakdown.charges.service_fee_kobo,
+                      order.payment_breakdown.currency ?? gateway?.currency ?? "NGN"
+                    )
+                  : "—"
+              }
+            />
+            <ReceiptField
               label="Paid at"
               value={formatDate(receipt.paid_at)}
             />
