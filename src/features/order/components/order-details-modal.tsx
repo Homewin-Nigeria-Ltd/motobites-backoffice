@@ -565,6 +565,7 @@ export function OrderDetailsModal({
       open={receiptOpen}
       onOpenChange={setReceiptOpen}
       orderId={orderId}
+      order={order}
     />
     </>
   )
