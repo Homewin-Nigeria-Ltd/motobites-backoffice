@@ -1,10 +1,13 @@
 "use client"
 
+import { OrderReceipt } from "@/features/order/components/order-receipt"
 import { useOrderReceipt } from "@/features/order/hooks/use-order-queries"
+import type { ApiOrderDetailData } from "@/features/order/types"
 import { formatKoboAmount } from "@/features/order/utils/currency"
 import { formatDate } from "@/features/order/utils/date"
 import { BaseModal } from "@/components/ui/base-modal"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { AppLoader } from "@/components/ui/app-loader"
 import { Icons } from "@/components/ui/icons"
@@ -41,12 +44,14 @@ type OrderReceiptModalProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
   orderId: string
+  order?: ApiOrderDetailData | null
 }
 
 export function OrderReceiptModal({
   open,
   onOpenChange,
   orderId,
+  order,
 }: OrderReceiptModalProps) {
   const { data: receipt, isPending, isError } = useOrderReceipt(orderId, open)
 
@@ -55,6 +60,7 @@ export function OrderReceiptModal({
   const customer = gateway?.customer
 
   return (
+    <>
     <BaseModal
       title="Payment Receipt"
       open={open}
@@ -62,6 +68,13 @@ export function OrderReceiptModal({
       size="lg"
       headerIcon={<Icons.fileText size={28} className="text-primary" />}
       bodyClassName="max-h-[min(70vh,28rem)] overflow-y-auto overscroll-contain max-sm:max-h-[70dvh]"
+      footer={
+        receipt && order ? (
+          <Button type="button" onClick={() => window.print()}>
+            Print Receipt
+          </Button>
+        ) : null
+      }
     >
       {isPending ? (
         <AppLoader className="py-10" spinnerClassName="size-6" />
@@ -163,5 +176,11 @@ export function OrderReceiptModal({
         </div>
       )}
     </BaseModal>
+    {open && order ? (
+      <div className="pos-receipt-print-root">
+        <OrderReceipt order={order} />
+      </div>
+    ) : null}
+    </>
   )
 }
