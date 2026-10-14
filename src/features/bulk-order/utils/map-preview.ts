@@ -1,9 +1,5 @@
-import {
-  mapOfflineOrderPreviewTotals,
-  resolveOfflineOrderAmount,
-} from "@/features/offline-order/utils/order-totals"
+import { mapOfflineOrderPreviewTotals } from "@/features/offline-order/utils/order-totals"
 
-import { BULK_ORDER_SERVICE_TAX_RATE } from "../constants"
 import type { ApiBulkOrderPreview, BulkOrderPreviewTotals } from "../types"
 
 export function mapBulkOrderPreviewTotals(
@@ -11,16 +7,8 @@ export function mapBulkOrderPreviewTotals(
   fallbackSubtotal: number,
 ): BulkOrderPreviewTotals {
   const base = mapOfflineOrderPreviewTotals(preview ?? {}, fallbackSubtotal)
-  const tax = resolveOfflineOrderAmount(
-    preview?.tax ?? preview?.service_tax ?? preview?.bulk_service_tax,
-    preview?.tax_kobo ?? preview?.service_tax_kobo,
-  )
-  const serviceFee =
-    base.serviceFee ||
-    tax ||
-    Math.round(base.subtotal * BULK_ORDER_SERVICE_TAX_RATE)
-  const total =
-    base.total || Math.max(0, base.subtotal - base.discount + serviceFee)
+  const serviceFee = 0
+  const total = Math.max(0, base.subtotal - base.discount)
   const allocation = preview?.allocation
   const allocationValid =
     allocation?.valid ??

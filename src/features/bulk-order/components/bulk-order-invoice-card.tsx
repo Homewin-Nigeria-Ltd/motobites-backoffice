@@ -7,11 +7,8 @@ import { Card } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { formatOfflineOrderAmount } from "@/features/offline-order/utils/order-totals"
 
-import { BULK_ORDER_SERVICE_TAX_RATE } from "../constants"
-
 type BulkOrderInvoiceCardProps = {
   subtotal: number
-  tax?: number
   total?: number
   discount?: number
   discountPercentage?: number
@@ -20,19 +17,13 @@ type BulkOrderInvoiceCardProps = {
 
 export function BulkOrderInvoiceCard({
   subtotal,
-  tax,
   total,
   discount = 0,
   discountPercentage = 0,
   isPreviewing = false,
 }: BulkOrderInvoiceCardProps) {
-  const serviceTax =
-    typeof tax === "number"
-      ? tax
-      : Math.round(subtotal * BULK_ORDER_SERVICE_TAX_RATE)
   const invoiceTotal =
-    typeof total === "number" ? total : subtotal - discount + serviceTax
-  const taxPercent = Math.round(BULK_ORDER_SERVICE_TAX_RATE * 100)
+    typeof total === "number" ? total : Math.max(0, subtotal - discount)
 
   return (
     <Card className="max-w-md gap-0 overflow-hidden py-0">
@@ -57,12 +48,6 @@ export function BulkOrderInvoiceCard({
             </span>
           </div>
         ) : null}
-        <div className="flex items-center justify-between text-sm">
-          <span className="text-muted-foreground">
-            Bulk Service Tax ({taxPercent}%)
-          </span>
-          <span className="font-medium">{formatOfflineOrderAmount(serviceTax)}</span>
-        </div>
         <Separator />
         <div className="flex items-center justify-between">
           <span className="text-sm font-medium text-muted-foreground">

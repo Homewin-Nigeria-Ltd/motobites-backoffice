@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { useState } from "react"
 import {
   flexRender,
@@ -13,8 +14,10 @@ import { OfferAcquisitionInsightCard } from "@/features/promotions/components/of
 import { OfferCheckoutsInsightCard } from "@/features/promotions/components/offer-checkouts-insight-card"
 import { OfferRevenueInsightCard } from "@/features/promotions/components/offer-revenue-insight-card"
 import { PROMOTIONS_ROUTES } from "@/features/promotions/constants"
+import { useDeleteOffer } from "@/features/promotions/hooks/use-promotion-mutations"
 import { usePromotionOffer } from "@/features/promotions/hooks/use-promotion-queries"
 import { AppLoader } from "@/components/ui/app-loader"
+import { BaseAlertDialog } from "@/components/ui/base-alert-dialog"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Icons } from "@/components/ui/icons"
@@ -33,8 +36,11 @@ type OfferDetailSectionProps = {
 }
 
 export function OfferDetailSection({ offerId }: OfferDetailSectionProps) {
+  const router = useRouter()
   const { data, isPending, isError, error } = usePromotionOffer(offerId)
+  const { deleteOffer, isPending: isDeleting } = useDeleteOffer()
   const [rowSelection, setRowSelection] = useState({})
+  const [deleteOpen, setDeleteOpen] = useState(false)
 
   const table = useReactTable({
     data: data?.userInsight ?? [],
@@ -69,6 +75,7 @@ export function OfferDetailSection({ offerId }: OfferDetailSectionProps) {
   const isActive = offer.status === "active"
 
   return (
+    <>
     <div className="flex flex-col gap-6 bg-muted p-4 md:gap-8 md:p-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="flex items-start gap-3">
@@ -105,12 +112,24 @@ export function OfferDetailSection({ offerId }: OfferDetailSectionProps) {
           </div>
         </div>
 
-        <Button asChild>
-          <Link href={PROMOTIONS_ROUTES.edit(offer.id)}>
-            <Icons.edit size={16} />
-            Edit Promo
-          </Link>
-        </Button>
+        <div className="flex flex-wrap items-center gap-2">
+          <Button asChild>
+            <Link href={PROMOTIONS_ROUTES.edit(offer.id)}>
+              <Icons.edit size={16} />
+              Edit Promo
+            </Link>
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+            disabled={isDeleting}
+            onClick={() => setDeleteOpen(true)}
+          >
+            <Icons.trash size={16} />
+            Delete
+          </Button>
+        </div>
       </div>
 
       <section className="space-y-4">
@@ -186,5 +205,27 @@ export function OfferDetailSection({ offerId }: OfferDetailSectionProps) {
         </div>
       </section>
     </div>
+
+    <BaseAlertDialog
+      title="Delete promotion?"
+      open={deleteOpen}
+      onOpenChange={setDeleteOpen}
+      confirmLabel="Delete"
+      pendingLabel="Deleting..."
+      confirmVariant="destructive"
+      isPending={isDeleting}
+      onConfirm={() => {
+        void deleteOffer(offer.id).then((result) => {
+          if (result.success) {
+            setDeleteOpen(false)
+            router.push(PROMOTIONS_ROUTES.list)
+          }
+        })
+      }}
+    >
+      This will permanently delete &quot;{offer.title}&quot;. This action
+      cannot be undone.
+    </BaseAlertDialog>
+    </>
   )
 }

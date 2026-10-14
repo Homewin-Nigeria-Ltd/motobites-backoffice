@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation"
 
+import { isSuperAdmin } from "@/features/offline-order/utils/admin-role"
 import {
   getPermissions,
   hasPermission,
@@ -14,6 +15,14 @@ export async function requirePermission(permission: PermissionKey) {
 
   if (!hasPermission(permissions, permission)) {
     redirect("/unauthorized")
+  }
+}
+
+export async function requireSuperAdmin() {
+  const user = await getUser()
+
+  if (!isSuperAdmin(user)) {
+    redirect("/settings")
   }
 }
 
