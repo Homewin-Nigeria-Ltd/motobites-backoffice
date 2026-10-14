@@ -40,6 +40,18 @@ function ReceiptField({ label, value, mono }: ReceiptFieldProps) {
   )
 }
 
+function formatReceiptCard(receipt: {
+  card?: { last_four?: string | null; type?: string | null } | null
+}) {
+  const lastFour = receipt.card?.last_four?.trim()
+  if (!lastFour) {
+    return "—"
+  }
+
+  const type = receipt.card?.type?.trim()
+  return type ? `${type} •••• ${lastFour}` : `•••• ${lastFour}`
+}
+
 type OrderReceiptModalProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -54,10 +66,7 @@ export function OrderReceiptModal({
   order,
 }: OrderReceiptModalProps) {
   const { data: receipt, isPending, isError } = useOrderReceipt(orderId, open)
-
-  const gateway = receipt?.gateway_response
-  const authorization = gateway?.authorization
-  const customer = gateway?.customer
+  const currency = order?.payment_breakdown?.currency ?? "NGN"
 
   return (
     <>
@@ -92,17 +101,14 @@ export function OrderReceiptModal({
               {receipt.status}
             </Badge>
             <span className="min-w-0 text-sm break-words text-muted-foreground">
-              {gateway?.gateway_response ?? receipt.channel}
+              {receipt.channel}
             </span>
           </div>
 
           <div className={detailGrid2}>
             <ReceiptField
               label="Amount"
-              value={formatKoboAmount(
-                receipt.amount_kobo,
-                gateway?.currency ?? "NGN"
-              )}
+              value={formatKoboAmount(receipt.amount_kobo, currency)}
             />
             <ReceiptField
               label="Service Fee"
@@ -110,7 +116,7 @@ export function OrderReceiptModal({
                 typeof order?.payment_breakdown?.charges?.service_fee_kobo === "number"
                   ? formatKoboAmount(
                       order.payment_breakdown.charges.service_fee_kobo,
-                      order.payment_breakdown.currency ?? gateway?.currency ?? "NGN"
+                      currency
                     )
                   : "—"
               }
@@ -130,13 +136,14 @@ export function OrderReceiptModal({
             />
             <ReceiptField
               label="Transaction ID"
-              value={String(gateway?.id ?? "—")}
+              value={receipt.transaction_id?.trim() || "—"}
+              mono
             />
             <ReceiptField
               label="Fees"
               value={
-                gateway?.fees != null
-                  ? formatKoboAmount(gateway.fees, gateway.currency)
+                typeof receipt.fees_kobo === "number"
+                  ? formatKoboAmount(receipt.fees_kobo, currency)
                   : "—"
               }
             />
@@ -145,26 +152,18 @@ export function OrderReceiptModal({
           <div className="space-y-4 border-t border-border pt-5 sm:pt-6">
             <p className="text-sm font-medium text-foreground">Card details</p>
             <div className={detailGrid2}>
-              <ReceiptField
-                label="Card"
-                value={
-                  authorization
-                    ? `${authorization.brand.trim()} •••• ${authorization.last4}`
-                    : "—"
-                }
-              />
+              <ReceiptField label="Card" value={formatReceiptCard(receipt)} />
               <ReceiptField
                 label="Card type"
-                value={authorization?.card_type?.trim() ?? "—"}
+                value={receipt.card?.type?.trim() || "—"}
               />
-              <ReceiptField label="Bank" value={authorization?.bank ?? "—"} />
+              <ReceiptField
+                label="Bank"
+                value={receipt.card?.bank?.trim() || "—"}
+              />
               <ReceiptField
                 label="Expires"
-                value={
-                  authorization
-                    ? `${authorization.exp_month}/${authorization.exp_year}`
-                    : "—"
-                }
+                value={receipt.card?.expires?.trim() || "—"}
               />
             </div>
           </div>
@@ -173,13 +172,17 @@ export function OrderReceiptModal({
             <p className="text-sm font-medium text-foreground">Customer</p>
             <div className={detailGrid2}>
               <ReceiptField
+                label="Name"
+                value={receipt.customer?.name?.trim() || "—"}
+              />
+              <ReceiptField
                 label="Email"
-                value={customer?.email ?? "—"}
+                value={receipt.customer?.email?.trim() || "—"}
                 mono
               />
               <ReceiptField
                 label="Customer code"
-                value={customer?.customer_code ?? "—"}
+                value={receipt.customer?.code?.trim() || "—"}
                 mono
               />
             </div>

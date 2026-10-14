@@ -296,33 +296,18 @@ export type OrderDetailApiResponse = {
   message?: string
 }
 
-export type ApiOrderReceiptGatewayAuthorization = {
-  last4: string
-  card_type: string
-  bank: string
-  brand: string
-  channel: string
-  exp_month: string
-  exp_year: string
+export type ApiOrderReceiptCard = {
+  last_four?: string | null
+  type?: string | null
+  bank?: string | null
+  expires?: string | null
 }
 
-export type ApiOrderReceiptGatewayCustomer = {
-  email: string
-  customer_code: string
-}
-
-export type ApiOrderReceiptGatewayResponse = {
-  id: number
-  status: string
-  reference: string
-  amount: number
-  currency: string
-  channel: string
-  gateway_response: string
-  paid_at: string
-  fees: number
-  authorization: ApiOrderReceiptGatewayAuthorization
-  customer: ApiOrderReceiptGatewayCustomer
+export type ApiOrderReceiptCustomer = {
+  id?: number | string
+  name?: string | null
+  email?: string | null
+  code?: string | null
 }
 
 export type ApiOrderReceiptData = {
@@ -331,7 +316,12 @@ export type ApiOrderReceiptData = {
   amount_kobo: number
   status: string
   paid_at: string
-  gateway_response: ApiOrderReceiptGatewayResponse
+  gateway_response?: Record<string, unknown> | string | null
+  transaction_id?: string | null
+  fees_kobo?: number | null
+  fees?: number | null
+  card?: ApiOrderReceiptCard | null
+  customer?: ApiOrderReceiptCustomer | null
 }
 
 export type OrderReceiptApiResponse = {
