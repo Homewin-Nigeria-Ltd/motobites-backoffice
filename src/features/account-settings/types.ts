@@ -1,3 +1,5 @@
+import type { AuthUserAdminRole } from "@/features/auth/types"
+
 export type AccountUser = {
   id: number
   name: string
@@ -6,6 +8,7 @@ export type AccountUser = {
   role: string
   status: string
   profile_photo_url: string | null
+  admin_role?: AuthUserAdminRole | string | null
 }
 
 export type AccountSettingsTab =

@@ -5,12 +5,19 @@ import { useState } from "react"
 import { LogoutConfirmDialog } from "@/features/auth/components/logout-confirm-dialog"
 import { SettingsSection } from "@/features/settings"
 
-export function SettingsPageClient() {
+export function SettingsPageClient({
+  showAdminSettings = false,
+}: {
+  showAdminSettings?: boolean
+}) {
   const [logoutOpen, setLogoutOpen] = useState(false)
 
   return (
     <>
-      <SettingsSection onLogoutClick={() => setLogoutOpen(true)} />
+      <SettingsSection
+        showAdminSettings={showAdminSettings}
+        onLogoutClick={() => setLogoutOpen(true)}
+      />
       <LogoutConfirmDialog open={logoutOpen} onOpenChange={setLogoutOpen} />
     </>
   )

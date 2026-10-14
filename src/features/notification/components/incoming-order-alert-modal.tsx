@@ -1,6 +1,8 @@
 "use client"
 
+import { useSession } from "@/features/auth/hooks/use-session"
 import type { IncomingOrderAlert } from "@/features/notification/utils/incoming-order-alert"
+import { isSalesRep } from "@/features/offline-order/utils/admin-role"
 import { OrderReviewActions } from "@/features/order/components/order-review-actions"
 import { Button } from "@/components/ui/button"
 import { Icons } from "@/components/ui/icons"
@@ -16,6 +18,9 @@ export function IncomingOrderAlertModal({
   alerts,
   onDismiss,
 }: IncomingOrderAlertModalProps) {
+  const { data: session } = useSession()
+  const canReview = isSalesRep(session?.user)
+
   if (alerts.length === 0) {
     return null
   }
@@ -86,7 +91,7 @@ export function IncomingOrderAlertModal({
               ))}
             </div>
           </div>
-          {alert.canReview ? (
+          {canReview && alert.canReview ? (
             <div className="border-t border-border px-4 py-3 [&_button]:h-9 [&_button]:flex-1 [&_button]:font-bold">
               <OrderReviewActions
                 orderId={alert.orderId}

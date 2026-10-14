@@ -11,6 +11,7 @@ import {
   type AccountPersonalInfoFormValues,
 } from "../schemas/account-personal-info.schema"
 import type { AccountUser } from "../types"
+import { getAdminRoleLabel } from "@/features/offline-order/utils/admin-role"
 import {
   Avatar,
   AvatarFallback,
@@ -29,14 +30,6 @@ function splitName(name: string) {
     firstName: parts[0] ?? "",
     lastName: parts.slice(1).join(" "),
   }
-}
-
-function formatRole(role: string) {
-  return role
-    .split(/[_\s-]+/)
-    .filter(Boolean)
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
-    .join(" ")
 }
 
 const languageLabels: Record<string, string> = {
@@ -274,7 +267,7 @@ export function AccountPersonalInformationPanel({
             <Label htmlFor="account-role">Role</Label>
             <Input
               id="account-role"
-              value={formatRole(user.role)}
+              value={getAdminRoleLabel(user) ?? "—"}
               readOnly
               className="h-11 bg-muted"
             />

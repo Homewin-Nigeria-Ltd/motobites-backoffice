@@ -60,6 +60,31 @@ export function useUpdateOffer() {
   }
 }
 
+export function useDeleteOffer() {
+  const queryClient = useQueryClient()
+
+  const mutation = useMutation({
+    ...promotionMutations.deleteOffer,
+    onSuccess: (result) => {
+      if (!result.success) {
+        toast.error(result.error)
+        return
+      }
+
+      void queryClient.invalidateQueries({ queryKey: promotionKeys.all })
+      toast.success("Promotion deleted successfully")
+    },
+    onError: () => {
+      toast.error("Failed to delete promotion. Please try again.")
+    },
+  })
+
+  return {
+    deleteOffer: mutation.mutateAsync,
+    isPending: mutation.isPending,
+  }
+}
+
 export function useCreateGiftcard() {
   const queryClient = useQueryClient()
 

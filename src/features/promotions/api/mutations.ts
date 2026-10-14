@@ -4,6 +4,7 @@ import {
 } from "../actions/giftcard.actions"
 import {
   createOfferAction,
+  deleteOfferAction,
   updateOfferAction,
 } from "../actions/offer.actions"
 import type { OfferInput, UpdateOfferInput } from "../types"
@@ -15,6 +16,9 @@ export const promotionMutations = {
   updateOffer: {
     mutationFn: ({ offerId, input }: UpdateOfferInput) =>
       updateOfferAction(offerId, input),
+  },
+  deleteOffer: {
+    mutationFn: (offerId: string) => deleteOfferAction(offerId),
   },
   createGiftcard: {
     mutationFn: (formData: FormData) => createGiftcardAction(formData),

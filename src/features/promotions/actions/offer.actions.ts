@@ -59,3 +59,19 @@ export async function updateOfferAction(
     return toActionError(error, "Failed to update promotion")
   }
 }
+
+export async function deleteOfferAction(
+  offerId: string
+): Promise<PromotionActionResult> {
+  if (!offerId.trim()) {
+    return { success: false, error: "Offer is required" }
+  }
+
+  try {
+    await apiServer.delete(promotionServerEndpoints.offer(offerId))
+
+    return { success: true }
+  } catch (error) {
+    return toActionError(error, "Failed to delete promotion")
+  }
+}

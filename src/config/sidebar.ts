@@ -146,6 +146,6 @@ export const navSupport: SupportItem[] = [
     name: "Settings",
     url: "/settings",
     icon: "settings",
-    permission: PERMISSION_KEYS.settings,
+    permission: null,
   },
 ]

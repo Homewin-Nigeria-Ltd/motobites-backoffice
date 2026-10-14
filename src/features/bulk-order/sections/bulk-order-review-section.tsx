@@ -155,7 +155,6 @@ export function BulkOrderReviewSection() {
 
         <BulkOrderInvoiceCard
           subtotal={previewTotals?.subtotal ?? subtotal}
-          tax={previewTotals?.serviceFee}
           total={previewTotals?.total}
           discount={previewTotals?.discount}
           discountPercentage={previewTotals?.discountPercentage}

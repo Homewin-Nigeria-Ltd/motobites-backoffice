@@ -4,6 +4,8 @@ import { useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
 
+import { useSession } from "@/features/auth/hooks/use-session"
+import { isSalesRep } from "@/features/offline-order/utils/admin-role"
 import { OrderAssigneeDialog } from "@/features/order/components/order-assignee-dialog"
 import { OrderAssigneeField } from "@/features/order/components/order-assignee-field"
 import { OrderReceiptModal } from "@/features/order/components/order-receipt-modal"
@@ -73,6 +75,7 @@ export function OrderDetailsModal({
   open,
   onOpenChange,
 }: OrderDetailsModalProps) {
+  const { data: session } = useSession()
   const { data: order, isPending, isError, error } = useOrderDetail(
     orderId,
     open
@@ -414,7 +417,7 @@ export function OrderDetailsModal({
           <OrderPaymentBreakdown breakdown={order.payment_breakdown} />
         ) : null}
 
-        {canReviewOrder(order) ? (
+        {canReviewOrder(order) && isSalesRep(session?.user) ? (
           <div className={detailField}>
             <Label className={detailLabel}>Accept / Decline Order</Label>
             <OrderReviewActions
