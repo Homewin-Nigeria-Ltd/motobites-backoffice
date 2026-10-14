@@ -98,7 +98,7 @@ export function BulkOrderPaymentSection() {
     ...baseTotals,
     total: Math.max(
       0,
-      baseTotals.subtotal - baseTotals.discount + baseTotals.serviceFee + deliveryCharge,
+      baseTotals.subtotal - baseTotals.discount + deliveryCharge,
     ),
   }
 

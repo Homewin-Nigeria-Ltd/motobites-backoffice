@@ -5,6 +5,7 @@ import * as React from "react"
 import { NavMain } from "@/components/layouts/dashboard/nav-main"
 import { NavSupport } from "@/components/layouts/dashboard/nav-support"
 import { NavUser } from "@/components/layouts/dashboard/nav-user"
+import { Badge } from "@/components/ui/badge"
 import {
   Sidebar,
   SidebarContent,
@@ -14,6 +15,7 @@ import {
 } from "@/components/ui/sidebar"
 import type { NavItem, SupportItem } from "@/config/sidebar"
 import type { AuthUser } from "@/features/auth"
+import { getAdminRoleLabel } from "@/features/offline-order/utils/admin-role"
 
 type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
   user: AuthUser
@@ -27,6 +29,8 @@ export function AppSidebar({
   filteredSupport,
   ...props
 }: AppSidebarProps) {
+  const roleLabel = getAdminRoleLabel(user)
+
   return (
     <Sidebar
       collapsible="icon"
@@ -34,13 +38,20 @@ export function AppSidebar({
       {...props}
     >
       <SidebarHeader className="pt-12">
-        <div className="flex h-8 w-full items-center justify-start group-data-[collapsible=icon]:justify-center">
-          <span className="text-lg font-semibold group-data-[collapsible=icon]:hidden">
+        <div className="flex w-full flex-col items-start justify-center gap-1.5 group-data-[collapsible=icon]:items-center">
+          <span className="text-lg font-semibold leading-none group-data-[collapsible=icon]:hidden">
             Motobites
           </span>
           <span className="hidden text-sm font-semibold group-data-[collapsible=icon]:block">
             MB
           </span>
+          {roleLabel ? (
+            <Badge
+              className="mt-1 h-6 max-w-full truncate rounded-full border-0 bg-white px-2.5 text-xs font-semibold text-primary hover:bg-white group-data-[collapsible=icon]:hidden"
+            >
+              {roleLabel}
+            </Badge>
+          ) : null}
         </div>
       </SidebarHeader>
       <SidebarContent>

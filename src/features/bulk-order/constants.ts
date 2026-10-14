@@ -18,5 +18,3 @@ export const BULK_ORDER_SOURCE_OPTIONS = [
 }>
 
 export const DEFAULT_BULK_ORDER_SOURCE: BulkOrderSource = "corporate_bulk"
-
-export const BULK_ORDER_SERVICE_TAX_RATE = 0.05
