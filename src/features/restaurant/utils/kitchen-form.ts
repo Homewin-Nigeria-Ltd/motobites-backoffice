@@ -98,12 +98,24 @@ export function apiOpeningHoursToFormRows(
     return ampm ? `${base} ${ampm}` : base
   }
 
-  return openingHours.map((row, index) => ({
-    id: `${row.day.toLowerCase()}-${index}`,
-    day: row.day,
-    startTime: normalizeApiTimeForForm(row.start_time),
-    endTime: normalizeApiTimeForForm(row.end_time),
-  }))
+  const hoursByDay = new Map(
+    (openingHours ?? []).map((row) => [row.day.trim().toLowerCase(), row])
+  )
+
+  return defaultOpeningHours.map((row) => {
+    const apiRow = hoursByDay.get(row.day.toLowerCase())
+
+    if (!apiRow) {
+      return { ...row, enabled: false }
+    }
+
+    return {
+      ...row,
+      startTime: normalizeApiTimeForForm(apiRow.start_time) || row.startTime,
+      endTime: normalizeApiTimeForForm(apiRow.end_time) || row.endTime,
+      enabled: true,
+    }
+  })
 }
 
 export function mapKitchenToRestaurant(kitchen: ApiKitchen): Restaurant {
