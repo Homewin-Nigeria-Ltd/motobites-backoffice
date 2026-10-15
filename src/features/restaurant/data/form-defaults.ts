@@ -7,6 +7,7 @@ export const defaultOpeningHours: OpeningHoursRow[] = [
   { id: "thu", day: "Thursday", startTime: "8:00 Am", endTime: "9:00 Pm" },
   { id: "fri", day: "Friday", startTime: "8:00 Am", endTime: "9:00 Pm" },
   { id: "sat", day: "Saturday", startTime: "8:00 Am", endTime: "9:00 Pm" },
+  { id: "sun", day: "Sunday", startTime: "8:00 Am", endTime: "9:00 Pm" },
 ]
 
 export const defaultMenuAvailability: MenuAvailabilityRow[] = [

@@ -19,6 +19,8 @@ export type ApiOrderFulfillmentBranch = {
   key: string
   name: string
   address?: string | null
+  latitude?: string | null
+  longitude?: string | null
 } | null
 
 export type ApiOrderRejectedBy =
@@ -252,14 +254,22 @@ export type ApiOrderDetailData = {
     rider: ApiOrderAssignee
     support: ApiOrderAssignee
   }
+  assigned_customer_care_representative?: ApiOrderAssignee | string | null
+  customer_care_representative?: ApiOrderAssignee | string | null
   timing: {
+    accepted_at?: string | null
+    accepted_by?: ApiOrderAssignee | string | null
+    preparing_at?: string | null
+    ready_at?: string | null
     estimated_preparation_minutes: number
-    preparation_countdown_seconds: number
+    preparation_countdown_seconds: number | null
     preparation_ready_at: string | null
     pickup_time: string | null
+    picked_up_at?: string | null
     delivery_countdown_seconds: number | null
     estimated_delivery_at: string | null
     delivered_at: string | null
+    delivered_at_iso?: string | null
   }
   confirmation_code: string
   confirmation_code_digits: string[]
@@ -275,6 +285,8 @@ export type ApiOrderDetailData = {
     customer: ApiOrderReview | null
     rider: ApiOrderReview | null
   }
+  customer_review?: ApiOrderReview | string | null
+  customer_remark?: string | null
   items?: ApiOrderDetailItem[]
   payment_breakdown?: ApiOrderPaymentBreakdown | null
   kitchen: {
