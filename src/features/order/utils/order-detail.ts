@@ -1,10 +1,13 @@
 import type {
+  ApiOrderAssignee,
+  ApiOrderDetailData,
   ApiOrderDetailItem,
   ApiOrderGift,
   ApiOrderItemAddon,
   ApiOrderPaymentBreakdown,
   ApiOrderReview,
 } from "@/features/order/types"
+import { formatDate } from "@/features/order/utils/date"
 
 export function formatOrderReviewText(
   review: ApiOrderReview | string | null | undefined
@@ -27,8 +30,12 @@ export function formatOrderReviewText(
 export function formatOrderReviewRemark(
   review: ApiOrderReview | string | null | undefined
 ) {
-  if (review == null || typeof review === "string") {
+  if (review == null) {
     return null
+  }
+
+  if (typeof review === "string") {
+    return review.trim() || null
   }
 
   if (!review.remark?.trim()) {
@@ -36,6 +43,38 @@ export function formatOrderReviewRemark(
   }
 
   return review.remark.trim()
+}
+
+function toAssignee(
+  value: ApiOrderAssignee | string | null | undefined
+): ApiOrderAssignee {
+  if (!value) {
+    return null
+  }
+
+  if (typeof value === "string") {
+    const name = value.trim()
+    return name ? { id: 0, name } : null
+  }
+
+  return value
+}
+
+export function formatOrderTiming(value?: string | null) {
+  if (!value?.trim()) {
+    return "—"
+  }
+
+  const parsed = new Date(value)
+  return Number.isNaN(parsed.getTime()) ? value : formatDate(value)
+}
+
+export function getOrderCustomerCareAssignee(order: ApiOrderDetailData) {
+  return (
+    order.assignments?.support ??
+    toAssignee(order.assigned_customer_care_representative) ??
+    toAssignee(order.customer_care_representative)
+  )
 }
 
 export function getOrderItemAddons(item: ApiOrderDetailItem): ApiOrderItemAddon[] {

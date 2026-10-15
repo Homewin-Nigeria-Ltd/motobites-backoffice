@@ -28,6 +28,8 @@ import {
   formatGiftAddress,
   formatOrderReviewRemark,
   formatOrderReviewText,
+  formatOrderTiming,
+  getOrderCustomerCareAssignee,
   getOrderItemAddons,
   getPaymentBreakdownLines,
 } from "@/features/order/utils/order-detail"
@@ -114,7 +116,10 @@ export function OrderDetailsModal({
   }
 
   const mapCoords = getOrderMapCoordinates(order.map)
-  const customerRemark = formatOrderReviewRemark(order.reviews.customer)
+  const customerRemark =
+    formatOrderReviewRemark(order.reviews?.customer) ??
+    formatOrderReviewRemark(order.customer_remark)
+  const customerCareAssignee = getOrderCustomerCareAssignee(order)
 
   const currentAssigneeId =
     assigneeDialogType != null
@@ -504,15 +509,43 @@ export function OrderDetailsModal({
 
         <div className={detailGrid2}>
           <div className={detailField}>
-            <Label className={detailLabel}>Pick-up Time</Label>
+            <Label className={detailLabel}>Accepted At</Label>
             <p className={cn(detailValue, "font-medium")}>
-              {order.timing.pickup_time ?? "—"}
+              {formatOrderTiming(order.timing.accepted_at)}
             </p>
           </div>
           <div className={detailField}>
+            <Label className={detailLabel}>Preparing At</Label>
+            <p className={cn(detailValue, "font-medium")}>
+              {formatOrderTiming(order.timing.preparing_at)}
+            </p>
+          </div>
+        </div>
+
+        <div className={detailGrid2}>
+          <div className={detailField}>
+            <Label className={detailLabel}>Ready At</Label>
+            <p className={cn(detailValue, "font-medium")}>
+              {formatOrderTiming(order.timing.ready_at)}
+            </p>
+          </div>
+          <div className={detailField}>
+            <Label className={detailLabel}>Pick-up Time</Label>
+            <p className={cn(detailValue, "font-medium")}>
+              {formatOrderTiming(
+                order.timing.pickup_time ?? order.timing.picked_up_at
+              )}
+            </p>
+          </div>
+        </div>
+
+        <div className={detailGrid2}>
+          <div className={detailField}>
             <Label className={detailLabel}>Delivery Time</Label>
             <p className={cn(detailValue, "font-medium")}>
-              {order.timing.delivered_at ?? "—"}
+              {formatOrderTiming(
+                order.timing.delivered_at ?? order.timing.delivered_at_iso
+              )}
             </p>
           </div>
         </div>
@@ -521,7 +554,7 @@ export function OrderDetailsModal({
           <Label className={detailLabel}>Assigned Customer Care Representative</Label>
           <div className={detailValue}>
             <OrderAssigneeField
-              assignee={order.assignments.support}
+              assignee={customerCareAssignee}
               assignLabel="Assign Representative"
               changeLabel="Change"
               onChangeClick={() => setAssigneeDialogType("support")}
@@ -542,13 +575,15 @@ export function OrderDetailsModal({
           <div className={detailField}>
             <Label className={detailLabel}>Customer&apos;s Review</Label>
             <p className="text-sm leading-relaxed text-muted-foreground">
-              {formatOrderReviewText(order.reviews.customer)}
+              {formatOrderReviewText(
+                order.reviews?.customer ?? order.customer_review
+              )}
             </p>
           </div>
           <div className={detailField}>
             <Label className={detailLabel}>Rider&apos;s Review</Label>
             <p className="text-sm leading-relaxed text-muted-foreground">
-              {formatOrderReviewText(order.reviews.rider)}
+              {formatOrderReviewText(order.reviews?.rider)}
             </p>
           </div>
         </div>

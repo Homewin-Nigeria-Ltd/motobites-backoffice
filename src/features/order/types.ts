@@ -19,6 +19,8 @@ export type ApiOrderFulfillmentBranch = {
   key: string
   name: string
   address?: string | null
+  latitude?: string | null
+  longitude?: string | null
 } | null
 
 export type ApiOrderRejectedBy =
@@ -252,14 +254,22 @@ export type ApiOrderDetailData = {
     rider: ApiOrderAssignee
     support: ApiOrderAssignee
   }
+  assigned_customer_care_representative?: ApiOrderAssignee | string | null
+  customer_care_representative?: ApiOrderAssignee | string | null
   timing: {
+    accepted_at?: string | null
+    accepted_by?: ApiOrderAssignee | string | null
+    preparing_at?: string | null
+    ready_at?: string | null
     estimated_preparation_minutes: number
-    preparation_countdown_seconds: number
+    preparation_countdown_seconds: number | null
     preparation_ready_at: string | null
     pickup_time: string | null
+    picked_up_at?: string | null
     delivery_countdown_seconds: number | null
     estimated_delivery_at: string | null
     delivered_at: string | null
+    delivered_at_iso?: string | null
   }
   confirmation_code: string
   confirmation_code_digits: string[]
@@ -275,6 +285,8 @@ export type ApiOrderDetailData = {
     customer: ApiOrderReview | null
     rider: ApiOrderReview | null
   }
+  customer_review?: ApiOrderReview | string | null
+  customer_remark?: string | null
   items?: ApiOrderDetailItem[]
   payment_breakdown?: ApiOrderPaymentBreakdown | null
   kitchen: {
@@ -296,33 +308,18 @@ export type OrderDetailApiResponse = {
   message?: string
 }
 
-export type ApiOrderReceiptGatewayAuthorization = {
-  last4: string
-  card_type: string
-  bank: string
-  brand: string
-  channel: string
-  exp_month: string
-  exp_year: string
+export type ApiOrderReceiptCard = {
+  last_four?: string | null
+  type?: string | null
+  bank?: string | null
+  expires?: string | null
 }
 
-export type ApiOrderReceiptGatewayCustomer = {
-  email: string
-  customer_code: string
-}
-
-export type ApiOrderReceiptGatewayResponse = {
-  id: number
-  status: string
-  reference: string
-  amount: number
-  currency: string
-  channel: string
-  gateway_response: string
-  paid_at: string
-  fees: number
-  authorization: ApiOrderReceiptGatewayAuthorization
-  customer: ApiOrderReceiptGatewayCustomer
+export type ApiOrderReceiptCustomer = {
+  id?: number | string
+  name?: string | null
+  email?: string | null
+  code?: string | null
 }
 
 export type ApiOrderReceiptData = {
@@ -331,7 +328,12 @@ export type ApiOrderReceiptData = {
   amount_kobo: number
   status: string
   paid_at: string
-  gateway_response: ApiOrderReceiptGatewayResponse
+  gateway_response?: Record<string, unknown> | string | null
+  transaction_id?: string | null
+  fees_kobo?: number | null
+  fees?: number | null
+  card?: ApiOrderReceiptCard | null
+  customer?: ApiOrderReceiptCustomer | null
 }
 
 export type OrderReceiptApiResponse = {
