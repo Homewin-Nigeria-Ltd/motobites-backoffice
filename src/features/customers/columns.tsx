@@ -5,7 +5,7 @@ import type { ColumnDef } from "@tanstack/react-table"
 
 import { CustomerStatusBadge } from "@/features/customers/components/customer-status-badge"
 import type { Customer } from "@/features/customers/types"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 export const customerColumns: ColumnDef<Customer>[] = [
   {
@@ -25,6 +25,9 @@ export const customerColumns: ColumnDef<Customer>[] = [
       return (
         <div className="flex items-center gap-3">
           <Avatar className="size-10">
+            {customer.avatar ? (
+              <AvatarImage src={customer.avatar} alt={customer.name} />
+            ) : null}
             <AvatarFallback className="bg-primary/15 text-sm font-medium text-primary">
               {customer.initials}
             </AvatarFallback>
@@ -87,6 +90,24 @@ export const customerColumns: ColumnDef<Customer>[] = [
     cell: ({ row }) => (
       <span className="whitespace-nowrap text-foreground">
         {row.original.walletBalanceFormatted}
+      </span>
+    ),
+  },
+  {
+    accessorKey: "ordersCount",
+    header: "Orders",
+    cell: ({ row }) => (
+      <span className="whitespace-nowrap text-foreground">
+        {row.original.ordersCount.toLocaleString()}
+      </span>
+    ),
+  },
+  {
+    accessorKey: "referralCount",
+    header: "Referrals",
+    cell: ({ row }) => (
+      <span className="whitespace-nowrap text-foreground">
+        {row.original.referralCount.toLocaleString()}
       </span>
     ),
   },

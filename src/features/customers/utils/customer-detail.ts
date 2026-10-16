@@ -12,6 +12,7 @@ import type {
   CustomerTransaction,
 } from "../types"
 import { mapApiCustomerToCustomer } from "./customer"
+import { mapApiReferredCustomer } from "./referral"
 
 function splitName(name: string) {
   const parts = name.trim().split(/\s+/).filter(Boolean)
@@ -195,7 +196,7 @@ function mapApiCustomerToCustomerDetail(
     lastName: customer.last_name || split.lastName,
     homeAddress: customer.home_address || "—",
     deliveryAddress: "—",
-    avatar: null,
+    avatar: customer.avatar ?? null,
     joinedAtIso: null,
     acquisitionSource: null,
     ordersCount: customer.orders_count ?? 0,
@@ -213,6 +214,8 @@ function mapApiCustomerToCustomerDetail(
     cnplEnabled: false,
     transactions,
     cnplTransactions,
+    referralCount: customer.referral_count ?? base.referralCount,
+    referrals: (customer.referrals ?? []).map(mapApiReferredCustomer),
     initials: customer.initials || getInitials(fullName),
   }
 }
@@ -241,6 +244,12 @@ export function mapApiCustomerDetailToCustomerDetail(
     orders_count: account.orders_count,
     today_transaction: account.today_transaction,
     today_transaction_formatted: account.today_transaction_formatted,
+    referral_count:
+      data.referral_count ??
+      account.referral_count ??
+      data.referrals?.length ??
+      0,
+    referrals: data.referrals,
   })
 
   const overdraftBalance = cnpl.overdraft_balance ?? 0
@@ -271,6 +280,7 @@ export function mapApiCustomerDetailToCustomerDetail(
     cnplEnabled: cnpl.is_enabled ?? false,
     transactions: (data.recent_orders ?? []).map(mapApiTransaction),
     cnplTransactions: cnplTransactions.map(mapApiCnplTransaction),
+    referrals: (data.referrals ?? []).map(mapApiReferredCustomer),
     initials: getInitials(fullName),
   }
 }

@@ -13,6 +13,7 @@ export type Customer = {
   name: string
   email: string
   initials: string
+  avatar: string | null
   status: CustomerStatus
   statusLabel: string
   joinedAt: string
@@ -22,6 +23,7 @@ export type Customer = {
   walletBalance: number
   walletBalanceFormatted: string
   ordersCount: number
+  referralCount: number
 }
 
 export type CustomerTransaction = {
@@ -52,6 +54,34 @@ export type CustomerCnplTransaction = {
   amount: string
 }
 
+export type CustomerReferral = {
+  id: string
+  name: string
+  email: string
+  phone: string
+  signedUpAt: string
+}
+
+export type ReferralSignup = {
+  id: string
+  referrerId: string | null
+  referrerName: string
+  referredId: string | null
+  referredName: string
+  referredEmail: string
+  referredPhone: string
+  signedUpAt: string
+}
+
+export type ReferralPeriod = "all" | "24h" | "week" | "month" | "custom"
+
+export type ReferralListParams = {
+  page: number
+  per_page?: number
+  from?: string
+  to?: string
+}
+
 export type CustomerDetail = Customer & {
   firstName: string
   lastName: string
@@ -73,6 +103,7 @@ export type CustomerDetail = Customer & {
   cnplEnabled: boolean
   transactions: CustomerTransaction[]
   cnplTransactions: CustomerCnplTransaction[]
+  referrals: CustomerReferral[]
 }
 
 export type CustomerTrend = "up" | "down"
@@ -105,6 +136,11 @@ export type CustomerListResponse = {
   meta: CustomerListMeta
 }
 
+export type ReferralListResponse = {
+  items: ReferralSignup[]
+  meta: CustomerListMeta
+}
+
 export type CustomerSummaryResponse = {
   stats: CustomerSummaryStat[]
 }
@@ -119,6 +155,7 @@ export type ApiCustomer = {
   last_name?: string
   email?: string
   initials?: string
+  avatar?: string | null
   status?: string
   status_label?: string
   joined_at?: string
@@ -130,6 +167,8 @@ export type ApiCustomer = {
   wallet_balance?: number
   wallet_balance_formatted?: string
   orders_count?: number
+  referral_count?: number
+  referrals?: ApiReferredCustomer[]
   overdraft_balance?: number
   overdraft_balance_formatted?: string
   overdraft_eligibility?: number
@@ -207,6 +246,7 @@ export type ApiCustomerAccount = {
   average_order_value_kobo?: number | null
   average_order_value_formatted?: string | null
   preferred_payment_method?: string | null
+  referral_count?: number
 }
 
 export type ApiCustomerCnpl = {
@@ -225,6 +265,41 @@ export type ApiCustomerDetailData = {
   chop_now_pay_later?: ApiCustomerCnpl
   cnpl_transactions?: ApiCustomerCnplTransaction[]
   recent_orders?: ApiCustomerTransaction[]
+  referral_count?: number
+  referrals?: ApiReferredCustomer[]
+}
+
+export type ApiReferralPerson = {
+  id?: number | string
+  name?: string
+  email?: string
+  phone?: string | null
+  referred_at?: string
+}
+
+export type ApiReferredCustomer = ApiReferralPerson & {
+  status?: string
+}
+
+export type ApiReferralSignup = {
+  id: number
+  name: string
+  email?: string
+  phone?: string | null
+  status?: string
+  referred_at?: string
+  referrer?: {
+    id: number
+    name?: string
+    email?: string
+  } | null
+}
+
+export type ApiReferralListResponse = {
+  success?: boolean
+  data: ApiReferralSignup[]
+  meta: CustomerListMeta
+  message?: string
 }
 
 export type ApiCustomerResponse = {
