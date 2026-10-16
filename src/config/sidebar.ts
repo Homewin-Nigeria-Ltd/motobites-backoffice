@@ -140,6 +140,7 @@ export const navSupport: SupportItem[] = [
     items: [
       { name: "Tickets", url: "/customers/tickets" },
       { name: "Chat", url: "/customers/chats" },
+      { name: "Referrals", url: "/customers/referrals" },
     ],
   },
   {

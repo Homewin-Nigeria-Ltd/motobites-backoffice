@@ -7,7 +7,9 @@ export {
 } from "./actions/customer.actions"
 export { CustomerManagementSection } from "./sections/customer-section"
 export { CustomerDetailSection } from "./sections/customer-detail-section"
+export { ReferralsSection } from "./sections/referrals-section"
 export { useCustomerList } from "./hooks/use-customer-list"
+export { useReferrals } from "./hooks/use-referrals"
 export { useCustomerDetail } from "./hooks/use-customer-detail"
 export { useCustomerOverview, useCustomerSummary } from "./hooks/use-customer-summary"
 export {

@@ -4,6 +4,7 @@ import { CustomerAccountDetailsSection } from "@/features/customers/sections/cus
 import { CustomerAccountManagementSection } from "@/features/customers/sections/customer-account-management-section"
 import { CustomerChopNowPayLaterSection } from "@/features/customers/sections/customer-chop-now-pay-later-section"
 import { CustomerPersonalInformationSection } from "@/features/customers/sections/customer-personal-information-section"
+import { CustomerReferralsSection } from "@/features/customers/sections/customer-referrals-section"
 import { CustomerTransactionHistorySection } from "@/features/customers/sections/customer-transaction-history-section"
 import { useCustomerDetail } from "@/features/customers/hooks/use-customer-detail"
 import { AppLoader } from "@/components/ui/app-loader"
@@ -31,6 +32,7 @@ export function CustomerDetailSection({
       <div className="flex-1 p-4 md:p-6">
         <div className="rounded-2xl bg-background px-4 py-2 md:px-8 md:py-4">
           <CustomerPersonalInformationSection customer={customer} />
+          <CustomerReferralsSection customer={customer} />
           <CustomerTransactionHistorySection customer={customer} />
           <CustomerAccountDetailsSection customer={customer} />
           <CustomerChopNowPayLaterSection customer={customer} />
