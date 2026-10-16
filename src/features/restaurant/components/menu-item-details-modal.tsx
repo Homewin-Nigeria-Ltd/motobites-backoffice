@@ -12,6 +12,7 @@ import {
   useMenuItemDetail,
 } from "@/features/restaurant/hooks/use-restaurant-queries"
 import { useToggleMenuItemAvailability } from "@/features/restaurant/hooks/use-restaurant-mutations"
+import { MenuItemFlagTags } from "@/features/restaurant/components/menu-item-flag-tags"
 import { mapApiMenuItemToMenu } from "@/features/restaurant/utils/menu-item"
 import { getMenuItemBranchAvailability } from "@/features/restaurant/utils/menu-item-branch-availability"
 import type { ApiMenuItemDetail, Menu, MenuItemModifier } from "@/features/restaurant/types"
@@ -181,12 +182,7 @@ function MenuItemDetailsContent({
                 {menu.description}
               </p>
 
-              {menu.isPopular ? (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-secondary px-3 py-1 text-sm font-medium text-primary">
-                  <Icons.flame size={16} />
-                  Popularity
-                </span>
-              ) : null}
+              <MenuItemFlagTags menu={menu} />
             </div>
 
             <Separator className="my-4" />
