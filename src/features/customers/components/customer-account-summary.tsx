@@ -59,6 +59,12 @@ export function CustomerAccountSummary({
       />
 
       <AccountStat
+        label="Referrals"
+        value={`${customer.referralCount.toLocaleString()}`}
+        description="Customers who signed up through this customer's referral."
+      />
+
+      <AccountStat
         label="Lifetime Value"
         value={customer.lifetimeValueFormatted}
         description="Total amount spent by this customer across all orders."

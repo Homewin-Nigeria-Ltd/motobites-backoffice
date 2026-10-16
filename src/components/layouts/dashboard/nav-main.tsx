@@ -81,7 +81,8 @@ function isNavItemActive(pathname: string, item: NavItem) {
         pathname.startsWith("/promotions") ||
         (pathname.startsWith("/customers/") &&
           !pathname.startsWith("/customers/tickets") &&
-          !pathname.startsWith("/customers/chats"))))
+          !pathname.startsWith("/customers/chats") &&
+          !pathname.startsWith("/customers/referrals"))))
   )
 }
 

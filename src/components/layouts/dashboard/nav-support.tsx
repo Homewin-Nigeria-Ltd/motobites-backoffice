@@ -47,7 +47,8 @@ export function NavSupport({
             ) ||
             (item.name === "Customer" &&
               (pathname.startsWith("/customers/tickets") ||
-                pathname.startsWith("/customers/chats")))
+                pathname.startsWith("/customers/chats") ||
+                pathname.startsWith("/customers/referrals")))
 
           if (item.items?.length) {
             return (

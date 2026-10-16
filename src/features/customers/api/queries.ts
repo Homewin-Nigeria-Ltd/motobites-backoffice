@@ -5,16 +5,20 @@ import type {
   ApiCustomerListResponse,
   ApiCustomerOverviewResponse,
   ApiCustomerResponse,
+  ApiReferralListResponse,
   CustomerDetail,
   CustomerListParams,
   CustomerListResponse,
   CustomerSummaryResponse,
+  ReferralListParams,
+  ReferralListResponse,
 } from "../types"
 import {
   mapApiCustomerToCustomer,
   mapApiOverviewToSummaryStats,
 } from "../utils/customer"
 import { mapApiCustomerDetailToCustomerDetail } from "../utils/customer-detail"
+import { mapApiReferralListResponse } from "../utils/referral"
 import { customerEndpoints } from "./endpoints"
 import { customerKeys } from "./keys"
 
@@ -62,6 +66,30 @@ async function fetchCustomerOverview(branchId?: number | null): Promise<Customer
   }
 }
 
+async function fetchReferralList(
+  params: ReferralListParams
+): Promise<ReferralListResponse> {
+  const query: Record<string, string | number> = {
+    page: params.page,
+    per_page: params.per_page ?? 8,
+  }
+
+  if (params.from?.trim()) {
+    query.from = params.from.trim()
+  }
+
+  if (params.to?.trim()) {
+    query.to = params.to.trim()
+  }
+
+  const response = await api.get<ApiReferralListResponse>(
+    customerEndpoints.referrals,
+    query
+  )
+
+  return mapApiReferralListResponse(response)
+}
+
 async function fetchCustomerDetail(id: string): Promise<CustomerDetail> {
   const response = await api.get<ApiCustomerResponse>(
     customerEndpoints.detail(id)
@@ -81,6 +109,12 @@ export const customerQueries = {
     queryOptions({
       queryKey: customerKeys.overview(branchId),
       queryFn: () => fetchCustomerOverview(branchId),
+    }),
+
+  referrals: (params: ReferralListParams) =>
+    queryOptions({
+      queryKey: customerKeys.referrals(params),
+      queryFn: () => fetchReferralList(params),
     }),
 
   detail: (id: string) =>

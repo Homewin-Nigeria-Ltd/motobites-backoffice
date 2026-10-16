@@ -92,6 +92,7 @@ export function mapApiCustomerToCustomer(customer: ApiCustomer): Customer {
     name,
     email: customer.email ?? "—",
     initials: customer.initials || getInitials(name),
+    avatar: customer.avatar ?? null,
     status,
     statusLabel: customer.status_label ?? STATUS_LABELS[status],
     joinedAt: customer.joined_at ?? "—",
@@ -104,6 +105,7 @@ export function mapApiCustomerToCustomer(customer: ApiCustomer): Customer {
     walletBalanceFormatted:
       customer.wallet_balance_formatted ?? formatNairaAmount(walletBalance),
     ordersCount: customer.orders_count ?? 0,
+    referralCount: customer.referral_count ?? 0,
   }
 }
 
