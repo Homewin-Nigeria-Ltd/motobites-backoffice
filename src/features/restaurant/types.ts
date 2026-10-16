@@ -7,6 +7,8 @@ export type Menu = {
   imageUrl: string
   enabled: boolean
   isPopular?: boolean
+  isCombo?: boolean
+  isChefsPick?: boolean
   videos?: MenuItemVideo[]
 }
 
@@ -317,6 +319,8 @@ export type ApiMenuItem = {
   unavailable_today: boolean
   is_popular: boolean
   is_combo?: boolean
+  is_chefs_pick?: boolean
+  is_chef_pick?: boolean
   availability_type: string
   availability_start?: string | null
   availability_end?: string | null

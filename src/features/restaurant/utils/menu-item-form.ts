@@ -48,6 +48,8 @@ export type MenuItemFormValues = {
   videos: File[];
   modifier_groups: MenuItemModifierGroupFormValue[];
   is_combo: boolean;
+  is_chefs_pick: boolean;
+  is_popular: boolean;
 };
 
 function isApiMenuItemTags(tags: unknown): tags is ApiMenuItemTags {
@@ -96,6 +98,8 @@ export function createEmptyMenuItemFormValues(
     videos: [],
     modifier_groups: [],
     is_combo: false,
+    is_chefs_pick: false,
+    is_popular: false,
   };
 }
 
@@ -156,6 +160,8 @@ export function mapApiMenuItemToFormValues(
     videos: [],
     modifier_groups,
     is_combo: Boolean(item.is_combo),
+    is_chefs_pick: Boolean(item.is_chefs_pick ?? item.is_chef_pick),
+    is_popular: Boolean(item.is_popular),
   };
 }
 
@@ -180,6 +186,8 @@ export function buildMenuItemFormData(
   formData.append("price", String(Number.parseFloat(values.price) || 0));
   formData.append("kitchen_id", values.kitchenId);
   formData.append("is_combo", values.is_combo ? "1" : "0");
+  formData.append("is_chefs_pick", values.is_chefs_pick ? "1" : "0");
+  formData.append("is_popular", values.is_popular ? "1" : "0");
 
   if (values.description?.trim()) {
     formData.append("description", values.description.trim());

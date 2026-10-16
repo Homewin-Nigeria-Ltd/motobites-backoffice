@@ -127,6 +127,8 @@ function AddMenuSheetForm({
       videos: z.array(z.any()).default([]),
       modifier_groups: z.array(modifierGroupSchema).default([]),
       is_combo: z.boolean().default(false),
+      is_chefs_pick: z.boolean().default(false),
+      is_popular: z.boolean().default(false),
     })
     .superRefine((data, ctx) => {
       const hasNewImages = Array.isArray(data.images) && data.images.length > 0;
@@ -472,7 +474,23 @@ function AddMenuSheetForm({
         />
       </section>
 
-      <section>
+      <section className="space-y-3">
+        <Controller
+          name="is_popular"
+          control={control}
+          render={({ field }) => (
+            <div className="flex items-center justify-between rounded-lg border border-border px-4 py-3">
+              <FieldLabel htmlFor="is_popular" className="cursor-pointer">
+                Popular
+              </FieldLabel>
+              <Switch
+                id="is_popular"
+                checked={Boolean(field.value)}
+                onCheckedChange={field.onChange}
+              />
+            </div>
+          )}
+        />
         <Controller
           name="is_combo"
           control={control}
@@ -483,6 +501,22 @@ function AddMenuSheetForm({
               </FieldLabel>
               <Switch
                 id="is_combo"
+                checked={Boolean(field.value)}
+                onCheckedChange={field.onChange}
+              />
+            </div>
+          )}
+        />
+        <Controller
+          name="is_chefs_pick"
+          control={control}
+          render={({ field }) => (
+            <div className="flex items-center justify-between rounded-lg border border-border px-4 py-3">
+              <FieldLabel htmlFor="is_chefs_pick" className="cursor-pointer">
+                Chef&apos;s pick
+              </FieldLabel>
+              <Switch
+                id="is_chefs_pick"
                 checked={Boolean(field.value)}
                 onCheckedChange={field.onChange}
               />

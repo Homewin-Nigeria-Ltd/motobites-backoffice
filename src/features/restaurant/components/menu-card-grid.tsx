@@ -7,6 +7,7 @@ import { BaseAlertDialog } from "@/components/ui/base-alert-dialog"
 import { Card } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { MenuCardActions } from "@/features/restaurant/components/menu-card-actions"
+import { MenuItemFlagTags } from "@/features/restaurant/components/menu-item-flag-tags"
 import { useDeleteMenuItem } from "@/features/restaurant/hooks/use-restaurant-mutations"
 import { MenuItemDetailsModal } from "@/features/restaurant/components/menu-item-details-modal"
 import { buildMenuItemHref } from "@/features/restaurant"
@@ -110,6 +111,7 @@ export function MenuCardGrid({ menu, hubId, onEditItem }: MenuCardGridProps) {
             <p className="line-clamp-2 text-sm text-muted-foreground">
               {menu.description}
             </p>
+            <MenuItemFlagTags menu={menu} className="mt-1" />
           </div>
           <Separator className="mx-5 my-3" />
           <div className="space-y-0.5 px-5 text-sm text-muted-foreground">
