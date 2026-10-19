@@ -394,3 +394,39 @@ export type ApiMenuItemsListResponse = {
   meta: ApiMenuItemsMeta
   message?: string
 }
+
+export type ApiPromotionalVideo = {
+  id: number
+  title: string
+  description?: string | null
+  duration: number
+  sort_order?: number
+  is_active?: boolean | number
+  thumbnail?: string | null
+  thumbnail_url?: string | null
+  video?: string | null
+  video_url?: string | null
+}
+
+export type PromotionalVideo = {
+  id: string
+  title: string
+  description: string
+  duration: number
+  sortOrder: number
+  isActive: boolean
+  thumbnailUrl: string | null
+  videoUrl: string | null
+}
+
+export type ApiPromotionalVideosResponse = {
+  success?: boolean
+  data: ApiPromotionalVideo[]
+  message?: string
+}
+
+export type PromotionalVideoMutationResponse = {
+  success?: boolean
+  data: ApiPromotionalVideo
+  message?: string
+}

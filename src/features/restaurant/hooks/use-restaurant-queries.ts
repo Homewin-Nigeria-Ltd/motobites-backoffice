@@ -79,3 +79,10 @@ export function useMenuItemDetail(
 export function useFulfillmentBranches() {
   return useQuery(restaurantQueries.branches())
 }
+
+export function usePromotionalVideos(options?: { enabled?: boolean }) {
+  return useQuery({
+    ...restaurantQueries.promotionalVideos(),
+    enabled: options?.enabled ?? true,
+  })
+}

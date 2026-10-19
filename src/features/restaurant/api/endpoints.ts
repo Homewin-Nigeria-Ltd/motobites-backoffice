@@ -9,6 +9,9 @@ export const restaurantServerEndpoints = {
     `${menuManagementBase}/items/${itemId}/images/${imageId}`,
   menuItemVideo: (itemId: string | number, videoId: string | number) =>
     `${menuManagementBase}/items/${itemId}/videos/${videoId}`,
+  promotionalVideos: `${menuManagementBase}/promotional-videos`,
+  promotionalVideo: (videoId: string | number) =>
+    `${menuManagementBase}/promotional-videos/${videoId}`,
   fulfillmentBranches: "/admin/fulfillment-branches",
   fulfillmentBranch: (branchId: string | number) =>
     `/admin/fulfillment-branches/${encodeURIComponent(String(branchId))}`,
@@ -29,6 +32,9 @@ export const restaurantEndpoints = {
     `/api/proxy/admin/menu-management/items/${itemId}/images/${imageId}`,
   menuItemVideo: (itemId: string | number, videoId: string | number) =>
     `/api/proxy/admin/menu-management/items/${itemId}/videos/${videoId}`,
+  promotionalVideos: "/api/proxy/admin/menu-management/promotional-videos",
+  promotionalVideo: (videoId: string | number) =>
+    `/api/proxy/admin/menu-management/promotional-videos/${videoId}`,
   fulfillmentBranches: "/api/proxy/admin/fulfillment-branches",
   fulfillmentBranch: (branchId: string | number) =>
     `/api/proxy/admin/fulfillment-branches/${encodeURIComponent(String(branchId))}`,
