@@ -12,6 +12,7 @@ import type {
   CreateFulfillmentBranchInput,
   KitchenMutationResponse,
   MenuItemMutationResponse,
+  PromotionalVideoMutationResponse,
   RestaurantActionResult,
   UpdateFulfillmentBranchInput,
 } from "../types"
@@ -136,5 +137,36 @@ export const restaurantMutations = {
   updateFulfillmentBranch: {
     mutationFn: (input: UpdateFulfillmentBranchInput) =>
       updateFulfillmentBranchAction(input),
+  },
+
+  createPromotionalVideo: {
+    mutationFn: (formData: FormData) =>
+      api
+        .post<PromotionalVideoMutationResponse, FormData>(
+          restaurantEndpoints.promotionalVideos,
+          formData
+        )
+        .then((response) => response.data),
+  },
+
+  updatePromotionalVideo: {
+    mutationFn: ({
+      videoId,
+      formData,
+    }: {
+      videoId: string
+      formData: FormData
+    }) =>
+      api
+        .put<PromotionalVideoMutationResponse, FormData>(
+          restaurantEndpoints.promotionalVideo(videoId),
+          formData
+        )
+        .then((response) => response.data),
+  },
+
+  deletePromotionalVideo: {
+    mutationFn: (videoId: string) =>
+      api.delete(restaurantEndpoints.promotionalVideo(videoId)),
   },
 } as const

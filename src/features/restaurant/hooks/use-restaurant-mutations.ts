@@ -338,3 +338,84 @@ export function useUpdateFulfillmentBranch() {
     isPending: mutation.isPending,
   }
 }
+
+export function useCreatePromotionalVideo() {
+  const queryClient = useQueryClient()
+
+  const mutation = useMutation({
+    ...restaurantMutations.createPromotionalVideo,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: restaurantKeys.promotionalVideos(),
+      })
+      toast.success("Promotional video added")
+    },
+    onError: (error) => {
+      const message =
+        error instanceof ApiError
+          ? error.message
+          : "Failed to add promotional video. Please try again."
+      toast.error(message)
+    },
+  })
+
+  return {
+    createPromotionalVideo: mutation.mutateAsync,
+    isPending: mutation.isPending,
+  }
+}
+
+export function useUpdatePromotionalVideo() {
+  const queryClient = useQueryClient()
+
+  const mutation = useMutation({
+    ...restaurantMutations.updatePromotionalVideo,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: restaurantKeys.promotionalVideos(),
+      })
+      toast.success("Promotional video updated")
+    },
+    onError: (error) => {
+      const message =
+        error instanceof ApiError
+          ? error.message
+          : "Failed to update promotional video. Please try again."
+      toast.error(message)
+    },
+  })
+
+  return {
+    updatePromotionalVideo: mutation.mutateAsync,
+    isPending: mutation.isPending,
+  }
+}
+
+export function useDeletePromotionalVideo() {
+  const queryClient = useQueryClient()
+
+  const mutation = useMutation({
+    ...restaurantMutations.deletePromotionalVideo,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: restaurantKeys.promotionalVideos(),
+      })
+      toast.success("Promotional video deleted")
+    },
+    onError: (error) => {
+      const message =
+        error instanceof ApiError
+          ? error.message
+          : "Failed to delete promotional video. Please try again."
+      toast.error(message)
+    },
+  })
+
+  return {
+    deletePromotionalVideo: mutation.mutateAsync,
+    isPending: mutation.isPending,
+    pendingVideoId: mutation.isPending
+      ? String(mutation.variables ?? "")
+      : null,
+  }
+}
