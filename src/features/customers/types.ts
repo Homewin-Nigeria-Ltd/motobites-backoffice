@@ -60,6 +60,11 @@ export type CustomerReferral = {
   email: string
   phone: string
   signedUpAt: string
+  hasFunded: boolean
+  totalFundedAmount: number
+  totalFundedAmountFormatted: string
+  referrerEarnings: number
+  referrerEarningsFormatted: string
 }
 
 export type ReferralSignup = {
@@ -71,6 +76,11 @@ export type ReferralSignup = {
   referredEmail: string
   referredPhone: string
   signedUpAt: string
+  hasFunded: boolean
+  totalFundedAmount: number
+  totalFundedAmountFormatted: string
+  referrerEarnings: number
+  referrerEarningsFormatted: string
 }
 
 export type ReferralPeriod = "all" | "24h" | "week" | "month" | "custom"
@@ -80,6 +90,17 @@ export type ReferralListParams = {
   per_page?: number
   from?: string
   to?: string
+}
+
+export type CustomerReferralStats = {
+  totalReferralsCount: number
+  fundedReferralsCount: number
+  referrerActualEarnings: number
+  referrerActualEarningsFormatted: string
+  referrerExpectedEarnings: number
+  referrerExpectedEarningsFormatted: string
+  referrerTotalPotentialEarnings: number
+  referrerTotalPotentialEarningsFormatted: string
 }
 
 export type CustomerDetail = Customer & {
@@ -104,6 +125,7 @@ export type CustomerDetail = Customer & {
   transactions: CustomerTransaction[]
   cnplTransactions: CustomerCnplTransaction[]
   referrals: CustomerReferral[]
+  referralStats: CustomerReferralStats
 }
 
 export type CustomerTrend = "up" | "down"
@@ -136,9 +158,22 @@ export type CustomerListResponse = {
   meta: CustomerListMeta
 }
 
+export type ReferralPlatformStats = {
+  totalReferralsCount: number
+  fundedReferralsCount: number
+  platformActualPayouts: number
+  platformActualPayoutsFormatted: string
+  platformExpectedPayouts: number
+  platformExpectedPayoutsFormatted: string
+  platformTotalPotentialPayouts: number
+  platformTotalPotentialPayoutsFormatted: string
+}
+
+export type ReferralListMeta = CustomerListMeta & ReferralPlatformStats
+
 export type ReferralListResponse = {
   items: ReferralSignup[]
-  meta: CustomerListMeta
+  meta: ReferralListMeta
 }
 
 export type CustomerSummaryResponse = {
@@ -279,6 +314,9 @@ export type ApiReferralPerson = {
 
 export type ApiReferredCustomer = ApiReferralPerson & {
   status?: string
+  has_funded?: boolean
+  total_funded_amount?: number
+  referrer_earnings?: number
 }
 
 export type ApiReferralSignup = {
@@ -288,6 +326,9 @@ export type ApiReferralSignup = {
   phone?: string | null
   status?: string
   referred_at?: string
+  has_funded?: boolean
+  total_funded_amount?: number
+  referrer_earnings?: number
   referrer?: {
     id: number
     name?: string
@@ -295,16 +336,33 @@ export type ApiReferralSignup = {
   } | null
 }
 
+export type ApiReferralListMeta = CustomerListMeta & {
+  total_referrals_count?: number
+  funded_referrals_count?: number
+  platform_actual_payouts?: number
+  platform_expected_payouts?: number
+  platform_total_potential_payouts?: number
+}
+
 export type ApiReferralListResponse = {
   success?: boolean
   data: ApiReferralSignup[]
-  meta: CustomerListMeta
+  meta: ApiReferralListMeta
   message?: string
+}
+
+export type ApiCustomerReferralMeta = {
+  total_referrals_count?: number
+  funded_referrals_count?: number
+  referrer_actual_earnings?: number
+  referrer_expected_earnings?: number
+  referrer_total_potential_earnings?: number
 }
 
 export type ApiCustomerResponse = {
   success?: boolean
   data: ApiCustomerDetailData
+  meta?: ApiCustomerReferralMeta
   message?: string
 }
 

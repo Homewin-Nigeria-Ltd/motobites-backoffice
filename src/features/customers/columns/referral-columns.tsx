@@ -3,6 +3,7 @@
 import Link from "next/link"
 import type { ColumnDef } from "@tanstack/react-table"
 
+import { ReferralFundedBadge } from "@/features/customers/components/referral-funded-badge"
 import type { ReferralSignup } from "@/features/customers/types"
 
 export const referralColumns: ColumnDef<ReferralSignup>[] = [
@@ -76,6 +77,31 @@ export const referralColumns: ColumnDef<ReferralSignup>[] = [
     cell: ({ row }) => (
       <span className="whitespace-nowrap text-muted-foreground">
         {row.original.signedUpAt}
+      </span>
+    ),
+  },
+  {
+    accessorKey: "hasFunded",
+    header: "Funded",
+    cell: ({ row }) => (
+      <ReferralFundedBadge funded={row.original.hasFunded} />
+    ),
+  },
+  {
+    accessorKey: "totalFundedAmount",
+    header: "Amount funded",
+    cell: ({ row }) => (
+      <span className="whitespace-nowrap text-foreground">
+        {row.original.totalFundedAmountFormatted}
+      </span>
+    ),
+  },
+  {
+    accessorKey: "referrerEarnings",
+    header: "Referrer earnings",
+    cell: ({ row }) => (
+      <span className="whitespace-nowrap text-foreground">
+        {row.original.referrerEarningsFormatted}
       </span>
     ),
   },

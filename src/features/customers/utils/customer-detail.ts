@@ -6,13 +6,18 @@ import type {
   ApiCustomer,
   ApiCustomerCnplTransaction,
   ApiCustomerDetailData,
+  ApiCustomerReferralMeta,
   ApiCustomerTransaction,
   CustomerCnplTransaction,
   CustomerDetail,
   CustomerTransaction,
 } from "../types"
 import { mapApiCustomerToCustomer } from "./customer"
-import { mapApiReferredCustomer } from "./referral"
+import {
+  emptyCustomerReferralStats,
+  mapApiCustomerReferralStats,
+  mapApiReferredCustomer,
+} from "./referral"
 
 function splitName(name: string) {
   const parts = name.trim().split(/\s+/).filter(Boolean)
@@ -216,12 +221,14 @@ function mapApiCustomerToCustomerDetail(
     cnplTransactions,
     referralCount: customer.referral_count ?? base.referralCount,
     referrals: (customer.referrals ?? []).map(mapApiReferredCustomer),
+    referralStats: emptyCustomerReferralStats(),
     initials: customer.initials || getInitials(fullName),
   }
 }
 
 export function mapApiCustomerDetailToCustomerDetail(
-  data: ApiCustomerDetailData
+  data: ApiCustomerDetailData,
+  meta?: ApiCustomerReferralMeta
 ): CustomerDetail {
   const { profile, account = {} } = data
   const cnpl = data.cnpl ?? data.chop_now_pay_later ?? {}
@@ -281,6 +288,10 @@ export function mapApiCustomerDetailToCustomerDetail(
     transactions: (data.recent_orders ?? []).map(mapApiTransaction),
     cnplTransactions: cnplTransactions.map(mapApiCnplTransaction),
     referrals: (data.referrals ?? []).map(mapApiReferredCustomer),
+    referralStats: mapApiCustomerReferralStats(
+      meta,
+      data.referral_count ?? data.referrals?.length ?? 0
+    ),
     initials: getInitials(fullName),
   }
 }

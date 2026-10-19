@@ -95,7 +95,7 @@ async function fetchCustomerDetail(id: string): Promise<CustomerDetail> {
     customerEndpoints.detail(id)
   )
 
-  return mapApiCustomerDetailToCustomerDetail(response.data)
+  return mapApiCustomerDetailToCustomerDetail(response.data, response.meta)
 }
 
 export const customerQueries = {
