@@ -23,6 +23,7 @@ export {
   useMenuItemDetail,
   useFulfillmentBranches,
   usePromotionalVideos,
+  usePromotionalVideo,
 } from "./hooks/use-restaurant-queries"
 export { useDebouncedSearch } from "./hooks/use-debounced-search"
 export {

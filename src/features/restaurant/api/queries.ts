@@ -7,6 +7,7 @@ import type {
   ApiMenuGroupedResponse,
   ApiMenuItemDetailResponse,
   ApiMenuItemsListResponse,
+  ApiPromotionalVideoResponse,
   ApiPromotionalVideosResponse,
   FulfillmentBranch,
   Hub,
@@ -37,6 +38,13 @@ async function fetchPromotionalVideos(): Promise<PromotionalVideo[]> {
   )
   const items = Array.isArray(response.data) ? response.data : []
   return items.map(mapApiPromotionalVideo)
+}
+
+async function fetchPromotionalVideo(videoId: string): Promise<PromotionalVideo> {
+  const response = await api.get<ApiPromotionalVideoResponse>(
+    restaurantEndpoints.promotionalVideo(videoId)
+  )
+  return mapApiPromotionalVideo(response.data)
 }
 
 async function fetchFulfillmentBranches(): Promise<FulfillmentBranch[]> {
@@ -166,5 +174,13 @@ export const restaurantQueries = {
       queryKey: restaurantKeys.promotionalVideos(),
       queryFn: fetchPromotionalVideos,
       staleTime: 30_000,
+    }),
+
+  promotionalVideo: (videoId: string) =>
+    queryOptions({
+      queryKey: restaurantKeys.promotionalVideo(videoId),
+      queryFn: () => fetchPromotionalVideo(videoId),
+      enabled: Boolean(videoId),
+      staleTime: 0,
     }),
 } as const

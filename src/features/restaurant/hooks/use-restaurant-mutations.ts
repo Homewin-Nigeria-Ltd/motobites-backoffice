@@ -370,9 +370,12 @@ export function useUpdatePromotionalVideo() {
 
   const mutation = useMutation({
     ...restaurantMutations.updatePromotionalVideo,
-    onSuccess: () => {
+    onSuccess: (_data, { videoId }) => {
       queryClient.invalidateQueries({
         queryKey: restaurantKeys.promotionalVideos(),
+      })
+      queryClient.invalidateQueries({
+        queryKey: restaurantKeys.promotionalVideo(videoId),
       })
       toast.success("Promotional video updated")
     },
