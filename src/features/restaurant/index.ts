@@ -22,6 +22,8 @@ export {
   useKitchenMenuItems,
   useMenuItemDetail,
   useFulfillmentBranches,
+  usePromotionalVideos,
+  usePromotionalVideo,
 } from "./hooks/use-restaurant-queries"
 export { useDebouncedSearch } from "./hooks/use-debounced-search"
 export {
@@ -32,6 +34,9 @@ export {
   useDeleteMenuItem,
   useToggleMenuItemAvailability,
   useCreateFulfillmentBranch,
+  useCreatePromotionalVideo,
+  useUpdatePromotionalVideo,
+  useDeletePromotionalVideo,
 } from "./hooks/use-restaurant-mutations"
 export { MenuCatalogSection } from "./sections/menu-catalog-section"
 export { MenuDetailSection } from "./sections/menu-detail-section"

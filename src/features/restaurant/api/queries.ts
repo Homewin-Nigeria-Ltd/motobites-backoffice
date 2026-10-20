@@ -7,11 +7,15 @@ import type {
   ApiMenuGroupedResponse,
   ApiMenuItemDetailResponse,
   ApiMenuItemsListResponse,
+  ApiPromotionalVideoResponse,
+  ApiPromotionalVideosResponse,
   FulfillmentBranch,
   Hub,
+  PromotionalVideo,
 } from "../types"
 import { mapApiFulfillmentBranch } from "../utils/fulfillment-branch"
 import { mapKitchenDetailToRestaurant, mapKitchenToRestaurant } from "../utils/kitchen-form"
+import { mapApiPromotionalVideo } from "../utils/promotional-video"
 import { api } from "@/lib/api/client"
 import { restaurantEndpoints } from "./endpoints"
 import { restaurantKeys } from "./keys"
@@ -26,6 +30,21 @@ async function fetchKitchenDetail(kitchenId: string) {
     restaurantEndpoints.kitchen(kitchenId)
   )
   return mapKitchenDetailToRestaurant(response.data)
+}
+
+async function fetchPromotionalVideos(): Promise<PromotionalVideo[]> {
+  const response = await api.get<ApiPromotionalVideosResponse>(
+    restaurantEndpoints.promotionalVideos
+  )
+  const items = Array.isArray(response.data) ? response.data : []
+  return items.map(mapApiPromotionalVideo)
+}
+
+async function fetchPromotionalVideo(videoId: string): Promise<PromotionalVideo> {
+  const response = await api.get<ApiPromotionalVideoResponse>(
+    restaurantEndpoints.promotionalVideo(videoId)
+  )
+  return mapApiPromotionalVideo(response.data)
 }
 
 async function fetchFulfillmentBranches(): Promise<FulfillmentBranch[]> {
@@ -148,5 +167,20 @@ export const restaurantQueries = {
       queryKey: restaurantKeys.branches(),
       queryFn: fetchFulfillmentBranches,
       staleTime: 30_000,
+    }),
+
+  promotionalVideos: () =>
+    queryOptions({
+      queryKey: restaurantKeys.promotionalVideos(),
+      queryFn: fetchPromotionalVideos,
+      staleTime: 30_000,
+    }),
+
+  promotionalVideo: (videoId: string) =>
+    queryOptions({
+      queryKey: restaurantKeys.promotionalVideo(videoId),
+      queryFn: () => fetchPromotionalVideo(videoId),
+      enabled: Boolean(videoId),
+      staleTime: 0,
     }),
 } as const

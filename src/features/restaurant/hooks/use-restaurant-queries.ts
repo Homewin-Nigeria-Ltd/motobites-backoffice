@@ -94,3 +94,24 @@ export function useKitchenTypes() {
     staleTime: 5 * 60 * 1000,
   })
 }
+
+export function usePromotionalVideos(options?: { enabled?: boolean }) {
+  return useQuery({
+    ...restaurantQueries.promotionalVideos(),
+    enabled: options?.enabled ?? true,
+  })
+}
+
+export function usePromotionalVideo(
+  videoId: string | undefined,
+  options?: { enabled?: boolean }
+) {
+  const enabled = options?.enabled ?? true
+
+  return useQuery({
+    ...restaurantQueries.promotionalVideo(videoId ?? ""),
+    enabled: enabled && Boolean(videoId),
+    refetchOnMount: "always",
+    staleTime: 0,
+  })
+}

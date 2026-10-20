@@ -4,6 +4,7 @@ import { useMemo, useState } from "react"
 import { useDebouncedSearch } from "@/features/restaurant/hooks/use-debounced-search"
 
 import { AddMenuSheet } from "@/features/restaurant/components/add-menu-sheet"
+import { PromotionalVideosSheet } from "@/features/restaurant/components/promotional-videos-sheet"
 import { MenuKitchenGroup } from "@/features/restaurant/components/menu-kitchen-group"
 import { useMenuGroupedItems } from "@/features/restaurant/hooks/use-restaurant-queries"
 import type { ApiMenuGroupedItem } from "@/features/restaurant/types"
@@ -37,6 +38,7 @@ export function MenuManagementSection() {
 
   const [sort, setSort] = useState<SortValue>("latest")
   const [menuSheetOpen, setMenuSheetOpen] = useState(false)
+  const [promotionalVideosOpen, setPromotionalVideosOpen] = useState(false)
   const [editingMenuItemId, setEditingMenuItemId] = useState<string>()
 
   const { data, isPending, isError, error } = useMenuGroupedItems({
@@ -122,6 +124,13 @@ export function MenuManagementSection() {
               />
             </div>
             <Button
+              variant="outline"
+              className="h-10 px-4"
+              onClick={() => setPromotionalVideosOpen(true)}
+            >
+              Promotional Videos
+            </Button>
+            <Button
               className="h-10 px-4"
               icon={{ name: "add", position: "left" }}
               onClick={() => {
@@ -161,6 +170,11 @@ export function MenuManagementSection() {
           )}
         </div>
       </div>
+
+      <PromotionalVideosSheet
+        open={promotionalVideosOpen}
+        onOpenChange={setPromotionalVideosOpen}
+      />
 
       <AddMenuSheet
         open={menuSheetOpen}

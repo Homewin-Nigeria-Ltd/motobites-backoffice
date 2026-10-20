@@ -396,3 +396,55 @@ export type ApiMenuItemsListResponse = {
   meta: ApiMenuItemsMeta
   message?: string
 }
+
+export type ApiPromotionalVideo = {
+  id: number
+  title: string
+  description?: string | null
+  duration?: number
+  duration_seconds?: number
+  duration_formatted?: string
+  sort_order?: number
+  is_active?: boolean | number
+  thumbnail?: string | null
+  thumbnail_url?: string | null
+  video?: string | null
+  video_url?: string | null
+  video_ref?: string | null
+  videoRef?: string | null
+  video_status?: string | null
+  likes_count?: number
+  shares_count?: number
+  is_liked?: boolean
+}
+
+export type PromotionalVideo = {
+  id: string
+  title: string
+  description: string
+  duration: number
+  durationFormatted: string
+  sortOrder: number
+  isActive: boolean
+  thumbnailUrl: string | null
+  videoUrl: string | null
+  videoStatus: string | null
+}
+
+export type ApiPromotionalVideosResponse = {
+  success?: boolean
+  data: ApiPromotionalVideo[]
+  message?: string
+}
+
+export type ApiPromotionalVideoResponse = {
+  success?: boolean
+  data: ApiPromotionalVideo
+  message?: string
+}
+
+export type PromotionalVideoMutationResponse = {
+  success?: boolean
+  data: ApiPromotionalVideo
+  message?: string
+}

@@ -4,10 +4,12 @@ import { useMemo, useState } from "react"
 import type { DateRange } from "react-day-picker"
 
 import { referralColumns } from "@/features/customers/columns/referral-columns"
+import { ReferralsSummaryCards } from "@/features/customers/components/referrals-summary-cards"
 import { ReferralsToolbar } from "@/features/customers/components/referrals-toolbar"
 import { useReferrals } from "@/features/customers/hooks/use-referrals"
 import type { ReferralPeriod } from "@/features/customers/types"
 import { buildReferralDateParams } from "@/features/customers/utils/referral-period"
+import { mapReferralPlatformStats } from "@/features/customers/utils/referral"
 import { DataTable } from "@/components/data-table"
 
 const DEFAULT_PAGE_SIZE = 8
@@ -51,8 +53,11 @@ export function ReferralsSection() {
     setPage(1)
   }
 
+  const platformStats = data?.meta ?? mapReferralPlatformStats()
+
   return (
     <div className="flex flex-col gap-4 bg-muted p-4 md:gap-6 md:p-6">
+      <ReferralsSummaryCards stats={platformStats} />
       <DataTable
         columns={referralColumns}
         data={isCustomPeriodReady ? items : []}
@@ -65,7 +70,11 @@ export function ReferralsSection() {
         }
         toolbar={
           <ReferralsToolbar
-            total={isCustomPeriodReady ? (data?.meta.total ?? 0) : 0}
+            total={
+              isCustomPeriodReady
+                ? (data?.meta.totalReferralsCount ?? data?.meta.total ?? 0)
+                : 0
+            }
             period={period}
             dateRange={dateRange}
             onPeriodChange={handlePeriodChange}

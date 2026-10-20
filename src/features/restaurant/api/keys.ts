@@ -15,5 +15,9 @@ export const restaurantKeys = {
     [...restaurantKeys.menuItems, "kitchen", params] as const,
   menuItemDetail: (itemId: string) =>
     [...restaurantKeys.menuItems, "detail", itemId] as const,
+  promotionalVideos: () =>
+    [...restaurantKeys.all, "promotional-videos"] as const,
+  promotionalVideo: (videoId: string) =>
+    [...restaurantKeys.promotionalVideos(), videoId] as const,
   branches: () => [...restaurantKeys.all, "branches"] as const,
 } as const
