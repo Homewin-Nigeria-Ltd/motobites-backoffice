@@ -86,3 +86,17 @@ export function usePromotionalVideos(options?: { enabled?: boolean }) {
     enabled: options?.enabled ?? true,
   })
 }
+
+export function usePromotionalVideo(
+  videoId: string | undefined,
+  options?: { enabled?: boolean }
+) {
+  const enabled = options?.enabled ?? true
+
+  return useQuery({
+    ...restaurantQueries.promotionalVideo(videoId ?? ""),
+    enabled: enabled && Boolean(videoId),
+    refetchOnMount: "always",
+    staleTime: 0,
+  })
+}

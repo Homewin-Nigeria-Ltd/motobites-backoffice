@@ -3,7 +3,10 @@
 import { useEffect, useMemo, useState } from "react"
 import Image from "next/image"
 
-import { usePromotionalVideos } from "@/features/restaurant/hooks/use-restaurant-queries"
+import {
+  usePromotionalVideo,
+  usePromotionalVideos,
+} from "@/features/restaurant/hooks/use-restaurant-queries"
 import {
   useCreatePromotionalVideo,
   useDeletePromotionalVideo,
@@ -12,7 +15,6 @@ import {
 import type { PromotionalVideo } from "@/features/restaurant/types"
 import {
   buildPromotionalVideoFormData,
-  formatVideoDuration,
   isPromotionalVideoTooLarge,
 } from "@/features/restaurant/utils/promotional-video"
 import { AppLoader } from "@/components/ui/app-loader"
@@ -81,26 +83,66 @@ function readVideoDuration(file: File) {
   })
 }
 
-export function PromotionalVideosSheet({
-  open,
-  onOpenChange,
-}: PromotionalVideosSheetProps) {
-  const [view, setView] = useState<"list" | "form">("list")
-  const [editing, setEditing] = useState<PromotionalVideo | null>(null)
-  const [form, setForm] = useState<FormState>(emptyForm)
-  const [deleteId, setDeleteId] = useState<string | null>(null)
-  const [error, setError] = useState("")
+function PromotionalVideoForm({
+  videoId,
+  onDone,
+}: {
+  videoId?: string
+  onDone: () => void
+}) {
+  const isEdit = Boolean(videoId)
+  const {
+    data: video,
+    isPending,
+    isError,
+    error,
+  } = usePromotionalVideo(videoId, { enabled: isEdit })
 
-  const { data: videos = [], isPending, isError, error: loadError } =
-    usePromotionalVideos({ enabled: open })
+  if (isEdit && isPending) {
+    return <AppLoader className="py-12" />
+  }
+
+  if (isEdit && isError) {
+    return (
+      <p className="text-sm text-destructive">
+        {error instanceof Error
+          ? error.message
+          : "Failed to load promotional video."}
+      </p>
+    )
+  }
+
+  if (isEdit && !video) {
+    return <AppLoader className="py-12" />
+  }
+
+  return (
+    <PromotionalVideoFormFields
+      key={videoId ?? "new"}
+      initialVideo={video}
+      onDone={onDone}
+    />
+  )
+}
+
+function PromotionalVideoFormFields({
+  initialVideo,
+  onDone,
+}: {
+  initialVideo?: PromotionalVideo
+  onDone: () => void
+}) {
+  const isEdit = Boolean(initialVideo)
+  const [form, setForm] = useState<FormState>(
+    initialVideo ? formFromVideo(initialVideo) : emptyForm
+  )
+  const [error, setError] = useState("")
   const { createPromotionalVideo, isPending: isCreating } =
     useCreatePromotionalVideo()
   const { updatePromotionalVideo, isPending: isUpdating } =
     useUpdatePromotionalVideo()
-  const { deletePromotionalVideo, isPending: isDeleting, pendingVideoId } =
-    useDeletePromotionalVideo()
-
   const isSaving = isCreating || isUpdating
+
   const thumbnailObjectUrl = useMemo(() => {
     if (!form.thumbnail) {
       return null
@@ -108,7 +150,8 @@ export function PromotionalVideosSheet({
 
     return URL.createObjectURL(form.thumbnail)
   }, [form.thumbnail])
-  const thumbnailPreview = thumbnailObjectUrl ?? editing?.thumbnailUrl ?? null
+  const thumbnailPreview =
+    thumbnailObjectUrl ?? initialVideo?.thumbnailUrl ?? null
 
   useEffect(() => {
     return () => {
@@ -117,34 +160,6 @@ export function PromotionalVideosSheet({
       }
     }
   }, [thumbnailObjectUrl])
-
-  const resetSheet = () => {
-    setView("list")
-    setEditing(null)
-    setForm(emptyForm)
-    setError("")
-  }
-
-  const handleOpenChange = (next: boolean) => {
-    if (!next) {
-      resetSheet()
-    }
-    onOpenChange(next)
-  }
-
-  const openCreate = () => {
-    setEditing(null)
-    setForm(emptyForm)
-    setError("")
-    setView("form")
-  }
-
-  const openEdit = (video: PromotionalVideo) => {
-    setEditing(video)
-    setForm(formFromVideo(video))
-    setError("")
-    setView("form")
-  }
 
   const handleThumbnail = (files: FileList | null) => {
     const file = files?.[0]
@@ -190,7 +205,7 @@ export function PromotionalVideosSheet({
       return
     }
 
-    if (!editing && (!form.thumbnail || !form.video)) {
+    if (!isEdit && (!form.thumbnail || !form.video)) {
       setError("Thumbnail and video are required.")
       return
     }
@@ -206,18 +221,179 @@ export function PromotionalVideosSheet({
     })
 
     try {
-      if (editing) {
-        await updatePromotionalVideo({ videoId: editing.id, formData })
+      if (initialVideo) {
+        await updatePromotionalVideo({ videoId: initialVideo.id, formData })
       } else {
         await createPromotionalVideo(formData)
       }
-      setView("list")
-      setEditing(null)
-      setForm(emptyForm)
-      setError("")
+      onDone()
     } catch {
       // toast handled in mutation
     }
+  }
+
+  return (
+    <form className="space-y-4" onSubmit={handleSubmit}>
+      <Field>
+        <FieldLabel htmlFor="promo-title">Title</FieldLabel>
+        <Input
+          id="promo-title"
+          value={form.title}
+          onChange={(e) =>
+            setForm((current) => ({ ...current, title: e.target.value }))
+          }
+        />
+      </Field>
+      <Field>
+        <FieldLabel htmlFor="promo-description">Description</FieldLabel>
+        <Textarea
+          id="promo-description"
+          value={form.description}
+          onChange={(e) =>
+            setForm((current) => ({
+              ...current,
+              description: e.target.value,
+            }))
+          }
+        />
+      </Field>
+      <div className="grid grid-cols-2 gap-3">
+        <Field>
+          <FieldLabel htmlFor="promo-duration">Duration (seconds)</FieldLabel>
+          <Input
+            id="promo-duration"
+            type="number"
+            min={1}
+            value={form.duration}
+            onChange={(e) =>
+              setForm((current) => ({
+                ...current,
+                duration: e.target.value,
+              }))
+            }
+          />
+        </Field>
+        <Field>
+          <FieldLabel htmlFor="promo-sort">Sort order</FieldLabel>
+          <Input
+            id="promo-sort"
+            type="number"
+            min={0}
+            value={form.sortOrder}
+            onChange={(e) =>
+              setForm((current) => ({
+                ...current,
+                sortOrder: e.target.value,
+              }))
+            }
+          />
+        </Field>
+      </div>
+      <div className="flex items-center justify-between rounded-lg border border-border px-4 py-3">
+        <FieldLabel htmlFor="promo-active" className="cursor-pointer">
+          Active
+        </FieldLabel>
+        <Switch
+          id="promo-active"
+          checked={form.isActive}
+          onCheckedChange={(checked) =>
+            setForm((current) => ({ ...current, isActive: checked }))
+          }
+        />
+      </div>
+      <Field>
+        <FieldLabel>Thumbnail {isEdit ? "(optional)" : ""}</FieldLabel>
+        {thumbnailPreview ? (
+          <div className="relative mb-2 h-32 overflow-hidden rounded-lg bg-muted">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={
+                form.thumbnail
+                  ? thumbnailPreview
+                  : toImageSrc(thumbnailPreview)
+              }
+              alt=""
+              className="size-full object-cover"
+            />
+          </div>
+        ) : null}
+        <Input
+          type="file"
+          accept="image/png,image/jpeg,image/webp"
+          onChange={(e) => handleThumbnail(e.target.files)}
+        />
+      </Field>
+      <Field>
+        <FieldLabel>
+          Video {isEdit ? "(optional, max 100MB)" : "(max 100MB)"}
+        </FieldLabel>
+        {form.video ? (
+          <p className="mb-1 text-xs text-muted-foreground">{form.video.name}</p>
+        ) : initialVideo?.videoUrl ? (
+          <a
+            href={initialVideo.videoUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mb-1 inline-block text-xs font-medium text-primary hover:underline"
+          >
+            Current video
+          </a>
+        ) : null}
+        <Input
+          type="file"
+          accept="video/mp4,video/quicktime,video/webm"
+          onChange={(e) => {
+            void handleVideo(e.target.files)
+          }}
+        />
+      </Field>
+      {error ? <p className="text-sm text-destructive">{error}</p> : null}
+      <Button type="submit" className="h-11 w-full" disabled={isSaving}>
+        {isSaving
+          ? isEdit
+            ? "Saving..."
+            : "Uploading..."
+          : isEdit
+            ? "Save changes"
+            : "Add video"}
+      </Button>
+    </form>
+  )
+}
+
+export function PromotionalVideosSheet({
+  open,
+  onOpenChange,
+}: PromotionalVideosSheetProps) {
+  const [view, setView] = useState<"list" | "form">("list")
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [deleteId, setDeleteId] = useState<string | null>(null)
+
+  const { data: videos = [], isPending, isError, error: loadError } =
+    usePromotionalVideos({ enabled: open })
+  const { deletePromotionalVideo, isPending: isDeleting, pendingVideoId } =
+    useDeletePromotionalVideo()
+
+  const resetSheet = () => {
+    setView("list")
+    setEditingId(null)
+  }
+
+  const handleOpenChange = (next: boolean) => {
+    if (!next) {
+      resetSheet()
+    }
+    onOpenChange(next)
+  }
+
+  const openCreate = () => {
+    setEditingId(null)
+    setView("form")
+  }
+
+  const openEdit = (videoId: string) => {
+    setEditingId(videoId)
+    setView("form")
   }
 
   const handleDelete = async () => {
@@ -235,7 +411,7 @@ export function PromotionalVideosSheet({
       <SlideInModal
         title={
           view === "form"
-            ? editing
+            ? editingId
               ? "Edit promotional video"
               : "Add promotional video"
             : "Promotional Videos"
@@ -255,7 +431,14 @@ export function PromotionalVideosSheet({
               Add video
             </Button>
           ) : (
-            <Button variant="ghost" className="h-10" onClick={() => setView("list")}>
+            <Button
+              variant="ghost"
+              className="h-10"
+              onClick={() => {
+                setView("list")
+                setEditingId(null)
+              }}
+            >
               Back
             </Button>
           )
@@ -302,7 +485,8 @@ export function PromotionalVideosSheet({
                           {video.title}
                         </p>
                         <p className="text-xs text-muted-foreground">
-                          {formatVideoDuration(video.duration)}
+                          {video.durationFormatted}
+                          {video.videoStatus ? ` · ${video.videoStatus}` : ""}
                           {video.isActive ? " · Active" : " · Inactive"}
                         </p>
                       </div>
@@ -311,7 +495,7 @@ export function PromotionalVideosSheet({
                           type="button"
                           variant="ghost"
                           size="sm"
-                          onClick={() => openEdit(video)}
+                          onClick={() => openEdit(video.id)}
                         >
                           Edit
                         </Button>
@@ -343,129 +527,10 @@ export function PromotionalVideosSheet({
             </div>
           )
         ) : (
-          <form className="space-y-4" onSubmit={handleSubmit}>
-            <Field>
-              <FieldLabel htmlFor="promo-title">Title</FieldLabel>
-              <Input
-                id="promo-title"
-                value={form.title}
-                onChange={(e) =>
-                  setForm((current) => ({ ...current, title: e.target.value }))
-                }
-              />
-            </Field>
-            <Field>
-              <FieldLabel htmlFor="promo-description">Description</FieldLabel>
-              <Textarea
-                id="promo-description"
-                value={form.description}
-                onChange={(e) =>
-                  setForm((current) => ({
-                    ...current,
-                    description: e.target.value,
-                  }))
-                }
-              />
-            </Field>
-            <div className="grid grid-cols-2 gap-3">
-              <Field>
-                <FieldLabel htmlFor="promo-duration">Duration (seconds)</FieldLabel>
-                <Input
-                  id="promo-duration"
-                  type="number"
-                  min={1}
-                  value={form.duration}
-                  onChange={(e) =>
-                    setForm((current) => ({
-                      ...current,
-                      duration: e.target.value,
-                    }))
-                  }
-                />
-              </Field>
-              <Field>
-                <FieldLabel htmlFor="promo-sort">Sort order</FieldLabel>
-                <Input
-                  id="promo-sort"
-                  type="number"
-                  min={0}
-                  value={form.sortOrder}
-                  onChange={(e) =>
-                    setForm((current) => ({
-                      ...current,
-                      sortOrder: e.target.value,
-                    }))
-                  }
-                />
-              </Field>
-            </div>
-            <div className="flex items-center justify-between rounded-lg border border-border px-4 py-3">
-              <FieldLabel htmlFor="promo-active" className="cursor-pointer">
-                Active
-              </FieldLabel>
-              <Switch
-                id="promo-active"
-                checked={form.isActive}
-                onCheckedChange={(checked) =>
-                  setForm((current) => ({ ...current, isActive: checked }))
-                }
-              />
-            </div>
-            <Field>
-              <FieldLabel>Thumbnail {editing ? "(optional)" : ""}</FieldLabel>
-              {thumbnailPreview ? (
-                <div className="relative mb-2 h-32 overflow-hidden rounded-lg bg-muted">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={
-                      form.thumbnail
-                        ? thumbnailPreview
-                        : toImageSrc(thumbnailPreview)
-                    }
-                    alt=""
-                    className="size-full object-cover"
-                  />
-                </div>
-              ) : null}
-              <Input
-                type="file"
-                accept="image/png,image/jpeg,image/webp"
-                onChange={(e) => handleThumbnail(e.target.files)}
-              />
-            </Field>
-            <Field>
-              <FieldLabel>Video {editing ? "(optional, max 100MB)" : "(max 100MB)"}</FieldLabel>
-              {form.video ? (
-                <p className="mb-1 text-xs text-muted-foreground">{form.video.name}</p>
-              ) : editing?.videoUrl ? (
-                <a
-                  href={editing.videoUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mb-1 inline-block text-xs font-medium text-primary hover:underline"
-                >
-                  Current video
-                </a>
-              ) : null}
-              <Input
-                type="file"
-                accept="video/mp4,video/quicktime,video/webm"
-                onChange={(e) => {
-                  void handleVideo(e.target.files)
-                }}
-              />
-            </Field>
-            {error ? <p className="text-sm text-destructive">{error}</p> : null}
-            <Button type="submit" className="h-11 w-full" disabled={isSaving}>
-              {isSaving
-                ? editing
-                  ? "Saving..."
-                  : "Uploading..."
-                : editing
-                  ? "Save changes"
-                  : "Add video"}
-            </Button>
-          </form>
+          <PromotionalVideoForm
+            videoId={editingId ?? undefined}
+            onDone={resetSheet}
+          />
         )}
       </SlideInModal>
 

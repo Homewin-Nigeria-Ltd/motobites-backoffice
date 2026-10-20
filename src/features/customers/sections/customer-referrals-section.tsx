@@ -12,7 +12,7 @@ export function CustomerReferralsSection({
   return (
     <CustomerDetailBlock
       title="Referrals"
-      description={`${customer.referralCount.toLocaleString()} customer${customer.referralCount === 1 ? "" : "s"} signed up through this customer.`}
+      description={`${customer.referralStats.totalReferralsCount.toLocaleString()} customer${customer.referralStats.totalReferralsCount === 1 ? "" : "s"} signed up through this customer.`}
     >
       <CustomerReferrals customer={customer} />
     </CustomerDetailBlock>

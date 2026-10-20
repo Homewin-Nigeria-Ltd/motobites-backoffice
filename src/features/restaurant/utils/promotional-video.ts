@@ -5,15 +5,20 @@ const MAX_VIDEO_BYTES = 100 * 1024 * 1024
 export function mapApiPromotionalVideo(
   video: ApiPromotionalVideo
 ): PromotionalVideo {
+  const duration = video.duration_seconds ?? video.duration ?? 0
+
   return {
     id: String(video.id),
     title: video.title || "Untitled video",
     description: video.description?.trim() || "",
-    duration: video.duration ?? 0,
+    duration,
+    durationFormatted:
+      video.duration_formatted?.trim() || formatVideoDuration(duration),
     sortOrder: video.sort_order ?? 0,
     isActive: video.is_active === true || video.is_active === 1,
     thumbnailUrl: video.thumbnail_url ?? video.thumbnail ?? null,
     videoUrl: video.video_url ?? video.video ?? null,
+    videoStatus: video.video_status ?? null,
   }
 }
 
