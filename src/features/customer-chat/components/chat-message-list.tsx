@@ -14,12 +14,14 @@ type ChatMessageListProps = {
   messages: ApiCustomerChatMessage[]
   customerAvatar: string | null
   customerName: string
+  customerId: number | null
 }
 
 export function ChatMessageList({
   messages,
   customerAvatar,
   customerName,
+  customerId,
 }: ChatMessageListProps) {
   const { data: session } = useSession()
   const supportUser = session?.user
@@ -61,6 +63,7 @@ export function ChatMessageList({
                 message={message}
                 customerAvatar={customerAvatar}
                 customerName={customerName}
+                customerId={customerId}
                 supportAvatar={supportUser?.profile_photo_url ?? null}
                 supportName={supportUser?.name ?? "Support"}
               />
