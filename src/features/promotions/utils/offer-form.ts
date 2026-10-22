@@ -36,7 +36,7 @@ export function mapApiOfferToFormValues(offer: ApiOffer): CreateOfferFormValues 
     details: detailOption?.value ?? "percentage:20",
     flatAmount:
       isFlat && offer.discount_value != null
-        ? String(offer.discount_value / 100)
+        ? String(offer.discount_value)
         : "",
     startDate: offer.start_date || offer.promo_start,
     endDate: offer.end_date || offer.promo_end,

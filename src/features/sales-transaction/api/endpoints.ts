@@ -6,4 +6,5 @@ export const salesTransactionEndpoints = {
     "/api/proxy/admin/sales-dashboard/transaction-management",
   transactionAnalytics:
     "/api/proxy/admin/sales-dashboard/transaction-analytics",
+  endOfDaySales: "/api/proxy/admin/sales-dashboard/end-of-day-sales",
 } as const

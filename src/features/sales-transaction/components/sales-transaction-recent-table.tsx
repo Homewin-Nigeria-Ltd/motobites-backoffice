@@ -3,6 +3,7 @@ import Link from "next/link"
 import { DataTable } from "@/components/data-table"
 import { Button } from "@/components/ui/button"
 import { salesTransactionColumns } from "@/features/sales-transaction/columns/sales-transaction-columns"
+import { EndOfDaySalesButton } from "@/features/sales-transaction/components/end-of-day-sales-dialog"
 import type { SalesTransactionRow } from "@/features/sales-transaction/types"
 
 type SalesTransactionRecentTableProps = {
@@ -20,9 +21,12 @@ export function SalesTransactionRecentTable({
         <h3 className="text-base font-semibold text-foreground">
           Recent Transactions
         </h3>
-        <Button asChild variant="link" className="h-auto p-0 text-primary">
-          <Link href="/offline-order/sales-transaction/history">View All</Link>
-        </Button>
+        <div className="flex items-center gap-3">
+          <EndOfDaySalesButton />
+          <Button asChild variant="link" className="h-auto p-0 text-primary">
+            <Link href="/offline-order/sales-transaction/history">View All</Link>
+          </Button>
+        </div>
       </div>
 
       <DataTable
