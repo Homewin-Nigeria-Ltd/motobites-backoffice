@@ -1,5 +1,7 @@
 "use client"
 
+import Link from "next/link"
+
 import { ChatComposer } from "../components/chat-composer"
 import { ChatConversationList } from "../components/chat-conversation-list"
 import { ChatFilterTabs } from "../components/chat-filter-tabs"
@@ -72,9 +74,20 @@ export function CustomerChatSection({ initialChatId }: CustomerChatSectionProps)
           {activeChatId ? (
             <>
               <div className="shrink-0 border-b border-border px-4 py-4 md:px-6">
-                <h2 className="text-base font-semibold text-foreground">
-                  {activeCustomer?.name ?? "Loading..."}
-                </h2>
+                {activeCustomer ? (
+                  <h2 className="text-base font-semibold text-foreground">
+                    <Link
+                      href={`/customers/${activeCustomer.id}`}
+                      className="hover:text-primary"
+                    >
+                      {activeCustomer.name}
+                    </Link>
+                  </h2>
+                ) : (
+                  <h2 className="text-base font-semibold text-foreground">
+                    Loading...
+                  </h2>
+                )}
               </div>
 
               <div className="min-h-0 flex-1 overflow-hidden">
@@ -87,6 +100,7 @@ export function CustomerChatSection({ initialChatId }: CustomerChatSectionProps)
                     messages={messages}
                     customerAvatar={customerAvatar}
                     customerName={activeCustomer?.name ?? "Customer"}
+                    customerId={activeCustomer?.id ?? null}
                   />
                 )}
               </div>

@@ -1,5 +1,7 @@
 "use client"
 
+import Link from "next/link"
+
 import { cn } from "@/lib/utils"
 import { getUserInitials } from "@/utils/get-initials"
 import type { ApiCustomerChatMessage } from "../types"
@@ -19,6 +21,7 @@ type ChatMessageBubbleProps = {
   message: ApiCustomerChatMessage
   customerAvatar: string | null
   customerName: string
+  customerId: number | null
   supportAvatar: string | null
   supportName: string
 }
@@ -26,11 +29,13 @@ type ChatMessageBubbleProps = {
 function MessageAvatar({
   avatar,
   name,
+  href,
 }: {
   avatar: string | null
   name: string
+  href?: string | null
 }) {
-  return (
+  const content = (
     <Avatar className="size-10 shrink-0">
       {avatar ? <AvatarImage src={avatar} alt={name} /> : null}
       <AvatarFallback className="bg-muted text-xs font-semibold text-primary">
@@ -38,12 +43,23 @@ function MessageAvatar({
       </AvatarFallback>
     </Avatar>
   )
+
+  if (!href) {
+    return content
+  }
+
+  return (
+    <Link href={href} aria-label={`Open ${name}'s profile`} className="shrink-0">
+      {content}
+    </Link>
+  )
 }
 
 export function ChatMessageBubble({
   message,
   customerAvatar,
   customerName,
+  customerId,
   supportAvatar,
   supportName,
 }: ChatMessageBubbleProps) {
@@ -73,7 +89,11 @@ export function ChatMessageBubble({
       )}
     >
       {!isSupport ? (
-        <MessageAvatar avatar={senderAvatar} name={senderName} />
+        <MessageAvatar
+          avatar={senderAvatar}
+          name={senderName}
+          href={customerId ? `/customers/${customerId}` : null}
+        />
       ) : null}
 
       <div
