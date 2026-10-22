@@ -53,6 +53,27 @@ export function CustomerAccountSummary({
       </div>
 
       <AccountStat
+        label="Wallet account number"
+        value={customer.walletAccount.accountNumber}
+      />
+      <AccountStat
+        label="Wallet account name"
+        value={customer.walletAccount.accountName}
+      />
+      <AccountStat
+        label="Wallet bank"
+        value={customer.walletAccount.bankName}
+      />
+      <AccountStat
+        label="Wallet currency"
+        value={customer.walletAccount.currency}
+      />
+      <AccountStat
+        label="Wallet status"
+        value={formatPaymentMethod(customer.walletAccount.status)}
+      />
+
+      <AccountStat
         label="Number of Orders"
         value={`${customer.ordersCount.toLocaleString()} Orders`}
         description="Total completed and historical orders associated with this customer."
