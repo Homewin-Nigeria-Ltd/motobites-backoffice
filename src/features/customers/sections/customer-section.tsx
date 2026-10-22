@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { useState } from "react"
 import type { PaginationState } from "@tanstack/react-table"
 
@@ -17,6 +18,7 @@ import { Button } from "@/components/ui/button"
 const DEFAULT_PAGE_SIZE = 8
 
 export function CustomerManagementSection() {
+  const router = useRouter()
   const { branchId } = useBranchFilter()
   const [tab, setTab] = useState<CustomerTab>("all")
   const [search, setSearch] = useState("")
@@ -75,6 +77,7 @@ export function CustomerManagementSection() {
         page={currentPage}
         totalPages={totalPages}
         onPageChange={handlePageChange}
+        onRowClick={(customer) => router.push(`/customers/${customer.id}`)}
         isLoading={isPending || (isFetching && items.length === 0)}
         toolbar={
           <CustomerToolbar

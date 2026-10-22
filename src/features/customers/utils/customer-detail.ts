@@ -7,6 +7,8 @@ import type {
   ApiCustomerCnplTransaction,
   ApiCustomerDetailData,
   ApiCustomerReferralMeta,
+  ApiWalletAccount,
+  CustomerWalletAccount,
   ApiCustomerTransaction,
   CustomerCnplTransaction,
   CustomerDetail,
@@ -176,6 +178,23 @@ function mapApiCnplTransaction(
   }
 }
 
+function dash(value?: string | null) {
+  const trimmed = value?.trim()
+  return trimmed ? trimmed : "—"
+}
+
+function mapWalletAccount(
+  account?: ApiWalletAccount | null
+): CustomerWalletAccount {
+  return {
+    accountNumber: dash(account?.account_number),
+    accountName: dash(account?.account_name),
+    bankName: dash(account?.bank_name),
+    currency: dash(account?.currency),
+    status: dash(account?.status),
+  }
+}
+
 function mapApiCustomerToCustomerDetail(
   customer: ApiCustomer
 ): CustomerDetail {
@@ -211,6 +230,7 @@ function mapApiCustomerToCustomerDetail(
     averageOrderValueKobo: null,
     averageOrderValueFormatted: "—",
     preferredPaymentMethod: null,
+    walletAccount: mapWalletAccount(null),
     overdraftBalance,
     overdraftBalanceFormatted:
       customer.overdraft_balance_formatted ??
@@ -279,6 +299,11 @@ export function mapApiCustomerDetailToCustomerDetail(
     averageOrderValueKobo: account.average_order_value_kobo ?? null,
     averageOrderValueFormatted: account.average_order_value_formatted ?? "—",
     preferredPaymentMethod: account.preferred_payment_method ?? null,
+    walletAccount: mapWalletAccount(
+      account.wallet_account ??
+        data.wallet_account ??
+        profile.wallet_account
+    ),
     overdraftBalance,
     overdraftBalanceFormatted:
       cnpl.overdraft_balance_formatted ??

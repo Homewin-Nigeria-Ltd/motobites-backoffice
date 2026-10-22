@@ -103,6 +103,22 @@ export type CustomerReferralStats = {
   referrerTotalPotentialEarningsFormatted: string
 }
 
+export type CustomerWalletAccount = {
+  accountNumber: string
+  accountName: string
+  bankName: string
+  currency: string
+  status: string
+}
+
+export type ApiWalletAccount = {
+  account_number?: string | null
+  account_name?: string | null
+  bank_name?: string | null
+  currency?: string | null
+  status?: string | null
+}
+
 export type CustomerDetail = Customer & {
   firstName: string
   lastName: string
@@ -118,6 +134,7 @@ export type CustomerDetail = Customer & {
   averageOrderValueKobo: number | null
   averageOrderValueFormatted: string
   preferredPaymentMethod: string | null
+  walletAccount: CustomerWalletAccount
   overdraftBalance: number
   overdraftBalanceFormatted: string
   overdraftEligibility: number
@@ -267,6 +284,7 @@ export type ApiCustomerProfile = {
   delivery_address?: string | null
   acquisition_source?: string | null
   home_addresses?: Array<string | { address?: string }>
+  wallet_account?: ApiWalletAccount | null
 }
 
 export type ApiCustomerAccount = {
@@ -282,6 +300,7 @@ export type ApiCustomerAccount = {
   average_order_value_formatted?: string | null
   preferred_payment_method?: string | null
   referral_count?: number
+  wallet_account?: ApiWalletAccount | null
 }
 
 export type ApiCustomerCnpl = {
@@ -296,6 +315,7 @@ export type ApiCustomerCnpl = {
 export type ApiCustomerDetailData = {
   profile: ApiCustomerProfile
   account?: ApiCustomerAccount
+  wallet_account?: ApiWalletAccount | null
   cnpl?: ApiCustomerCnpl
   chop_now_pay_later?: ApiCustomerCnpl
   cnpl_transactions?: ApiCustomerCnplTransaction[]
