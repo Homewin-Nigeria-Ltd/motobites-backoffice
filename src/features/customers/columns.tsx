@@ -1,6 +1,5 @@
 "use client"
 
-import Link from "next/link"
 import type { ColumnDef } from "@tanstack/react-table"
 
 import { CustomerStatusBadge } from "@/features/customers/components/customer-status-badge"
@@ -33,12 +32,9 @@ export const customerColumns: ColumnDef<Customer>[] = [
             </AvatarFallback>
           </Avatar>
           <div className="min-w-0">
-            <Link
-              href={`/customers/${customer.id}`}
-              className="truncate font-medium text-foreground hover:text-primary"
-            >
+            <p className="truncate font-medium text-foreground">
               {customer.name}
-            </Link>
+            </p>
             <p className="truncate text-xs text-muted-foreground">
               {customer.email}
             </p>
