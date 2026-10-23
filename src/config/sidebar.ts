@@ -130,6 +130,12 @@ export const navMain: NavItem[] = [
     icon: "heart",
     permission: PERMISSION_KEYS.customerRetentionLoyalty,
   },
+  {
+    title: "Broadcast",
+    url: "/notification/broadcast",
+    icon: "send",
+    permission: PERMISSION_KEYS.customerSupport,
+  },
 ]
 
 export const navSupport: SupportItem[] = [

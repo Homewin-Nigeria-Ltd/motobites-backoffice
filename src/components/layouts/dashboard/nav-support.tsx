@@ -46,7 +46,7 @@ export function NavSupport({
                 pathname.startsWith(`${subItem.url}/`)
             ) ||
             (item.name === "Customer" &&
-              (pathname.startsWith("/customers/tickets") ||
+              (                pathname.startsWith("/customers/tickets") ||
                 pathname.startsWith("/customers/chats") ||
                 pathname.startsWith("/customers/referrals")))
 
