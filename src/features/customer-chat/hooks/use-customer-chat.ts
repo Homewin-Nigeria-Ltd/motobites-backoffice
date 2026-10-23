@@ -13,6 +13,7 @@ import {
 } from "../utils/chat-helpers"
 import {
   appendMessageToCache,
+  clearConversationUnreadInCache,
   createPendingMessage,
   removeMessageFromCache,
   replacePendingMessageInCache,
@@ -142,6 +143,14 @@ export function useCustomerChat(initialChatId?: string | null) {
     enabled: Boolean(activeChatId) && !isSelectedClosed,
   })
 
+  useEffect(() => {
+    if (!activeChatId) {
+      return
+    }
+
+    clearConversationUnreadInCache(queryClient, activeChatId)
+  }, [activeChatId, conversations, queryClient])
+
   const selectConversation = useCallback(
     (conversationId: string) => {
       if (!conversationId.trim()) {
@@ -149,8 +158,9 @@ export function useCustomerChat(initialChatId?: string | null) {
       }
 
       setStoredChatId(conversationId)
+      clearConversationUnreadInCache(queryClient, conversationId)
     },
-    [setStoredChatId]
+    [queryClient, setStoredChatId]
   )
 
   const handleSendMessage = useCallback(
