@@ -276,6 +276,43 @@ export function parseRealtimeMessage(
   }
 }
 
+export function clearConversationUnreadInCache(
+  queryClient: QueryClient,
+  chatId: string
+) {
+  queryClient.setQueriesData<CustomerChatListResponse>(
+    { queryKey: [...customerChatKeys.all, "conversations"] },
+    (old) => {
+      if (!old) {
+        return old
+      }
+
+      let changed = false
+      const data = old.data.map((conversation) => {
+        if (conversation.id !== chatId || (conversation.unread_count ?? 0) === 0) {
+          return conversation
+        }
+
+        changed = true
+
+        return {
+          ...conversation,
+          unread_count: 0,
+        }
+      })
+
+      if (!changed) {
+        return old
+      }
+
+      return {
+        ...old,
+        data,
+      }
+    }
+  )
+}
+
 export function markChatClosedInCache(
   queryClient: QueryClient,
   chatId: string

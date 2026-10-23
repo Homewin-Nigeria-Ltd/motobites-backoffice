@@ -36,6 +36,46 @@ function defaultMeta(total: number): SupportMessagesResponse["meta"] {
   }
 }
 
+export function clearConversationUnreadInCache(
+  queryClient: QueryClient,
+  riderId: number
+) {
+  queryClient.setQueriesData<SupportConversationsResponse>(
+    { queryKey: [...riderChatKeys.all, "conversations"] },
+    (old) => {
+      if (!old) {
+        return old
+      }
+
+      let changed = false
+      const data = old.data.map((conversation) => {
+        if (
+          conversation.rider.id !== riderId ||
+          (conversation.unread_count ?? 0) === 0
+        ) {
+          return conversation
+        }
+
+        changed = true
+
+        return {
+          ...conversation,
+          unread_count: 0,
+        }
+      })
+
+      if (!changed) {
+        return old
+      }
+
+      return {
+        ...old,
+        data,
+      }
+    }
+  )
+}
+
 export function updateConversationPreviewInCache(
   queryClient: QueryClient,
   message: ApiSupportMessage

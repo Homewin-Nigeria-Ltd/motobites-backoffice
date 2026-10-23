@@ -9,6 +9,7 @@ import { riderChatKeys } from "../api/keys"
 import { ACTIVE_RIDER_STORAGE_KEY } from "../constants"
 import {
   appendMessageToCache,
+  clearConversationUnreadInCache,
   createPendingMessage,
   removeMessageFromCache,
   replacePendingMessageInCache,
@@ -221,6 +222,14 @@ export function useRiderChat(initialRiderId?: number | null) {
     enabled: Boolean(activeRiderId) && !isSelectedClosed,
   })
 
+  useEffect(() => {
+    if (activeRiderId === null) {
+      return
+    }
+
+    clearConversationUnreadInCache(queryClient, activeRiderId)
+  }, [activeRiderId, conversations, queryClient])
+
   const selectConversation = useCallback(
     (conversationId: string) => {
       const riderId = Number(conversationId)
@@ -230,8 +239,9 @@ export function useRiderChat(initialRiderId?: number | null) {
       }
 
       setStoredRiderId(riderId)
+      clearConversationUnreadInCache(queryClient, riderId)
     },
-    [setStoredRiderId]
+    [queryClient, setStoredRiderId]
   )
 
   const handleSendMessage = useCallback(
