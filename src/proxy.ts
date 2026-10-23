@@ -12,6 +12,7 @@ const PROTECTED_PREFIXES = [
   "/kitchen",
   "/staff",
   "/customers",
+  "/notification",
   "/revenue-analytics",
   "/inventory",
   "/promotions",
@@ -98,6 +99,12 @@ export function proxy(request: NextRequest) {
 
   if (pathname === "/ticket" || pathname.startsWith("/ticket/")) {
     return NextResponse.redirect(new URL("/customers/tickets", request.url))
+  }
+
+  if (pathname === "/customers/broadcast" || pathname.startsWith("/customers/broadcast/")) {
+    const nextUrl = new URL("/notification/broadcast", request.url)
+    nextUrl.search = request.nextUrl.search
+    return NextResponse.redirect(nextUrl)
   }
 
   if (pathname === "/customer-retention-and-loyalty" || pathname.startsWith("/customer-retention-and-loyalty/")) {
