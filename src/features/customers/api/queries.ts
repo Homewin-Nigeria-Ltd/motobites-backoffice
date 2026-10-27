@@ -1,4 +1,4 @@
-import { queryOptions } from "@tanstack/react-query"
+import { keepPreviousData, queryOptions } from "@tanstack/react-query"
 
 import { api } from "@/lib/api/client"
 import type {
@@ -82,6 +82,10 @@ async function fetchReferralList(
     query.to = params.to.trim()
   }
 
+  if (params.category) {
+    query.category = params.category
+  }
+
   const response = await api.get<ApiReferralListResponse>(
     customerEndpoints.referrals,
     query
@@ -90,9 +94,19 @@ async function fetchReferralList(
   return mapApiReferralListResponse(response)
 }
 
-async function fetchCustomerDetail(id: string): Promise<CustomerDetail> {
+async function fetchCustomerDetail(
+  id: string,
+  amount?: number
+): Promise<CustomerDetail> {
+  const query: Record<string, string | number> = {}
+
+  if (amount !== undefined) {
+    query.amount = amount
+  }
+
   const response = await api.get<ApiCustomerResponse>(
-    customerEndpoints.detail(id)
+    customerEndpoints.detail(id),
+    query
   )
 
   return mapApiCustomerDetailToCustomerDetail(response.data, response.meta)
@@ -117,10 +131,11 @@ export const customerQueries = {
       queryFn: () => fetchReferralList(params),
     }),
 
-  detail: (id: string) =>
+  detail: (id: string, amount?: number) =>
     queryOptions({
-      queryKey: customerKeys.detail(id),
-      queryFn: () => fetchCustomerDetail(id),
+      queryKey: customerKeys.detail(id, amount),
+      queryFn: () => fetchCustomerDetail(id, amount),
       enabled: Boolean(id.trim()),
+      placeholderData: keepPreviousData,
     }),
 }

@@ -38,7 +38,7 @@ import { cn } from "@/lib/utils"
 export function DashboardSection() {
   const router = useRouter()
   const { branchId } = useBranchFilter()
-  const [period, setPeriod] = useState(DashboardPeriod.TwentyFourHours)
+  const [period, setPeriod] = useState(DashboardPeriod.AllTime)
   const [dateRange, setDateRange] = useState<DateRange | undefined>()
   const [isTotalDeliveriesModalOpen, setIsTotalDeliveriesModalOpen] =
     useState(false)

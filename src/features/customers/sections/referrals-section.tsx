@@ -7,7 +7,7 @@ import { referralColumns } from "@/features/customers/columns/referral-columns"
 import { ReferralsSummaryCards } from "@/features/customers/components/referrals-summary-cards"
 import { ReferralsToolbar } from "@/features/customers/components/referrals-toolbar"
 import { useReferrals } from "@/features/customers/hooks/use-referrals"
-import type { ReferralPeriod } from "@/features/customers/types"
+import type { ReferralCategory, ReferralPeriod } from "@/features/customers/types"
 import { buildReferralDateParams } from "@/features/customers/utils/referral-period"
 import { mapReferralPlatformStats } from "@/features/customers/utils/referral"
 import { DataTable } from "@/components/data-table"
@@ -15,12 +15,13 @@ import { DataTable } from "@/components/data-table"
 const DEFAULT_PAGE_SIZE = 8
 
 export function ReferralsSection() {
-  const [period, setPeriod] = useState<ReferralPeriod>("all")
+  const [period, setPeriod] = useState<ReferralPeriod>()
+  const [category, setCategory] = useState<ReferralCategory | "all">()
   const [dateRange, setDateRange] = useState<DateRange | undefined>()
   const [page, setPage] = useState(1)
 
   const dateParams = useMemo(
-    () => buildReferralDateParams(period, dateRange),
+    () => (period ? buildReferralDateParams(period, dateRange) : {}),
     [period, dateRange]
   )
   const isCustomPeriodReady = period !== "custom" || Boolean(dateRange?.from)
@@ -31,6 +32,7 @@ export function ReferralsSection() {
       per_page: DEFAULT_PAGE_SIZE,
       from: dateParams.from,
       to: dateParams.to,
+      category: category === "all" ? undefined : category,
     },
     { enabled: isCustomPeriodReady }
   )
@@ -46,6 +48,11 @@ export function ReferralsSection() {
     if (nextPeriod !== "custom") {
       setDateRange(undefined)
     }
+  }
+
+  const handleCategoryChange = (nextCategory: ReferralCategory | "all") => {
+    setCategory(nextCategory)
+    setPage(1)
   }
 
   const handleDateRangeChange = (next: DateRange | undefined) => {
@@ -76,8 +83,10 @@ export function ReferralsSection() {
                 : 0
             }
             period={period}
+            category={category}
             dateRange={dateRange}
             onPeriodChange={handlePeriodChange}
+            onCategoryChange={handleCategoryChange}
             onDateRangeChange={handleDateRangeChange}
           />
         }

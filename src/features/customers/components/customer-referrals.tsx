@@ -2,16 +2,39 @@ import Link from "next/link"
 
 import { ReferralFundedBadge } from "@/features/customers/components/referral-funded-badge"
 import type { CustomerDetail } from "@/features/customers/types"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 
 type CustomerReferralsProps = {
   customer: CustomerDetail
+  fundedAmount: string
+  onFundedAmountChange: (value: string) => void
+  isFiltering?: boolean
 }
 
-export function CustomerReferrals({ customer }: CustomerReferralsProps) {
+export function CustomerReferrals({
+  customer,
+  fundedAmount,
+  onFundedAmountChange,
+  isFiltering = false,
+}: CustomerReferralsProps) {
   const stats = customer.referralStats
+  const hasAmountFilter = fundedAmount.trim().length > 0
 
   return (
     <div className="space-y-6">
+      <div className="max-w-xs space-y-2">
+        <Label htmlFor="referral-funded-amount">Funded amount</Label>
+        <Input
+          id="referral-funded-amount"
+          type="number"
+          min={0}
+          inputMode="numeric"
+          placeholder="10000"
+          value={fundedAmount}
+          onChange={(event) => onFundedAmountChange(event.target.value)}
+        />
+      </div>
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         <div>
           <p className="text-sm text-muted-foreground">Total referrals</p>
@@ -45,9 +68,15 @@ export function CustomerReferrals({ customer }: CustomerReferralsProps) {
         </div>
       </div>
 
+      {isFiltering ? (
+        <p className="text-sm text-muted-foreground">Updating referrals...</p>
+      ) : null}
+
       {customer.referrals.length === 0 ? (
         <p className="text-sm text-muted-foreground">
-          No referred customers yet.
+          {hasAmountFilter
+            ? "No referrals have funded this amount."
+            : "No referred customers yet."}
         </p>
       ) : (
         <div className="overflow-x-auto">

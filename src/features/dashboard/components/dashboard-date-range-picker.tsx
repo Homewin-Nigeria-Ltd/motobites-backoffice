@@ -16,12 +16,14 @@ type DashboardDateRangePickerProps = {
   value?: DateRange
   onChange: (value: DateRange | undefined) => void
   className?: string
+  placeholder?: string
 }
 
 export function DashboardDateRangePicker({
   value,
   onChange,
   className,
+  placeholder = "Filter by date range",
 }: DashboardDateRangePickerProps) {
   return (
     <Popover>
@@ -43,7 +45,7 @@ export function DashboardDateRangePicker({
               format(value.from, "LLL dd, y")
             )
           ) : (
-            "Filter by date range"
+            placeholder
           )}
         </Button>
       </PopoverTrigger>

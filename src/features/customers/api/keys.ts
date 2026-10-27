@@ -10,5 +10,6 @@ export const customerKeys = {
   referrals: (params: ReferralListParams) =>
     [...customerKeys.all, "referrals", params] as const,
   details: () => [...customerKeys.all, "detail"] as const,
-  detail: (id: string) => [...customerKeys.details(), id] as const,
+  detail: (id: string, amount?: number) =>
+    [...customerKeys.details(), id, amount ?? null] as const,
 }
