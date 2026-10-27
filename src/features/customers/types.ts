@@ -85,11 +85,14 @@ export type ReferralSignup = {
 
 export type ReferralPeriod = "all" | "24h" | "week" | "month" | "custom"
 
+export type ReferralCategory = "funded" | "unfunded"
+
 export type ReferralListParams = {
   page: number
   per_page?: number
   from?: string
   to?: string
+  category?: ReferralCategory
 }
 
 export type CustomerReferralStats = {
@@ -322,6 +325,7 @@ export type ApiCustomerDetailData = {
   recent_orders?: ApiCustomerTransaction[]
   referral_count?: number
   referrals?: ApiReferredCustomer[]
+  metadata?: ApiCustomerReferralMeta
 }
 
 export type ApiReferralPerson = {

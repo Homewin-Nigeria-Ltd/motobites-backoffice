@@ -314,7 +314,7 @@ export function mapApiCustomerDetailToCustomerDetail(
     cnplTransactions: cnplTransactions.map(mapApiCnplTransaction),
     referrals: (data.referrals ?? []).map(mapApiReferredCustomer),
     referralStats: mapApiCustomerReferralStats(
-      meta,
+      data.metadata ?? meta,
       data.referral_count ?? data.referrals?.length ?? 0
     ),
     initials: getInitials(fullName),
