@@ -82,6 +82,10 @@ async function fetchReferralList(
     query.to = params.to.trim()
   }
 
+  if (params.category) {
+    query.category = params.category
+  }
+
   const response = await api.get<ApiReferralListResponse>(
     customerEndpoints.referrals,
     query
