@@ -27,6 +27,7 @@ export function ChatConversationItem({
   onSelect,
 }: ChatConversationItemProps) {
   const { customer, unread_count } = conversation
+  const customerName = customer?.name?.trim() || "Customer"
   const avatar = getCustomerAvatar(customer)
   const preview = getConversationPreview(conversation)
   const timestamp = getConversationTimestamp(conversation)
@@ -41,7 +42,7 @@ export function ChatConversationItem({
       )}
     >
       <Avatar className="size-11 shrink-0">
-        {avatar ? <AvatarImage src={avatar} alt={customer.name} /> : null}
+        {avatar ? <AvatarImage src={avatar} alt={customerName} /> : null}
         <AvatarFallback className="bg-muted text-sm font-semibold text-primary">
           {getCustomerInitials(customer)}
         </AvatarFallback>
@@ -50,7 +51,7 @@ export function ChatConversationItem({
       <div className="min-w-0 flex-1">
         <div className="flex items-start justify-between gap-2">
           <p className="truncate text-sm font-semibold text-foreground">
-            {customer.name}
+            {customerName}
           </p>
           {timestamp ? (
             <span className="shrink-0 text-xs text-muted-foreground">

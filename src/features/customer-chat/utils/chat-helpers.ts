@@ -6,12 +6,27 @@ import type {
 } from "../types"
 import { formatChatConversationTime } from "./format-chat-time"
 
-export function getCustomerAvatar(customer: ApiCustomerChatCustomer) {
-  return customer.profile?.avatar ?? null
+export function getCustomerAvatar(
+  customer: ApiCustomerChatCustomer | null | undefined
+) {
+  return customer?.profile?.avatar ?? null
 }
 
-export function getCustomerInitials(customer: ApiCustomerChatCustomer) {
-  return customer.initials?.trim() || customer.name.slice(0, 1).toUpperCase()
+export function getCustomerInitials(
+  customer: ApiCustomerChatCustomer | null | undefined
+) {
+  const initials = customer?.initials?.trim()
+  const name = customer?.name?.trim()
+
+  if (initials) {
+    return initials
+  }
+
+  if (name) {
+    return name.slice(0, 1).toUpperCase()
+  }
+
+  return "?"
 }
 
 export function getMessageBody(message: ApiCustomerChatMessage) {
