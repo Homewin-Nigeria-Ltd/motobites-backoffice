@@ -128,7 +128,7 @@ export function useCustomerChat(initialChatId?: string | null) {
       const preview = getConversationPreview(conversation) ?? ""
 
       return (
-        conversation.customer.name.toLowerCase().includes(query) ||
+        (conversation.customer?.name ?? "").toLowerCase().includes(query) ||
         preview.toLowerCase().includes(query)
       )
     })
