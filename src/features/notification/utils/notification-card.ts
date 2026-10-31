@@ -1,8 +1,14 @@
+import { CHAT_ID_PARAM } from "@/features/customer-chat/constants"
 import type { ApiNotification } from "@/features/notification/types"
 import { ORDER_ID_SEARCH_PARAM } from "@/features/order/utils/order-status"
 
 const ORDER_PAGE = "/order/pending"
+const CHATS_PAGE = "/customers/chats"
 const ORDER_TARGET_PATTERN = /^order_management\/orders\/([^/]+)$/
+const SUPPORT_CHAT_TARGET_PATTERNS = [
+  /^admin\/support\/chats\/([^/]+)$/,
+  /^customers\/chats\/([^/]+)$/,
+]
 
 type NotificationCategoryConfig = {
   label: string
@@ -193,6 +199,30 @@ function buildOrderPageHref(orderId?: string | null) {
   return `${ORDER_PAGE}?${ORDER_ID_SEARCH_PARAM}=${encodeURIComponent(orderId)}`
 }
 
+function getSupportConversationId(
+  metadata?: Record<string, unknown>,
+  target?: string,
+) {
+  const conversationId = metadata?.conversation_id
+  if (typeof conversationId === "string" && conversationId.trim()) {
+    return conversationId.trim()
+  }
+
+  const normalizedTarget = normalizeTarget(target ?? "")
+  for (const pattern of SUPPORT_CHAT_TARGET_PATTERNS) {
+    const match = normalizedTarget.match(pattern)
+    if (match?.[1]) {
+      return match[1]
+    }
+  }
+
+  return null
+}
+
+function buildSupportChatHref(conversationId: string) {
+  return `${CHATS_PAGE}?${CHAT_ID_PARAM}=${encodeURIComponent(conversationId)}`
+}
+
 function isReassignmentNotification(metadata?: Record<string, unknown>) {
   return metadata?.event === "rider_reassignment_requested"
 }
@@ -327,6 +357,14 @@ export function getNotificationDisplay(
       }
     }
 
+    const conversationId = getSupportConversationId(
+      item.metadata,
+      item.action.target,
+    )
+    if (conversationId) {
+      href = buildSupportChatHref(conversationId)
+    }
+
     return {
       key: categoryKey,
       label: config.label,
@@ -336,16 +374,23 @@ export function getNotificationDisplay(
     }
   }
 
+  const conversationId = getSupportConversationId(
+    item.metadata,
+    item.action.target,
+  )
+
   return {
     key: item.category,
     label: item.category_label,
     actionLabel: item.action.label,
-    href: resolveHref(
-      item.action.target,
-      item.metadata,
-      item.category,
-      "/dashboard",
-    ),
+    href: conversationId
+      ? buildSupportChatHref(conversationId)
+      : resolveHref(
+          item.action.target,
+          item.metadata,
+          item.category,
+          "/dashboard",
+        ),
     accent: item.category.includes("order") ? "primary" : "muted",
   }
 }
