@@ -1,6 +1,7 @@
 export enum DashboardPeriod {
   TwentyFourHours = "24h",
   Week = "week",
+  Month = "month",
   ThreeMonths = "3months",
   Year = "year",
   AllTime = "all_time",
