@@ -39,6 +39,14 @@ async function fetchCustomerList(
     query.fulfillment_branch_id = params.fulfillment_branch_id
   }
 
+  if (params.category) {
+    query.category = params.category
+  }
+
+  if (params.amount !== undefined) {
+    query.amount = params.amount
+  }
+
   const response = await api.get<ApiCustomerListResponse>(
     customerEndpoints.list,
     query

@@ -53,14 +53,14 @@ function mapIntervalToPeriod(interval: TrendInterval): DashboardPeriod {
     case "weekly":
       return DashboardPeriod.Week
     case "monthly":
-      return DashboardPeriod.ThreeMonths
+      return DashboardPeriod.Month
   }
 }
 
 const PERIOD_TABS = [
   { key: DashboardPeriod.TwentyFourHours, label: "24h" },
   { key: DashboardPeriod.Week, label: "Week" },
-  { key: DashboardPeriod.ThreeMonths, label: "Month" },
+  { key: DashboardPeriod.Month, label: "Month" },
   { key: DashboardPeriod.Year, label: "Year" },
 ]
 
@@ -235,6 +235,11 @@ export function TotalUsersModal({
                 label="Total Registered Users"
                 value={formatDashboardCount(cardData.summary.total_registered_users)}
                 changePercent={cardData.summary.total_registered_users_change_percent}
+              />
+              <StatMetricCard
+                label="Users Who Funded Account"
+                value={formatDashboardCount(cardData.summary.funded_users ?? 0)}
+                changePercent={cardData.summary.funded_users_change_percent}
               />
               <StatMetricCard
                 label="New Users (Today)"

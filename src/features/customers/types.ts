@@ -158,12 +158,16 @@ export type CustomerSummaryStat = {
   trend: CustomerTrend
 }
 
+export type CustomerFundingCategory = "all" | "funded" | "unfunded"
+
 export type CustomerListParams = {
   page: number
   per_page?: number
   search?: string
   tab?: CustomerTab
   fulfillment_branch_id?: number | null
+  category?: CustomerFundingCategory
+  amount?: number
 }
 
 export type CustomerListMeta = {

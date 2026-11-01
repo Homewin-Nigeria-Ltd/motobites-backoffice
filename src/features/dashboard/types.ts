@@ -650,6 +650,9 @@ export type TotalUsersCardData = {
     total_registered_users: number
     total_registered_users_change_percent?: number
 
+    funded_users?: number
+    funded_users_change_percent?: number
+
     new_users: number
     new_users_change_percent?: number
 

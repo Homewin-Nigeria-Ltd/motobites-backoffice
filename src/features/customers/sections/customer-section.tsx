@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import type { PaginationState } from "@tanstack/react-table"
 
 import { customerColumns } from "@/features/customers/columns"
@@ -10,7 +10,10 @@ import { CustomerSummaryCards } from "@/features/customers/components/customer-s
 import { CustomerToolbar } from "@/features/customers/components/customer-toolbar"
 import { useCustomerList, useCustomerOverview } from "@/features/customers"
 import { useBranchFilter } from "@/context/branch-context"
-import type { CustomerTab } from "@/features/customers/types"
+import type {
+  CustomerFundingCategory,
+  CustomerTab,
+} from "@/features/customers/types"
 import { PROMOTIONS_ROUTES } from "@/features/promotions/constants"
 import { DataTable } from "@/components/data-table"
 import { Button } from "@/components/ui/button"
@@ -22,10 +25,31 @@ export function CustomerManagementSection() {
   const { branchId } = useBranchFilter()
   const [tab, setTab] = useState<CustomerTab>("all")
   const [search, setSearch] = useState("")
+  const [category, setCategory] = useState<CustomerFundingCategory>()
+  const [amountInput, setAmountInput] = useState("")
+  const [amount, setAmount] = useState<number>()
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: DEFAULT_PAGE_SIZE,
   })
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      const trimmed = amountInput.trim()
+
+      if (!trimmed) {
+        setAmount(undefined)
+        return
+      }
+
+      const nextAmount = Number(trimmed)
+      setAmount(
+        Number.isFinite(nextAmount) && nextAmount >= 0 ? nextAmount : undefined
+      )
+    }, 300)
+
+    return () => window.clearTimeout(timer)
+  }, [amountInput])
 
   const { data: overviewData, isPending: isOverviewPending } =
     useCustomerOverview(branchId)
@@ -35,6 +59,8 @@ export function CustomerManagementSection() {
     page: pagination.pageIndex + 1,
     per_page: pagination.pageSize,
     fulfillment_branch_id: branchId ?? undefined,
+    category,
+    amount,
   })
 
   const handleTabChange = (value: CustomerTab) => {
@@ -44,6 +70,16 @@ export function CustomerManagementSection() {
 
   const handleSearchChange = (value: string) => {
     setSearch(value)
+    setPagination((current) => ({ ...current, pageIndex: 0 }))
+  }
+
+  const handleCategoryChange = (value: CustomerFundingCategory) => {
+    setCategory(value)
+    setPagination((current) => ({ ...current, pageIndex: 0 }))
+  }
+
+  const handleAmountChange = (value: string) => {
+    setAmountInput(value)
     setPagination((current) => ({ ...current, pageIndex: 0 }))
   }
 
@@ -85,6 +121,10 @@ export function CustomerManagementSection() {
             onTabChange={handleTabChange}
             search={search}
             onSearchChange={handleSearchChange}
+            category={category}
+            onCategoryChange={handleCategoryChange}
+            amount={amountInput}
+            onAmountChange={handleAmountChange}
           />
         }
       />
