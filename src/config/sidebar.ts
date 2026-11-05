@@ -118,6 +118,18 @@ export const navMain: NavItem[] = [
     icon: "shield",
     permission: PERMISSION_KEYS.staffManagement,
   },
+  {
+    title: "Sales Executives",
+    url: "/sales-executives",
+    icon: "account",
+    permission: PERMISSION_KEYS.salesExecutives,
+    items: [
+      { title: "Overview", url: "/sales-executives" },
+      { title: "Agents", url: "/sales-executives/agents" },
+      { title: "Targets", url: "/sales-executives/targets" },
+      { title: "Applications", url: "/sales-executives/applications" },
+    ],
+  },
   // {
   //   title: "Technical Report",
   //   url: "/technical-report",

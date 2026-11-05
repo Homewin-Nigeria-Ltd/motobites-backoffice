@@ -66,6 +66,12 @@ const CATEGORY_CONFIG: Record<string, NotificationCategoryConfig> = {
     href: "/staff",
     accent: "muted",
   },
+  sales_executives: {
+    label: "SALES EXECUTIVES",
+    actionLabel: "Open Sales Executives",
+    href: "/sales-executives",
+    accent: "muted",
+  },
   settings: {
     label: "SETTINGS",
     actionLabel: "Open Settings",
@@ -86,6 +92,7 @@ const TARGET_ROUTES: Record<string, string> = {
   rider_chat: "/riders/chat",
   performance: "/performance",
   staff_management: "/staff",
+  sales_executives: "/sales-executives",
   customer_retention_loyalty: "/customers",
   customer_support: "/customers/tickets",
   settings: "/settings",
