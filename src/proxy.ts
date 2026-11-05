@@ -11,6 +11,7 @@ const PROTECTED_PREFIXES = [
   "/menu",
   "/kitchen",
   "/staff",
+  "/sales-executives",
   "/customers",
   "/notification",
   "/revenue-analytics",

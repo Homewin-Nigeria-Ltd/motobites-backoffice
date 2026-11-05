@@ -18,6 +18,7 @@ export const LANDING_ROUTES: LandingRoute[] = [
   { permission: PERMISSION_KEYS.riderChat, path: "/riders/chat" },
   { permission: PERMISSION_KEYS.performance, path: "/performance" },
   { permission: PERMISSION_KEYS.staffManagement, path: "/staff" },
+  { permission: PERMISSION_KEYS.salesExecutives, path: "/sales-executives" },
   {
     permission: PERMISSION_KEYS.customerRetentionLoyalty,
     path: "/promotions",

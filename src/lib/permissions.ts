@@ -14,6 +14,7 @@ export const PERMISSION_KEYS = {
   riderChat: "rider_chat",
   performance: "performance",
   staffManagement: "staff_management",
+  salesExecutives: "sales_executives",
   technicalReport: "technical_report",
   customerRetentionLoyalty: "customer_retention_loyalty",
   customerSupport: "customer_support",
@@ -36,6 +37,7 @@ export type Permissions = {
   canAccessRiderChat: boolean
   canAccessPerformance: boolean
   canAccessStaffManagement: boolean
+  canAccessSalesExecutives: boolean
   canAccessTechnicalReport: boolean
   canAccessCustomerRetentionLoyalty: boolean
   canAccessCustomerSupport: boolean
@@ -90,6 +92,10 @@ function buildPermissions(user: AuthUser): Permissions {
       user,
       PERMISSION_KEYS.staffManagement,
     ),
+    canAccessSalesExecutives: userHasPermission(
+      user,
+      PERMISSION_KEYS.salesExecutives,
+    ),
     canAccessTechnicalReport: userHasPermission(
       user,
       PERMISSION_KEYS.technicalReport,
@@ -128,6 +134,7 @@ const permissionFlagByKey: Record<PermissionKey, keyof Permissions> = {
   [PERMISSION_KEYS.riderChat]: "canAccessRiderChat",
   [PERMISSION_KEYS.performance]: "canAccessPerformance",
   [PERMISSION_KEYS.staffManagement]: "canAccessStaffManagement",
+  [PERMISSION_KEYS.salesExecutives]: "canAccessSalesExecutives",
   [PERMISSION_KEYS.technicalReport]: "canAccessTechnicalReport",
   [PERMISSION_KEYS.customerRetentionLoyalty]: "canAccessCustomerRetentionLoyalty",
   [PERMISSION_KEYS.customerSupport]: "canAccessCustomerSupport",
