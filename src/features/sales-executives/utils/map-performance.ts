@@ -28,7 +28,9 @@ function displayWhen(value: unknown, fallback = "—") {
     return fallback
   }
 
-  const parsed = Date.parse(raw)
+  const parsed = Date.parse(
+    raw.includes(" ") && !raw.includes("T") ? raw.replace(" ", "T") : raw
+  )
   if (Number.isNaN(parsed)) {
     return raw
   }
@@ -445,82 +447,117 @@ function referralList(value: unknown) {
 
   return {
     items,
-    page: num(meta.current_page, 1),
-    lastPage: num(meta.last_page, 1),
+    page: num(record?.current_page ?? meta.current_page, 1),
+    lastPage: num(record?.last_page ?? meta.last_page, 1),
   }
+}
+
+function mapRaceLeaders(value: unknown) {
+  return asArray(value)
+    .map((item) => {
+      const record = asRecord(item)
+      if (!record) {
+        return null
+      }
+
+      const name = text(record.name, "")
+      const id = num(record.agent_id ?? record.id)
+      if (!id && !name) {
+        return null
+      }
+
+      return {
+        id,
+        name: name || "Agent",
+        qualified: num(record.qualified_users ?? record.qualified),
+      }
+    })
+    .filter((item): item is SalesExecutiveAgentDetail["raceLeaders"][number] => item !== null)
 }
 
 export function mapSalesExecutiveAgentDetail(payload: unknown): SalesExecutiveAgentDetail {
   const { root, body } = envelope(payload)
-  const profile = asRecord(body.profile) ?? asRecord(root.profile) ?? body
-  const summary = asRecord(body.summary) ?? asRecord(body.totals) ?? body
+  const agent = asRecord(body.agent) ?? asRecord(root.agent) ?? {}
+  const profile = asRecord(body.profile) ?? asRecord(root.profile) ?? agent
+  const summary = asRecord(body.summary) ?? asRecord(body.totals) ?? {}
   const target = asRecord(body.target) ?? asRecord(body.target_progress) ?? {}
   const race = asRecord(body.race) ?? {}
   const referralPage = referralList(body.referrals ?? root.referrals)
   const qualified = num(
-    summary.qualified ?? summary.qualified_users ?? summary.qualified_referrals
+    summary.qualified_users ?? summary.qualified ?? summary.qualified_referrals
   )
-  const signedUp = num(summary.signed_up ?? summary.signups ?? body.signed_up)
+  const signedUp = num(summary.signups ?? summary.signed_up ?? body.signed_up)
   const activity = asArray(
     body.activity ?? body.target_activity ?? root.activity ?? root.target_activity
   )
+  const setBy = text(target.set_by, "")
+  const setAt = displayWhen(target.set_at, "")
+  const targetNote = text(target.note ?? body.target_note, "")
 
   return {
-    id: num(body.id ?? profile.id ?? root.id),
-    name: text(body.name ?? profile.name, "Agent"),
-    code: text(body.code ?? body.referral_code ?? profile.promo_code ?? profile.referral_code, ""),
-    status: text(body.status ?? profile.status, "active"),
-    since: displayWhen(body.since ?? body.joined_at ?? profile.joined_at ?? body.agent_since, ""),
+    id: num(agent.id ?? body.id ?? profile.id ?? root.id),
+    name: text(agent.name ?? body.name ?? profile.name, "Agent"),
+    code: text(
+      agent.referral_code ?? body.referral_code ?? profile.referral_code ?? profile.promo_code,
+      ""
+    ),
+    status: text(agent.status ?? body.status ?? profile.status, "active"),
+    since: displayWhen(
+      agent.joined_at ?? body.joined_at ?? profile.joined_at ?? body.since ?? body.agent_since,
+      ""
+    ),
     signedUp,
     qualified,
     qualifiedPercent: num(
-      summary.qualified_percent ?? body.qualified_percent,
+      summary.qualification_rate ?? summary.qualified_percent ?? body.qualified_percent,
       signedUp ? Math.round((qualified / signedUp) * 100) : 0
     ),
     periodPay: money(
       summary.period_pay_formatted ?? body.period_pay_formatted,
       typeof summary.earned === "number"
         ? summary.earned
-        : summary.period_pay ?? body.period_pay ?? summary.earned_this_month
+        : summary.earned_this_month ?? summary.period_pay ?? body.period_pay
     ),
     periodPayNote: text(summary.period_pay_note ?? body.pay_note, ""),
     earnedTotal: money(
       summary.earned_total_formatted ?? body.earned_total_formatted,
-      typeof summary.reward_amount === "number"
-        ? summary.reward_amount
-        : typeof body.reward_amount === "number"
-          ? body.reward_amount
-          : summary.earned_total ?? body.earned_total ?? summary.earned_referral_rewards
+      summary.earned_total ?? body.earned_total ?? summary.earned_referral_rewards
     ),
     earnedNote: text(summary.earned_note ?? body.earned_note, ""),
-    targetQualified: num(
-      target.qualified_users ?? target.qualified ?? body.month_qualified ?? qualified
-    ),
+    targetQualified: num(target.qualified_users ?? target.qualified ?? body.month_qualified),
     targetGoal: num(
-      target.goal ?? target.target ?? (typeof body.target === "number" ? body.target : undefined)
+      target.target ?? target.goal ?? (typeof body.target === "number" ? body.target : undefined)
     ),
-    targetNote: text(target.note ?? body.target_note, ""),
-    raceQualified: num(race.qualified ?? race.qualified_users ?? body.race_qualified),
-    raceGoal: num(race.goal ?? race.target, 100),
-    racePlace: num(race.place ?? race.rank ?? body.race_rank),
+    targetPace: text(target.pace_status ?? target.pace, ""),
+    targetNote:
+      targetNote || (setBy ? `Set by ${setBy}${setAt ? `, ${setAt}` : ""}` : ""),
+    raceQualified: num(race.qualified_users ?? race.qualified ?? body.race_qualified),
+    raceGoal: num(race.target ?? race.goal),
+    racePlace: num(race.rank ?? race.place ?? body.race_rank),
+    raceTotal: num(race.total_agents),
+    raceLeaders: mapRaceLeaders(race.leaders),
     raceNote: text(race.note ?? body.race_note, ""),
     referrals: referralPage.items
       .map(mapReferral)
       .filter((item): item is SalesExecutiveReferral => item !== null),
     referralsPage: referralPage.page,
     referralsLastPage: referralPage.lastPage,
-    promoCode: text(profile.promo_code ?? profile.referral_code ?? body.referral_code, "—"),
+    promoCode: text(
+      agent.referral_code ?? profile.promo_code ?? profile.referral_code ?? body.referral_code,
+      "—"
+    ),
     userId: text(profile.user_id ?? body.user_id, "—"),
     staffId: text(profile.staff_id ?? body.staff_id, "—"),
-    phone: text(profile.phone ?? body.phone, "—"),
-    email: text(profile.email ?? body.email, "—"),
+    phone: text(agent.phone ?? profile.phone ?? body.phone, "—"),
+    email: text(agent.email ?? profile.email ?? body.email, "—"),
     paidThrough: text(profile.paid_through ?? body.paid_through, "—"),
     activity: activity
       .map((item) => {
         const record = asRecord(item)
         return {
-          text: text(record?.text ?? record?.message ?? record?.description ?? item, ""),
-          at: displayWhen(record?.at ?? record?.created_at, ""),
+          text: text(record?.description ?? record?.text ?? record?.message ?? item, ""),
+          note: text(record?.note, ""),
+          at: displayWhen(record?.created_at ?? record?.at, ""),
         }
       })
       .filter((item) => item.text),
