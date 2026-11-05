@@ -546,7 +546,7 @@ export function mapSalesExecutiveAgentDetail(payload: unknown): SalesExecutiveAg
       agent.referral_code ?? profile.promo_code ?? profile.referral_code ?? body.referral_code,
       "—"
     ),
-    userId: text(profile.user_id ?? body.user_id, "—"),
+    userId: text(agent.id ?? body.id ?? profile.user_id ?? body.user_id, "-"),
     staffId: text(profile.staff_id ?? body.staff_id, "—"),
     phone: text(agent.phone ?? profile.phone ?? body.phone, "—"),
     email: text(agent.email ?? profile.email ?? body.email, "—"),
