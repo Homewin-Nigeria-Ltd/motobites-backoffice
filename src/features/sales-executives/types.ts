@@ -212,7 +212,14 @@ export type SalesExecutiveReferral = {
 
 export type SalesExecutiveActivity = {
   text: string
+  note: string
   at: string
+}
+
+export type SalesExecutiveRaceLeader = {
+  id: number
+  name: string
+  qualified: number
 }
 
 export type SalesExecutiveAgentDetail = {
@@ -230,10 +237,13 @@ export type SalesExecutiveAgentDetail = {
   earnedNote: string
   targetQualified: number
   targetGoal: number
+  targetPace: string
   targetNote: string
   raceQualified: number
   raceGoal: number
   racePlace: number
+  raceTotal: number
+  raceLeaders: SalesExecutiveRaceLeader[]
   raceNote: string
   referrals: SalesExecutiveReferral[]
   referralsPage: number

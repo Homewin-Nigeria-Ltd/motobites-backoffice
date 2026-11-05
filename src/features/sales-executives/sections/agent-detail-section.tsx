@@ -17,7 +17,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 
-import { Metric, Panel, ProgressBar } from "../components/performance-ui"
+import { Metric, PaceBadge, Panel, ProgressBar } from "../components/performance-ui"
 import {
   useSalesExecutiveAgent,
   useUpdateSalesExecutiveStatus,
@@ -168,9 +168,12 @@ export function SalesExecutiveAgentSection({ id }: { id: string }) {
 
       <div className="grid gap-3 md:grid-cols-2">
         <Panel className="flex flex-col gap-3">
-          <p className="text-sm text-muted-foreground">
-            {monthName(month)} target
-          </p>
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-sm text-muted-foreground">
+              {monthName(month)} target
+            </p>
+            {data.targetPace ? <PaceBadge pace={data.targetPace} /> : null}
+          </div>
           <p className="text-3xl font-semibold">
             {formatCount(data.targetQualified)}
             <span className="text-lg text-muted-foreground">
@@ -178,29 +181,56 @@ export function SalesExecutiveAgentSection({ id }: { id: string }) {
               / {formatCount(data.targetGoal)}
             </span>
           </p>
-          <DashedProgress value={data.targetQualified} max={data.targetGoal} />
+          <DashedProgress value={data.targetQualified} max={data.targetGoal} fill />
           {data.targetNote ? (
             <p className="text-sm text-muted-foreground">{data.targetNote}</p>
           ) : null}
         </Panel>
         <Panel className="flex flex-col gap-3">
-          <p className="text-sm text-muted-foreground">Race to 100</p>
+          <p className="text-sm text-muted-foreground">
+            {data.raceGoal ? `Race to ${formatCount(data.raceGoal)}` : "Race"}
+          </p>
           <p className="text-3xl font-semibold">
             {formatCount(data.raceQualified)}
-            <span className="text-lg text-muted-foreground">
-              {" "}
-              / {formatCount(data.raceGoal || 100)}
-            </span>
+            {data.raceGoal ? (
+              <span className="text-lg text-muted-foreground">
+                {" "}
+                / {formatCount(data.raceGoal)}
+              </span>
+            ) : null}
           </p>
-          <ProgressBar
-            value={data.raceQualified}
-            max={data.raceGoal || 100}
-            className="h-3"
-          />
-          <p className="text-sm text-muted-foreground">
-            {data.racePlace ? `Rank ${formatCount(data.racePlace)}. ` : ""}
-            {data.raceNote}
-          </p>
+          {data.raceGoal ? (
+            <ProgressBar
+              value={data.raceQualified}
+              max={data.raceGoal}
+              className="h-3"
+            />
+          ) : null}
+          {data.racePlace ? (
+            <p className="text-sm text-muted-foreground">
+              Rank {formatCount(data.racePlace)}
+              {data.raceTotal ? ` of ${formatCount(data.raceTotal)}` : ""}
+              {data.raceNote ? `. ${data.raceNote}` : ""}
+            </p>
+          ) : null}
+          {data.raceLeaders.length ? (
+            <ol className="flex flex-col gap-2">
+              {data.raceLeaders.map((leader, index) => (
+                <li
+                  key={leader.id || `${leader.name}-${index}`}
+                  className="flex items-center justify-between gap-3 text-sm"
+                >
+                  <span>
+                    <span className="text-muted-foreground">{index + 1}. </span>
+                    <span className={leader.id === data.id ? "font-medium" : undefined}>
+                      {leader.name}
+                    </span>
+                  </span>
+                  <span className="font-medium">{formatCount(leader.qualified)}</span>
+                </li>
+              ))}
+            </ol>
+          ) : null}
         </Panel>
       </div>
 
@@ -225,24 +255,25 @@ export function SalesExecutiveAgentSection({ id }: { id: string }) {
               <dt className="text-muted-foreground">Promo code</dt>
               <dd>{data.promoCode}</dd>
               <dt className="text-muted-foreground">User ID</dt>
-              <dd>{data.userId}</dd>
-              <dt className="text-muted-foreground">Staff ID</dt>
-              <dd>{data.staffId}</dd>
+              <dd>{data.userId === "—" ? "-" : data.userId}</dd>
               <dt className="text-muted-foreground">Phone</dt>
               <dd>{data.phone}</dd>
               <dt className="text-muted-foreground">Email</dt>
               <dd className="break-all">{data.email}</dd>
               <dt className="text-muted-foreground">Paid through</dt>
-              <dd>{data.paidThrough}</dd>
+              <dd>{data.paidThrough === "—" ? "-" : data.paidThrough}</dd>
             </dl>
           </Panel>
           <Panel>
             <h2 className="font-semibold">Activity</h2>
             {data.activity.length ? (
               <ul className="mt-3 flex flex-col gap-3 text-sm">
-                {data.activity.map((item) => (
-                  <li key={`${item.at}-${item.text}`}>
+                {data.activity.map((item, index) => (
+                  <li key={`${item.at}-${item.text}-${index}`}>
                     <p>{item.text}</p>
+                    {item.note ? (
+                      <p className="text-muted-foreground">{item.note}</p>
+                    ) : null}
                     {item.at ? (
                       <p className="text-xs text-muted-foreground">{item.at}</p>
                     ) : null}
