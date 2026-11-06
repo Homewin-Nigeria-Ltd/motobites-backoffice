@@ -255,7 +255,7 @@ export function SalesExecutiveAgentSection({ id }: { id: string }) {
               <dt className="text-muted-foreground">Promo code</dt>
               <dd>{data.promoCode}</dd>
               <dt className="text-muted-foreground">User ID</dt>
-              <dd>{data.userId === "—" ? "-" : data.userId}</dd>
+              <dd>{data.userId}</dd>
               <dt className="text-muted-foreground">Phone</dt>
               <dd>{data.phone}</dd>
               <dt className="text-muted-foreground">Email</dt>
