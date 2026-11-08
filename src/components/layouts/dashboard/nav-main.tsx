@@ -59,6 +59,10 @@ function isNavSubItemActive(pathname: string, subUrl: string) {
     return !pathname.startsWith("/kitchen/branches")
   }
 
+  if (subUrl === "/sales-executives") {
+    return pathname === "/sales-executives"
+  }
+
   return true
 }
 
@@ -76,6 +80,8 @@ function isNavItemActive(pathname: string, item: NavItem) {
     (item.url === "/delivery" && pathname.startsWith("/delivery")) ||
     (item.url === "/inventory" && pathname.startsWith("/inventory")) ||
     (item.url === "/performance" && pathname.startsWith("/performance")) ||
+    (item.url === "/sales-executives" &&
+      pathname.startsWith("/sales-executives")) ||
     (item.url === "/customers" &&
       (pathname === "/customers" ||
         pathname.startsWith("/promotions") ||
