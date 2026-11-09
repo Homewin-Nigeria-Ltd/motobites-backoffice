@@ -3,6 +3,7 @@
 import { useState } from "react"
 
 import { Button } from "@/components/ui/button"
+import { Icons } from "@/components/ui/icons"
 import { Input } from "@/components/ui/input"
 
 type ChatComposerProps = {
@@ -31,40 +32,54 @@ export function ChatComposer({
 
   return (
     <div className="shrink-0 border-t border-border bg-background px-4 py-4 md:px-6">
-      <div className="flex items-center gap-3">
-        <Input
-          value={message}
-          onChange={(event) => setMessage(event.target.value)}
-          placeholder="Type your message..."
-          className="h-11 flex-1"
-          disabled={disabled}
-          onKeyDown={(event) => {
-            if (event.key === "Enter" && !event.shiftKey) {
-              event.preventDefault()
-              handleSend()
-            }
-          }}
-        />
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center gap-2">
+          <Input
+            value={message}
+            onChange={(event) => setMessage(event.target.value)}
+            placeholder="Type your message..."
+            className="h-12 min-w-0 flex-1 rounded-xl px-4"
+            disabled={disabled}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" && !event.shiftKey) {
+                event.preventDefault()
+                handleSend()
+              }
+            }}
+          />
 
-        <Button
-          type="button"
-          className="h-11 shrink-0 rounded-xl px-4"
-          disabled={disabled || !message.trim()}
-          onClick={handleSend}
-          icon={{ name: "send", position: "left" }}
-        >
-          Send
-        </Button>
+          <Button
+            type="button"
+            size="icon"
+            className="size-12 shrink-0 rounded-xl md:hidden"
+            disabled={disabled || !message.trim()}
+            aria-label="Send"
+            onClick={handleSend}
+          >
+            <Icons.send />
+          </Button>
+          <Button
+            type="button"
+            className="hidden h-12 shrink-0 rounded-xl px-4 md:inline-flex"
+            disabled={disabled || !message.trim()}
+            onClick={handleSend}
+            icon={{ name: "send", position: "left" }}
+          >
+            Send
+          </Button>
+        </div>
 
-        <Button
-          type="button"
-          variant="secondary"
-          className="h-11 shrink-0 rounded-xl px-4"
-          disabled={disabled}
-          onClick={onCloseConversation}
-        >
-          Close Conversation
-        </Button>
+        <div className="flex justify-end">
+          <Button
+            type="button"
+            variant="secondary"
+            className="h-9 rounded-xl px-3"
+            disabled={disabled}
+            onClick={onCloseConversation}
+          >
+            Close Conversation
+          </Button>
+        </div>
       </div>
     </div>
   )
