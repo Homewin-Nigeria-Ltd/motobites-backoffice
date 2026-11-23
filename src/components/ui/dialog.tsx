@@ -3,6 +3,7 @@
 import * as React from "react"
 import { Dialog as DialogPrimitive } from "radix-ui"
 
+import { OverlayPortalContainer } from "@/components/overlay-portal-container"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Icons } from "@/components/ui/icons"
@@ -66,7 +67,9 @@ function DialogContent({
         )}
         {...props}
       >
-        {children}
+        <OverlayPortalContainer className="flex w-full flex-col">
+          {children}
+        </OverlayPortalContainer>
         {showCloseButton && (
           <DialogPrimitive.Close data-slot="dialog-close" asChild>
             <Button

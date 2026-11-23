@@ -16,3 +16,14 @@ export function usePromotionOffer(offerId: string) {
 export function useGiftcards() {
   return useQuery(promotionQueries.giftCards())
 }
+
+export function useCustomerGroups() {
+  return useQuery(promotionQueries.customerGroups())
+}
+
+export function useCustomerGroup(groupId: string, enabled = true) {
+  return useQuery({
+    ...promotionQueries.customerGroup(groupId),
+    enabled: Boolean(groupId) && enabled,
+  })
+}

@@ -50,11 +50,10 @@ export function EditOfferSection({ offerId }: EditOfferSectionProps) {
           </p>
         ) : (
           <OfferForm
-            key={offer.id}
+            key={`${offer.id}-${offer.is_reusable}-${offer.max_uses_per_customer}-${offer.max_uses}`}
             mode="edit"
             offerId={String(offer.id)}
             defaultValues={mapApiOfferToFormValues(offer)}
-            isActive={offer.is_active}
           />
         )}
       </div>

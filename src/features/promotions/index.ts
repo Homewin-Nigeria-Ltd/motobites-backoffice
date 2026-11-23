@@ -5,8 +5,21 @@ export { CreateGiftcardSection } from "./sections/create-giftcard-section"
 export { EditOfferSection } from "./sections/edit-offer-section"
 export { EditGiftcardSection } from "./sections/edit-giftcard-section"
 export { OfferDetailSection } from "./sections/offer-detail-section"
-export { usePromotionOffers, usePromotionOffer, useGiftcards } from "./hooks/use-promotion-queries"
-export { useCreateOffer, useUpdateOffer, useDeleteOffer, useCreateGiftcard, useUpdateGiftcard } from "./hooks/use-promotion-mutations"
+export {
+  usePromotionOffers,
+  usePromotionOffer,
+  useGiftcards,
+  useCustomerGroups,
+} from "./hooks/use-promotion-queries"
+export {
+  useCreateOffer,
+  useUpdateOffer,
+  useDeleteOffer,
+  useCreateGiftcard,
+  useUpdateGiftcard,
+  useCreateCustomerGroup,
+  useUpdateCustomerGroup,
+} from "./hooks/use-promotion-mutations"
 export { promotionEndpoints } from "./api/endpoints"
 export { promotionKeys } from "./api/keys"
 export { promotionQueries } from "./api/queries"

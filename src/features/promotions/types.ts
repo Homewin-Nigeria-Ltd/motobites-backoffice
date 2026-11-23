@@ -1,6 +1,6 @@
 export type OfferTab = "all" | "active" | "inactive" | "expired"
 
-export type OfferStatus = "active" | "inactive" | "expired"
+export type OfferStatus = "active" | "inactive" | "paused" | "expired"
 
 export type Offer = {
   id: string
@@ -13,6 +13,7 @@ export type Offer = {
   startDate: string
   endDate: string
   statusLabel: string
+  usageCount: number
 }
 
 export type OfferListParams = {
@@ -45,8 +46,41 @@ export type ApiOffer = {
   promo_start: string
   promo_end: string
   is_active: boolean
+  is_paused?: boolean | null
   status: string
   status_label: string
+  max_uses_per_customer?: number | null
+  is_reusable?: boolean | string | number | null
+  minimum_order_value?: number | null
+  discount_cap?: number | null
+  eligibility_type?: string | null
+  eligible_group_ids?: number[] | null
+  eligible_customer_ids?: number[] | null
+  eligible_users?: number[] | string[] | string | null
+  selected_customers?: string[] | null
+  customer_groups?: string[] | null
+  max_uses?: number | null
+  total_uses?: number | null
+  remaining_uses?: number | null
+  usage_count?: number | null
+  confirmed_usage_count?: number | null
+  reserved_usage_count?: number | null
+  min_order_kobo?: number | null
+  discount_cap_kobo?: number | null
+  times_used?: number | null
+  customers_redeemed?: number | null
+  total_discounts_given?: number | null
+  total_discounts_given_kobo?: number | null
+}
+
+export type ApiOfferUsageTracking = {
+  total_uses?: number | null
+  confirmed_uses?: number | null
+  reserved_uses?: number | null
+  remaining_uses?: number | null
+  unique_customers_redeemed?: number | null
+  total_discounts_given_kobo?: number | null
+  redeemed_customers?: unknown[] | null
 }
 
 export type ApiOffersResponse = {
@@ -109,6 +143,7 @@ export type ApiOfferDetailData = {
   offer: ApiOffer
   promotion_insight: ApiPromotionInsight
   user_insight: ApiUserInsight[]
+  usage_tracking?: ApiOfferUsageTracking | null
 }
 
 export type ApiOfferDetailResponse = {
@@ -168,6 +203,7 @@ export type OfferDetail = {
   offer: Offer
   promotionInsight: PromotionInsight
   userInsight: UserInsightRow[]
+  usageTracking: OfferUsageTracking
 }
 
 export type OfferInput = {
@@ -181,14 +217,91 @@ export type OfferInput = {
   discount_value: number
   details: string
   detail: string
-  applies_to: string
+  applies_to: "subtotal"
   restriction: string
   kitchen_id: number | null
   start_date: string
   end_date: string
   promo_start: string
   promo_end: string
+  status: "active" | "inactive" | "paused"
   is_active: boolean
+  max_uses_per_customer: number
+  is_reusable: boolean
+  max_uses: number | null
+  min_order_kobo: number
+  minimum_order_value: number
+  discount_cap_kobo: number | null
+  discount_cap: number | null
+  eligibility_type: string
+  eligible_customer_ids: number[]
+  eligible_group_ids: number[]
+}
+
+export type ApiCustomerGroupCustomer = {
+  id: number
+  name?: string | null
+  full_name?: string | null
+  first_name?: string | null
+  last_name?: string | null
+  email?: string | null
+  phone?: string | null
+}
+
+export type ApiCustomerGroup = {
+  id: number
+  name: string
+  description?: string | null
+  customer_ids?: number[] | null
+  customers?: ApiCustomerGroupCustomer[] | null
+  customers_count?: number | null
+  members_count?: number | null
+  created_at?: string | null
+  updated_at?: string | null
+}
+
+export type ApiCustomerGroupResponse = {
+  success: boolean
+  data: ApiCustomerGroup
+}
+
+export type ApiCustomerGroupsResponse = {
+  success: boolean
+  data: ApiCustomerGroup[]
+}
+
+export type CustomerGroupMember = {
+  id: string
+  label: string
+}
+
+export type CustomerGroup = {
+  id: string
+  name: string
+  description: string
+  customerIds: number[]
+  customers: CustomerGroupMember[]
+  membersCount: number
+}
+
+export type CustomerGroupInput = {
+  name: string
+  description?: string
+  customer_ids?: number[]
+}
+
+export type UpdateCustomerGroupInput = {
+  groupId: string
+  input: CustomerGroupInput
+}
+
+export type OfferUsageTracking = {
+  timesUsed: number
+  customersRedeemed: number
+  totalDiscountGiven: number
+  remainingUses: number | null
+  confirmedUses?: number
+  reservedUses?: number
 }
 
 export type CreateOfferInput = OfferInput

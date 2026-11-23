@@ -2,17 +2,22 @@ import { queryOptions } from "@tanstack/react-query"
 
 import { api } from "@/lib/api/client"
 import type {
+  ApiCustomerGroup,
+  ApiCustomerGroupResponse,
+  ApiCustomerGroupsResponse,
   ApiGiftcard,
   ApiGiftcardsResponse,
   ApiOffer,
   ApiOfferDetailData,
   ApiOfferDetailResponse,
   ApiOffersResponse,
+  CustomerGroup,
   Giftcard,
   Offer,
   OfferDetail,
   OfferListParams,
 } from "../types"
+import { mapApiCustomerGroupToCustomerGroup } from "../utils/customer-group"
 import { mapApiGiftcardToGiftcard } from "../utils/giftcard"
 import { mapApiOfferToOffer } from "../utils/offer"
 import { mapApiOfferDetailData } from "../utils/offer-detail"
@@ -78,6 +83,37 @@ async function fetchApiGiftcard(giftcardId: string): Promise<ApiGiftcard> {
   return giftcard
 }
 
+async function fetchCustomerGroups(): Promise<CustomerGroup[]> {
+  const response = await api.get<
+    ApiCustomerGroupsResponse | ApiCustomerGroupsResponse["data"]
+  >(promotionEndpoints.customerGroups)
+
+  const groups = Array.isArray(response)
+    ? response
+    : Array.isArray(response?.data)
+      ? response.data
+      : []
+
+  return groups.map(mapApiCustomerGroupToCustomerGroup)
+}
+
+async function fetchCustomerGroup(groupId: string): Promise<CustomerGroup> {
+  const response = await api.get<
+    ApiCustomerGroupResponse | ApiCustomerGroup | { data: ApiCustomerGroup }
+  >(promotionEndpoints.customerGroup(groupId))
+
+  const group =
+    response && typeof response === "object" && "data" in response
+      ? (response as ApiCustomerGroupResponse | { data: ApiCustomerGroup }).data
+      : (response as ApiCustomerGroup)
+
+  if (!group || typeof group !== "object" || group.id == null) {
+    throw new Error("Customer group not found")
+  }
+
+  return mapApiCustomerGroupToCustomerGroup(group)
+}
+
 export const promotionQueries = {
   offers: (params: OfferListParams = {}) =>
     queryOptions({
@@ -111,5 +147,18 @@ export const promotionQueries = {
       queryKey: [...promotionKeys.giftCard(giftcardId), "api"] as const,
       queryFn: () => fetchApiGiftcard(giftcardId),
       enabled: Boolean(giftcardId),
+    }),
+
+  customerGroups: () =>
+    queryOptions({
+      queryKey: promotionKeys.customerGroups(),
+      queryFn: () => fetchCustomerGroups(),
+    }),
+
+  customerGroup: (groupId: string) =>
+    queryOptions({
+      queryKey: promotionKeys.customerGroup(groupId),
+      queryFn: () => fetchCustomerGroup(groupId),
+      enabled: Boolean(groupId),
     }),
 }

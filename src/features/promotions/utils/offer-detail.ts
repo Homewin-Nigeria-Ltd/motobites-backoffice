@@ -3,13 +3,13 @@ import type {
   ApiPromotionInsight,
   ApiUserInsight,
   OfferDetail,
-  PromotionInsight,
   PromotionInsightCheckouts,
   PromotionInsightCustomerAcquisition,
   PromotionInsightRevenue,
   UserInsightRow,
 } from "../types"
 import { mapApiOfferToOffer } from "./offer"
+import { mapApiOfferToUsageTracking } from "./offer-form"
 
 function getInitials(name: string) {
   return name
@@ -99,6 +99,10 @@ export function mapApiOfferDetailData(data: ApiOfferDetailData): OfferDetail {
         data.promotion_insight.customer_acquisition
       ),
     },
-    userInsight: data.user_insight.map(mapUserInsightRow),
+    userInsight: (data.user_insight ?? []).map(mapUserInsightRow),
+    usageTracking: mapApiOfferToUsageTracking(
+      data.offer,
+      data.usage_tracking
+    ),
   }
 }

@@ -108,3 +108,35 @@ export function getOfferDetailOptionByDiscount(
       option.discountValue === discountValue
   )
 }
+
+export const offerUsageLimitOptions = [
+  {
+    value: "once_per_customer",
+    label: "Once per customer",
+  },
+  {
+    value: "multiple",
+    label: "Multiple times per customer",
+  },
+] as const
+
+export type OfferUsageLimit =
+  (typeof offerUsageLimitOptions)[number]["value"]
+
+export const offerEligibleUsersOptions = [
+  { value: "all", label: "All customers" },
+  { value: "new_customers", label: "New customers only" },
+  { value: "selected_customers", label: "Selected customers" },
+  { value: "customer_groups", label: "Specific customer groups" },
+] as const
+
+export type OfferEligibleUsers =
+  (typeof offerEligibleUsersOptions)[number]["value"]
+
+export const offerStatusOptions = [
+  { value: "active", label: "Active" },
+  { value: "inactive", label: "Inactive" },
+  { value: "paused", label: "Paused" },
+] as const
+
+export type OfferFormStatus = (typeof offerStatusOptions)[number]["value"]

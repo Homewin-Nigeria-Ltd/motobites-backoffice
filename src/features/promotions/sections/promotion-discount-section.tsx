@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 
 import { CreateGiftcardCard } from "@/features/promotions/components/create-giftcard-card"
 import { CreateOfferCard } from "@/features/promotions/components/create-offer-card"
+import { CustomerGroupsSection } from "@/features/promotions/components/customer-groups-section"
 import { GiftcardCard } from "@/features/promotions/components/giftcard-card"
 import { OfferCard } from "@/features/promotions/components/offer-card"
 import { OffersToolbar } from "@/features/promotions/components/offers-toolbar"
@@ -96,6 +97,8 @@ export function PromotionDiscountSection() {
           </div>
         )}
       </section>
+
+      <CustomerGroupsSection />
 
       <section className="space-y-4">
         <h2 className="text-2xl font-semibold tracking-tight text-foreground">

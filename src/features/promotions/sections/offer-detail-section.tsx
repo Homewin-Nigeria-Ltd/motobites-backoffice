@@ -13,6 +13,7 @@ import { userInsightColumns } from "@/features/promotions/columns/user-insight-c
 import { OfferAcquisitionInsightCard } from "@/features/promotions/components/offer-acquisition-insight-card"
 import { OfferCheckoutsInsightCard } from "@/features/promotions/components/offer-checkouts-insight-card"
 import { OfferRevenueInsightCard } from "@/features/promotions/components/offer-revenue-insight-card"
+import { OfferUsageStats } from "@/features/promotions/components/offer-usage-stats"
 import { PROMOTIONS_ROUTES } from "@/features/promotions/constants"
 import { useDeleteOffer } from "@/features/promotions/hooks/use-promotion-mutations"
 import { usePromotionOffer } from "@/features/promotions/hooks/use-promotion-queries"
@@ -42,6 +43,7 @@ export function OfferDetailSection({ offerId }: OfferDetailSectionProps) {
   const [rowSelection, setRowSelection] = useState({})
   const [deleteOpen, setDeleteOpen] = useState(false)
 
+  // eslint-disable-next-line react-hooks/incompatible-library -- TanStack Table returns unstable function refs
   const table = useReactTable({
     data: data?.userInsight ?? [],
     columns: userInsightColumns,
@@ -71,7 +73,7 @@ export function OfferDetailSection({ offerId }: OfferDetailSectionProps) {
     )
   }
 
-  const { offer, promotionInsight } = data
+  const { offer, promotionInsight, usageTracking } = data
   const isActive = offer.status === "active"
 
   return (
@@ -131,6 +133,8 @@ export function OfferDetailSection({ offerId }: OfferDetailSectionProps) {
           </Button>
         </div>
       </div>
+
+      <OfferUsageStats usage={usageTracking} />
 
       <section className="space-y-4">
         <h2 className="text-lg font-semibold tracking-tight text-foreground">
