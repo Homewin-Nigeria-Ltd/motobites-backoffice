@@ -55,6 +55,9 @@ export function OfferCard({ offer, onClick }: OfferCardProps) {
                 {offer.promoCode}
               </p>
             ) : null}
+            <p className="mt-1 text-xs font-medium text-muted-foreground">
+              Usage: {offer.usageCount.toLocaleString("en-US")}
+            </p>
             <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
               {offer.description || offer.detailsLabel}
             </p>

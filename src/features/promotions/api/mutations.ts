@@ -1,4 +1,8 @@
 import {
+  createCustomerGroupAction,
+  updateCustomerGroupAction,
+} from "../actions/customer-group.actions"
+import {
   createGiftcardAction,
   updateGiftcardAction,
 } from "../actions/giftcard.actions"
@@ -7,7 +11,12 @@ import {
   deleteOfferAction,
   updateOfferAction,
 } from "../actions/offer.actions"
-import type { OfferInput, UpdateOfferInput } from "../types"
+import type {
+  CustomerGroupInput,
+  OfferInput,
+  UpdateCustomerGroupInput,
+  UpdateOfferInput,
+} from "../types"
 
 export const promotionMutations = {
   createOffer: {
@@ -26,5 +35,12 @@ export const promotionMutations = {
   updateGiftcard: {
     mutationFn: ({ giftcardId, formData }: { giftcardId: string; formData: FormData }) =>
       updateGiftcardAction(giftcardId, formData),
+  },
+  createCustomerGroup: {
+    mutationFn: (input: CustomerGroupInput) => createCustomerGroupAction(input),
+  },
+  updateCustomerGroup: {
+    mutationFn: ({ groupId, input }: UpdateCustomerGroupInput) =>
+      updateCustomerGroupAction(groupId, input),
   },
 } as const

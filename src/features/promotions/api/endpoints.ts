@@ -7,6 +7,9 @@ export const promotionServerEndpoints = {
   giftCards: `${promotionsPath}/gift-cards`,
   giftCard: (id: string | number) =>
     `${promotionsPath}/gift-cards/${encodeURIComponent(String(id))}`,
+  customerGroups: `${promotionsPath}/customer-groups`,
+  customerGroup: (id: string | number) =>
+    `${promotionsPath}/customer-groups/${encodeURIComponent(String(id))}`,
 } as const
 
 export const promotionEndpoints = {
@@ -16,4 +19,7 @@ export const promotionEndpoints = {
   giftCards: `/api/proxy${promotionsPath}/gift-cards`,
   giftCard: (id: string | number) =>
     `/api/proxy${promotionsPath}/gift-cards/${encodeURIComponent(String(id))}`,
+  customerGroups: `/api/proxy${promotionsPath}/customer-groups`,
+  customerGroup: (id: string | number) =>
+    `/api/proxy${promotionsPath}/customer-groups/${encodeURIComponent(String(id))}`,
 } as const

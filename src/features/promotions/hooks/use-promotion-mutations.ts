@@ -134,3 +134,60 @@ export function useUpdateGiftcard() {
     isPending: mutation.isPending,
   }
 }
+
+export function useCreateCustomerGroup() {
+  const queryClient = useQueryClient()
+
+  const mutation = useMutation({
+    ...promotionMutations.createCustomerGroup,
+    onSuccess: (result) => {
+      if (!result.success) {
+        toast.error(result.error)
+        return
+      }
+
+      void queryClient.invalidateQueries({
+        queryKey: promotionKeys.customerGroups(),
+      })
+      toast.success("Customer group created")
+    },
+    onError: () => {
+      toast.error("Failed to create customer group. Please try again.")
+    },
+  })
+
+  return {
+    createCustomerGroup: mutation.mutateAsync,
+    isPending: mutation.isPending,
+  }
+}
+
+export function useUpdateCustomerGroup() {
+  const queryClient = useQueryClient()
+
+  const mutation = useMutation({
+    ...promotionMutations.updateCustomerGroup,
+    onSuccess: (result, variables) => {
+      if (!result.success) {
+        toast.error(result.error)
+        return
+      }
+
+      void queryClient.invalidateQueries({
+        queryKey: promotionKeys.customerGroups(),
+      })
+      void queryClient.invalidateQueries({
+        queryKey: promotionKeys.customerGroup(variables.groupId),
+      })
+      toast.success("Customer group updated")
+    },
+    onError: () => {
+      toast.error("Failed to update customer group. Please try again.")
+    },
+  })
+
+  return {
+    updateCustomerGroup: mutation.mutateAsync,
+    isPending: mutation.isPending,
+  }
+}

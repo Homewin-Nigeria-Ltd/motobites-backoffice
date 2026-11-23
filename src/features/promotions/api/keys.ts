@@ -8,4 +8,7 @@ export const promotionKeys = {
   giftCards: () => [...promotionKeys.all, "gift-cards"] as const,
   giftCard: (giftcardId: string) =>
     [...promotionKeys.all, "gift-card", giftcardId] as const,
+  customerGroups: () => [...promotionKeys.all, "customer-groups"] as const,
+  customerGroup: (groupId: string) =>
+    [...promotionKeys.all, "customer-group", groupId] as const,
 } as const
