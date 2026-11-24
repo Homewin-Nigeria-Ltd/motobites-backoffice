@@ -5,6 +5,7 @@ import type {
   ApiCustomer,
   CustomerActionResult,
   IncreaseCnplEligibilityInput,
+  UpdateCustomerStaffStatusInput,
 } from "../types"
 import { ApiError } from "@/lib/api/client"
 import { apiServer } from "@/lib/api/server-client"
@@ -101,6 +102,39 @@ export async function increaseCnplEligibilityAction({
       return {
         success: false,
         error: error.message || "Failed to increase CNPL eligibility limit",
+      }
+    }
+
+    throw error
+  }
+}
+
+export async function updateCustomerStaffStatusAction({
+  id,
+  is_staff,
+}: UpdateCustomerStaffStatusInput): Promise<CustomerActionResult<ApiCustomer>> {
+  if (!id.trim()) {
+    return { success: false, error: "Customer is required" }
+  }
+
+  try {
+    const data = await apiServer.patch<ApiCustomer>(
+      customerEndpoints.staffStatus(id),
+      { is_staff }
+    )
+
+    return {
+      success: true,
+      data,
+      message: is_staff
+        ? "Customer marked as staff"
+        : "Staff designation removed",
+    }
+  } catch (error) {
+    if (error instanceof ApiError) {
+      return {
+        success: false,
+        error: error.message || "Failed to update staff status",
       }
     }
 

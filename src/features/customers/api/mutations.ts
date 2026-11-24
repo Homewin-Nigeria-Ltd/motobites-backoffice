@@ -3,6 +3,7 @@ import {
   deleteCustomerAction,
   increaseCnplEligibilityAction,
   suspendCustomerAction,
+  updateCustomerStaffStatusAction,
 } from "../actions/customer.actions"
 
 export const customerMutations = {
@@ -20,5 +21,9 @@ export const customerMutations = {
 
   increaseCnplEligibility: {
     mutationFn: increaseCnplEligibilityAction,
+  },
+
+  updateStaffStatus: {
+    mutationFn: updateCustomerStaffStatusAction,
   },
 } as const

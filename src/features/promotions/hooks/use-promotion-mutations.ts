@@ -191,3 +191,90 @@ export function useUpdateCustomerGroup() {
     isPending: mutation.isPending,
   }
 }
+
+export function useCreateSpecialGiftOffer() {
+  const queryClient = useQueryClient()
+
+  const mutation = useMutation({
+    ...promotionMutations.createSpecialGiftOffer,
+    onSuccess: (result) => {
+      if (!result.success) {
+        toast.error(result.error)
+        return
+      }
+
+      void queryClient.invalidateQueries({
+        queryKey: promotionKeys.specialGiftOffers(),
+      })
+      toast.success("Special offer created")
+    },
+    onError: () => {
+      toast.error("Failed to create special offer. Please try again.")
+    },
+  })
+
+  return {
+    createSpecialGiftOffer: mutation.mutateAsync,
+    isPending: mutation.isPending,
+  }
+}
+
+export function useUpdateSpecialGiftOffer() {
+  const queryClient = useQueryClient()
+
+  const mutation = useMutation({
+    ...promotionMutations.updateSpecialGiftOffer,
+    onSuccess: (result, variables) => {
+      if (!result.success) {
+        toast.error(result.error)
+        return
+      }
+
+      void queryClient.invalidateQueries({
+        queryKey: promotionKeys.specialGiftOffers(),
+      })
+      void queryClient.invalidateQueries({
+        queryKey: promotionKeys.specialGiftOffer(variables.offerId),
+      })
+      toast.success("Special offer updated")
+    },
+    onError: () => {
+      toast.error("Failed to update special offer. Please try again.")
+    },
+  })
+
+  return {
+    updateSpecialGiftOffer: mutation.mutateAsync,
+    isPending: mutation.isPending,
+  }
+}
+
+export function useDeleteSpecialGiftOffer() {
+  const queryClient = useQueryClient()
+
+  const mutation = useMutation({
+    ...promotionMutations.deleteSpecialGiftOffer,
+    onSuccess: (result, offerId) => {
+      if (!result.success) {
+        toast.error(result.error)
+        return
+      }
+
+      void queryClient.invalidateQueries({
+        queryKey: promotionKeys.specialGiftOffers(),
+      })
+      void queryClient.removeQueries({
+        queryKey: promotionKeys.specialGiftOffer(offerId),
+      })
+      toast.success("Special offer deleted")
+    },
+    onError: () => {
+      toast.error("Failed to delete special offer. Please try again.")
+    },
+  })
+
+  return {
+    deleteSpecialGiftOffer: mutation.mutateAsync,
+    isPending: mutation.isPending,
+  }
+}

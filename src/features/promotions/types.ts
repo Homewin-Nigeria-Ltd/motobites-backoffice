@@ -369,3 +369,59 @@ export type UpdateGiftcardInput = {
   giftcardId: string
   input: GiftcardFormInput
 }
+
+export type SpecialGiftOffer = {
+  id: string
+  name: string
+  minimumBasketValue: number
+  giftMenuItemId: string
+  giftMenuItemName: string
+  giftQuantity: number
+  startsAt: string
+  endsAt: string
+  isActive: boolean
+  status: string
+  statusLabel: string
+}
+
+export type ApiSpecialGiftOffer = {
+  id: number
+  name?: string | null
+  minimum_basket_value?: number | null
+  gift_menu_item_id?: number | null
+  gift_menu_item?: {
+    id?: number | null
+    name?: string | null
+  } | null
+  gift_quantity?: number | null
+  starts_at?: string | null
+  ends_at?: string | null
+  is_active?: boolean | null
+  status?: string | null
+  status_label?: string | null
+}
+
+export type ApiSpecialGiftOffersResponse = {
+  success: boolean
+  data: ApiSpecialGiftOffer[]
+}
+
+export type ApiSpecialGiftOfferResponse = {
+  success: boolean
+  data: ApiSpecialGiftOffer
+}
+
+export type SpecialGiftOfferInput = {
+  name: string
+  minimum_basket_value: number
+  gift_menu_item_id: number
+  gift_quantity: number
+  starts_at: string
+  ends_at: string
+  is_active: boolean
+}
+
+export type UpdateSpecialGiftOfferInput = {
+  offerId: string
+  input: SpecialGiftOfferInput
+}

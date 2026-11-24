@@ -116,3 +116,31 @@ export function useIncreaseCnplEligibility(customerId: string) {
     isPending: mutation.isPending,
   }
 }
+
+export function useUpdateCustomerStaffStatus(customerId: string) {
+  const queryClient = useQueryClient()
+
+  const mutation = useMutation({
+    ...customerMutations.updateStaffStatus,
+    onSuccess: (result) => {
+      if (!result.success) {
+        toast.error(result.error)
+        return
+      }
+
+      void queryClient.invalidateQueries({
+        queryKey: customerKeys.detail(customerId),
+      })
+      void queryClient.invalidateQueries({ queryKey: customerKeys.all })
+      toast.success(result.message ?? "Staff status updated")
+    },
+    onError: () => {
+      toast.error("Failed to update staff status")
+    },
+  })
+
+  return {
+    updateStaffStatus: mutation.mutateAsync,
+    isPending: mutation.isPending,
+  }
+}

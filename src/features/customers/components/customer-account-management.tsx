@@ -7,17 +7,20 @@ import {
   useDeactivateCustomer,
   useDeleteCustomer,
   useSuspendCustomer,
+  useUpdateCustomerStaffStatus,
 } from "@/features/customers/hooks/use-customer-mutations"
 import type { CustomerStatus } from "@/features/customers/types"
 import { BaseAlertDialog } from "@/components/ui/base-alert-dialog"
 import { Button } from "@/components/ui/button"
 import { Icon, type IconName } from "@/components/ui/icons"
+import { Switch } from "@/components/ui/switch"
 import { cn } from "@/lib/utils"
 
 type CustomerAccountManagementProps = {
   customerId: string
   customerName: string
   status: CustomerStatus
+  isStaff: boolean
 }
 
 type ManagementAction = "delete" | "suspend" | "deactivate"
@@ -55,6 +58,7 @@ export function CustomerAccountManagement({
   customerId,
   customerName,
   status,
+  isStaff,
 }: CustomerAccountManagementProps) {
   const router = useRouter()
   const { deleteCustomer, isPending: isDeleting } = useDeleteCustomer()
@@ -63,9 +67,12 @@ export function CustomerAccountManagement({
     deactivateCustomer,
     isPending: isDeactivating,
   } = useDeactivateCustomer()
+  const { updateStaffStatus, isPending: isUpdatingStaff } =
+    useUpdateCustomerStaffStatus(customerId)
   const [confirmAction, setConfirmAction] = useState<ConfirmAction>(null)
 
-  const isPending = isDeleting || isSuspending || isDeactivating
+  const isPending =
+    isDeleting || isSuspending || isDeactivating || isUpdatingStaff
 
   const dialogCopy = {
     delete: {
@@ -105,6 +112,28 @@ export function CustomerAccountManagement({
   return (
     <>
       <div className="flex flex-col items-center gap-4 py-1 md:gap-5 md:py-2">
+        <div className="flex h-14 w-full max-w-md items-center justify-between rounded-xl bg-muted px-5 md:px-6">
+          <div className="min-w-0 pr-4">
+            <p className="text-base font-medium text-foreground">Staff member</p>
+            <p className="text-xs text-muted-foreground">
+              Staff-only promos apply when this is on.
+            </p>
+          </div>
+          <Switch
+            checked={isStaff}
+            disabled={isUpdatingStaff}
+            aria-label={
+              isStaff ? "Remove staff designation" : "Mark as staff"
+            }
+            onCheckedChange={(checked) => {
+              void updateStaffStatus({
+                id: customerId,
+                is_staff: checked,
+              })
+            }}
+          />
+        </div>
+
         {actionButtons.map((button) => {
           const isDisabled =
             (button.key === "suspend" && status === "suspended") ||
@@ -115,7 +144,7 @@ export function CustomerAccountManagement({
               key={button.key}
               type="button"
               variant="ghost"
-              disabled={isDisabled}
+              disabled={isDisabled || isPending}
               className={cn(
                 "h-14 w-full max-w-md justify-between rounded-xl px-5 text-base font-medium md:px-6",
                 button.className

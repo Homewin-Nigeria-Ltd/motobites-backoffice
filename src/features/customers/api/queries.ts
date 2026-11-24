@@ -25,10 +25,14 @@ import { customerKeys } from "./keys"
 async function fetchCustomerList(
   params: CustomerListParams
 ): Promise<CustomerListResponse> {
+  const isStaffTab = params.tab === "staff"
   const query: Record<string, string | number> = {
-    tab: params.tab ?? "all",
     page: params.page,
     per_page: params.per_page ?? 8,
+  }
+
+  if (!isStaffTab) {
+    query.tab = params.tab ?? "all"
   }
 
   if (params.search?.trim()) {
@@ -48,12 +52,12 @@ async function fetchCustomerList(
   }
 
   const response = await api.get<ApiCustomerListResponse>(
-    customerEndpoints.list,
+    isStaffTab ? customerEndpoints.staff : customerEndpoints.list,
     query
   )
 
   return {
-    items: response.data.map(mapApiCustomerToCustomer),
+    items: (response.data ?? []).map(mapApiCustomerToCustomer),
     meta: response.meta,
   }
 }

@@ -9,6 +9,7 @@ const tabLabels: Record<CustomerTab, string> = {
   active: "Active Users",
   deactivated: "Deactivated Users",
   churn: "Churn Users",
+  staff: "Staff Users",
 }
 
 type CustomerFilterTabsProps = {

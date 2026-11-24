@@ -11,16 +11,21 @@ import type {
   ApiOfferDetailData,
   ApiOfferDetailResponse,
   ApiOffersResponse,
+  ApiSpecialGiftOffer,
+  ApiSpecialGiftOfferResponse,
+  ApiSpecialGiftOffersResponse,
   CustomerGroup,
   Giftcard,
   Offer,
   OfferDetail,
   OfferListParams,
+  SpecialGiftOffer,
 } from "../types"
 import { mapApiCustomerGroupToCustomerGroup } from "../utils/customer-group"
 import { mapApiGiftcardToGiftcard } from "../utils/giftcard"
 import { mapApiOfferToOffer } from "../utils/offer"
 import { mapApiOfferDetailData } from "../utils/offer-detail"
+import { mapApiSpecialGiftOfferToSpecialGiftOffer } from "../utils/special-gift-offer"
 import { promotionEndpoints } from "./endpoints"
 import { promotionKeys } from "./keys"
 
@@ -161,4 +166,48 @@ export const promotionQueries = {
       queryFn: () => fetchCustomerGroup(groupId),
       enabled: Boolean(groupId),
     }),
+
+  specialGiftOffers: () =>
+    queryOptions({
+      queryKey: promotionKeys.specialGiftOffers(),
+      queryFn: () => fetchSpecialGiftOffers(),
+    }),
+
+  specialGiftOffer: (offerId: string) =>
+    queryOptions({
+      queryKey: promotionKeys.specialGiftOffer(offerId),
+      queryFn: () => fetchSpecialGiftOffer(offerId),
+      enabled: Boolean(offerId),
+    }),
+}
+
+async function fetchSpecialGiftOffers(): Promise<SpecialGiftOffer[]> {
+  const response = await api.get<
+    ApiSpecialGiftOffersResponse | ApiSpecialGiftOffer[] | { data: ApiSpecialGiftOffer[] }
+  >(promotionEndpoints.specialGiftOffers)
+
+  const offers = Array.isArray(response)
+    ? response
+    : Array.isArray((response as ApiSpecialGiftOffersResponse)?.data)
+      ? (response as ApiSpecialGiftOffersResponse).data
+      : []
+
+  return offers.map(mapApiSpecialGiftOfferToSpecialGiftOffer)
+}
+
+async function fetchSpecialGiftOffer(offerId: string): Promise<SpecialGiftOffer> {
+  const response = await api.get<
+    ApiSpecialGiftOfferResponse | ApiSpecialGiftOffer | { data: ApiSpecialGiftOffer }
+  >(promotionEndpoints.specialGiftOffer(offerId))
+
+  const offer =
+    response && typeof response === "object" && "data" in response
+      ? (response as ApiSpecialGiftOfferResponse | { data: ApiSpecialGiftOffer }).data
+      : (response as ApiSpecialGiftOffer)
+
+  if (!offer || typeof offer !== "object" || offer.id == null) {
+    throw new Error("Special offer not found")
+  }
+
+  return mapApiSpecialGiftOfferToSpecialGiftOffer(offer)
 }
