@@ -135,8 +135,7 @@ export function SpecialGiftOfferForm(props: SpecialGiftOfferFormProps) {
                   ? {
                       id: field.value,
                       label:
-                        props.giftMenuItemLabel ||
-                        `Menu item #${field.value}`,
+                        props.giftMenuItemLabel || "Selected menu item",
                     }
                   : null
               }

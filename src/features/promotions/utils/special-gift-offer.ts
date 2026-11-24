@@ -9,12 +9,15 @@ export function mapApiSpecialGiftOfferToSpecialGiftOffer(
   offer: ApiSpecialGiftOffer
 ): SpecialGiftOffer {
   const isActive = Boolean(offer.is_active)
+  const gift = offer.gift ?? offer.gift_menu_item
   const giftMenuItemId = String(
-    offer.gift_menu_item_id ?? offer.gift_menu_item?.id ?? ""
+    offer.gift_menu_item_id ?? gift?.id ?? ""
   )
-  const giftMenuItemName =
-    offer.gift_menu_item?.name?.trim() ||
-    (giftMenuItemId ? `Menu item #${giftMenuItemId}` : "—")
+  const giftMenuItemName = gift?.name?.trim() || "—"
+  const statusLabel =
+    offer.status_label?.trim() ||
+    offer.status?.trim() ||
+    (isActive ? "Active" : "Inactive")
 
   return {
     id: String(offer.id),
@@ -26,9 +29,8 @@ export function mapApiSpecialGiftOfferToSpecialGiftOffer(
     startsAt: offer.starts_at?.trim() || "",
     endsAt: offer.ends_at?.trim() || "",
     isActive,
-    status: offer.status?.trim() || (isActive ? "active" : "inactive"),
-    statusLabel:
-      offer.status_label?.trim() || (isActive ? "Active" : "Inactive"),
+    status: statusLabel.toLowerCase(),
+    statusLabel,
   }
 }
 
