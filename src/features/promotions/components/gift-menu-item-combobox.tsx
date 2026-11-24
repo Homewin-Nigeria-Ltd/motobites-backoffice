@@ -62,12 +62,14 @@ export function GiftMenuItemCombobox({
         const id = String((item as { id: unknown }).id)
         const name =
           "name" in item && typeof (item as { name: unknown }).name === "string"
-            ? (item as { name: string }).name
-            : `Menu item #${id}`
+            ? (item as { name: string }).name.trim()
+            : ""
+
+        if (!name) continue
 
         byId.set(id, {
           id,
-          label: `${name} · #${id}`,
+          label: name,
         })
       }
     }
@@ -78,7 +80,7 @@ export function GiftMenuItemCombobox({
   const selected =
     options.find((option) => option.id === value) ??
     (value
-      ? { id: value, label: initialOption?.label || `Menu item #${value}` }
+      ? { id: value, label: initialOption?.label || "Selected menu item" }
       : null)
 
   return (

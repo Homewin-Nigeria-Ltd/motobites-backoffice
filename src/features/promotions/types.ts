@@ -384,21 +384,29 @@ export type SpecialGiftOffer = {
   statusLabel: string
 }
 
+export type ApiSpecialGiftOfferGift = {
+  id?: number | null
+  name?: string | null
+  price?: string | number | null
+  image?: string | null
+  is_available?: boolean | null
+}
+
 export type ApiSpecialGiftOffer = {
   id: number
   name?: string | null
-  minimum_basket_value?: number | null
+  minimum_basket_value?: number | string | null
   gift_menu_item_id?: number | null
-  gift_menu_item?: {
-    id?: number | null
-    name?: string | null
-  } | null
+  gift?: ApiSpecialGiftOfferGift | null
+  gift_menu_item?: ApiSpecialGiftOfferGift | null
   gift_quantity?: number | null
   starts_at?: string | null
   ends_at?: string | null
   is_active?: boolean | null
   status?: string | null
   status_label?: string | null
+  orders_count?: number | null
+  gifts_distributed?: number | null
 }
 
 export type ApiSpecialGiftOffersResponse = {
