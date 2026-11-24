@@ -5,7 +5,7 @@ export type CustomerStatus =
   | "suspended"
   | "pending"
 
-export type CustomerTab = "all" | "active" | "deactivated" | "churn"
+export type CustomerTab = "all" | "active" | "deactivated" | "churn" | "staff"
 
 export type Customer = {
   id: string
@@ -130,6 +130,7 @@ export type CustomerDetail = Customer & {
   avatar: string | null
   joinedAtIso: string | null
   acquisitionSource: string | null
+  isStaff: boolean
   ordersCount: number
   lifetimeValueKobo: number | null
   lifetimeValueFormatted: string
@@ -231,6 +232,7 @@ export type ApiCustomer = {
   overdraft_balance?: number
   overdraft_balance_formatted?: string
   overdraft_eligibility?: number
+  is_staff?: boolean | null
   transaction_history?: ApiCustomerTransaction[]
   transactions?: ApiCustomerTransaction[]
   cnpl_transactions?: ApiCustomerCnplTransaction[]
@@ -290,6 +292,7 @@ export type ApiCustomerProfile = {
   joined_at_iso?: string | null
   delivery_address?: string | null
   acquisition_source?: string | null
+  is_staff?: boolean | null
   home_addresses?: Array<string | { address?: string }>
   wallet_account?: ApiWalletAccount | null
 }
@@ -330,6 +333,7 @@ export type ApiCustomerDetailData = {
   referral_count?: number
   referrals?: ApiReferredCustomer[]
   metadata?: ApiCustomerReferralMeta
+  is_staff?: boolean | null
 }
 
 export type ApiReferralPerson = {
@@ -415,6 +419,11 @@ export type ApiCustomerOverviewResponse = {
 export type IncreaseCnplEligibilityInput = {
   id: string
   amount: number
+}
+
+export type UpdateCustomerStaffStatusInput = {
+  id: string
+  is_staff: boolean
 }
 
 export type CustomerActionResult<T = undefined> =

@@ -9,6 +9,7 @@ import { CustomerGroupsSection } from "@/features/promotions/components/customer
 import { GiftcardCard } from "@/features/promotions/components/giftcard-card"
 import { OfferCard } from "@/features/promotions/components/offer-card"
 import { OffersToolbar } from "@/features/promotions/components/offers-toolbar"
+import { SpecialGiftOffersSection } from "@/features/promotions/components/special-gift-offers-section"
 import { PROMOTIONS_ROUTES } from "@/features/promotions/constants"
 import {
   useGiftcards,
@@ -99,6 +100,8 @@ export function PromotionDiscountSection() {
       </section>
 
       <CustomerGroupsSection />
+
+      <SpecialGiftOffersSection />
 
       <section className="space-y-4">
         <h2 className="text-2xl font-semibold tracking-tight text-foreground">

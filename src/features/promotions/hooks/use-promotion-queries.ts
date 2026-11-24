@@ -27,3 +27,7 @@ export function useCustomerGroup(groupId: string, enabled = true) {
     enabled: Boolean(groupId) && enabled,
   })
 }
+
+export function useSpecialGiftOffers() {
+  return useQuery(promotionQueries.specialGiftOffers())
+}

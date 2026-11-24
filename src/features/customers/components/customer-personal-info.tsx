@@ -5,6 +5,7 @@ import {
   AvatarFallback,
   AvatarImage,
 } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
 import { Icons } from "@/components/ui/icons"
 import { cn } from "@/lib/utils"
 import { formatDate } from "@/utils/date"
@@ -52,16 +53,29 @@ function formatJoinedDate(customer: CustomerDetail) {
 export function CustomerPersonalInfo({ customer }: CustomerPersonalInfoProps) {
   return (
     <div className="flex flex-col items-start gap-8 py-2 md:gap-10 md:py-4">
-      <div className="relative self-start">
-        <Avatar className="size-28 border-4 border-background shadow-sm">
-          <AvatarImage src={customer.avatar ?? undefined} alt={customer.name} />
-          <AvatarFallback className="bg-primary/15 text-3xl font-semibold text-primary">
-            {customer.initials}
-          </AvatarFallback>
-        </Avatar>
-        <span className="absolute right-0 bottom-0 flex size-7 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm">
-          <Icons.check size={14} />
-        </span>
+      <div className="flex flex-col items-start gap-3 self-start">
+        <div className="relative">
+          <Avatar className="size-28 border-4 border-background shadow-sm">
+            <AvatarImage
+              src={customer.avatar ?? undefined}
+              alt={customer.name}
+            />
+            <AvatarFallback className="bg-primary/15 text-3xl font-semibold text-primary">
+              {customer.initials}
+            </AvatarFallback>
+          </Avatar>
+          <span className="absolute right-0 bottom-0 flex size-7 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm">
+            <Icons.check size={14} />
+          </span>
+        </div>
+        {customer.isStaff ? (
+          <Badge
+            variant="secondary"
+            className="rounded-full border-0 bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary"
+          >
+            Staff
+          </Badge>
+        ) : null}
       </div>
 
       <div className={cn(detailGrid, "w-full")}>

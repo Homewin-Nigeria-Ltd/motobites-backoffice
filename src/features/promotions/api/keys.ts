@@ -11,4 +11,8 @@ export const promotionKeys = {
   customerGroups: () => [...promotionKeys.all, "customer-groups"] as const,
   customerGroup: (groupId: string) =>
     [...promotionKeys.all, "customer-group", groupId] as const,
+  specialGiftOffers: () =>
+    [...promotionKeys.all, "special-gift-offers"] as const,
+  specialGiftOffer: (offerId: string) =>
+    [...promotionKeys.all, "special-gift-offer", offerId] as const,
 } as const

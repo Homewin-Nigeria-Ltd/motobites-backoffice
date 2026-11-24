@@ -2,12 +2,15 @@ const customerManagementPath = "/admin/customer-management"
 
 export const customerEndpoints = {
   list: `/api/proxy${customerManagementPath}`,
+  staff: `/api/proxy${customerManagementPath}/staff`,
   overview: `/api/proxy${customerManagementPath}/overview`,
   referrals: `/api/proxy${customerManagementPath}/referrals`,
   detail: (id: string | number) => `/api/proxy${customerManagementPath}/${id}`,
   member: (id: string | number) => `${customerManagementPath}/${id}`,
   suspend: (id: string | number) => `${customerManagementPath}/${id}/suspend`,
   deactivate: (id: string | number) => `${customerManagementPath}/${id}/deactivate`,
+  staffStatus: (id: string | number) =>
+    `${customerManagementPath}/${id}/staff-status`,
   increaseCnplEligibility: (id: string | number) =>
     `${customerManagementPath}/${id}/increase-cnpl-eligibility`,
 } as const

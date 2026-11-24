@@ -11,11 +11,18 @@ import {
   deleteOfferAction,
   updateOfferAction,
 } from "../actions/offer.actions"
+import {
+  createSpecialGiftOfferAction,
+  deleteSpecialGiftOfferAction,
+  updateSpecialGiftOfferAction,
+} from "../actions/special-gift-offer.actions"
 import type {
   CustomerGroupInput,
   OfferInput,
+  SpecialGiftOfferInput,
   UpdateCustomerGroupInput,
   UpdateOfferInput,
+  UpdateSpecialGiftOfferInput,
 } from "../types"
 
 export const promotionMutations = {
@@ -42,5 +49,16 @@ export const promotionMutations = {
   updateCustomerGroup: {
     mutationFn: ({ groupId, input }: UpdateCustomerGroupInput) =>
       updateCustomerGroupAction(groupId, input),
+  },
+  createSpecialGiftOffer: {
+    mutationFn: (input: SpecialGiftOfferInput) =>
+      createSpecialGiftOfferAction(input),
+  },
+  updateSpecialGiftOffer: {
+    mutationFn: ({ offerId, input }: UpdateSpecialGiftOfferInput) =>
+      updateSpecialGiftOfferAction(offerId, input),
+  },
+  deleteSpecialGiftOffer: {
+    mutationFn: (offerId: string) => deleteSpecialGiftOfferAction(offerId),
   },
 } as const

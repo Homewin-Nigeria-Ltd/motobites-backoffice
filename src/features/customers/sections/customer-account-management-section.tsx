@@ -20,6 +20,7 @@ export function CustomerAccountManagementSection({
         customerId={customer.id}
         customerName={customer.name}
         status={customer.status}
+        isStaff={customer.isStaff}
       />
     </CustomerDetailBlock>
   )

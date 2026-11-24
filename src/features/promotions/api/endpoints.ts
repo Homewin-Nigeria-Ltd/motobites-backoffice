@@ -10,6 +10,9 @@ export const promotionServerEndpoints = {
   customerGroups: `${promotionsPath}/customer-groups`,
   customerGroup: (id: string | number) =>
     `${promotionsPath}/customer-groups/${encodeURIComponent(String(id))}`,
+  specialGiftOffers: `${promotionsPath}/special-gift-offers`,
+  specialGiftOffer: (id: string | number) =>
+    `${promotionsPath}/special-gift-offers/${encodeURIComponent(String(id))}`,
 } as const
 
 export const promotionEndpoints = {
@@ -22,4 +25,7 @@ export const promotionEndpoints = {
   customerGroups: `/api/proxy${promotionsPath}/customer-groups`,
   customerGroup: (id: string | number) =>
     `/api/proxy${promotionsPath}/customer-groups/${encodeURIComponent(String(id))}`,
+  specialGiftOffers: `/api/proxy${promotionsPath}/special-gift-offers`,
+  specialGiftOffer: (id: string | number) =>
+    `/api/proxy${promotionsPath}/special-gift-offers/${encodeURIComponent(String(id))}`,
 } as const

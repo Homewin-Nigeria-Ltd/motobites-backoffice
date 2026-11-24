@@ -8,6 +8,9 @@ export const PROMOTIONS_ROUTES = {
   createGiftcard: "/promotions/giftcards/new",
   editGiftcard: (giftcardId: string | number) =>
     `/promotions/giftcards/${encodeURIComponent(String(giftcardId))}/edit`,
+  createSpecialGiftOffer: "/promotions/special-offers/new",
+  editSpecialGiftOffer: (offerId: string | number) =>
+    `/promotions/special-offers/${encodeURIComponent(String(offerId))}/edit`,
 } as const
 
 export const giftcardCategoryOptions = [
@@ -128,6 +131,7 @@ export const offerEligibleUsersOptions = [
   { value: "new_customers", label: "New customers only" },
   { value: "selected_customers", label: "Selected customers" },
   { value: "customer_groups", label: "Specific customer groups" },
+  { value: "staff", label: "Staff only" },
 ] as const
 
 export type OfferEligibleUsers =

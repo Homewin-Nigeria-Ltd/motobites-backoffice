@@ -17,6 +17,7 @@ const TAB_LABELS: Record<CustomerTab, string> = {
   active: "Active Users",
   deactivated: "Deactivated Users",
   churn: "Churn Users",
+  staff: "Staff Users",
 }
 
 const TAB_KEY_ALIASES: Record<CustomerTab, string[]> = {
@@ -24,6 +25,7 @@ const TAB_KEY_ALIASES: Record<CustomerTab, string[]> = {
   active: ["active", "active_users", "active_user"],
   deactivated: ["deactivated", "deactivated_users", "deactivated_user"],
   churn: ["churn", "churn_users", "churn_user", "churned", "churned_users"],
+  staff: ["staff", "staff_users", "staff_user"],
 }
 
 export function normalizeCustomerStatus(
