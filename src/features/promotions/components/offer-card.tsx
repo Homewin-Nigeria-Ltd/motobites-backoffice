@@ -6,7 +6,9 @@ import Link from "next/link"
 import type { Offer } from "@/features/promotions/types"
 import { PROMOTIONS_ROUTES } from "@/features/promotions/constants"
 import { useDeleteOffer } from "@/features/promotions/hooks/use-promotion-mutations"
+import { getPromotionStatusBadgeClassName } from "@/features/promotions/utils/offer"
 import { BaseAlertDialog } from "@/components/ui/base-alert-dialog"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Icons } from "@/components/ui/icons"
@@ -47,9 +49,20 @@ export function OfferCard({ offer, onClick }: OfferCardProps) {
             <Icons.priceTag size={22} className="text-primary" />
           </div>
           <div className="min-w-0 flex-1">
-            <h3 className="truncate text-base font-semibold text-foreground">
-              {offer.title}
-            </h3>
+            <div className="flex flex-wrap items-center gap-2">
+              <h3 className="truncate text-base font-semibold text-foreground">
+                {offer.title}
+              </h3>
+              <Badge
+                variant="secondary"
+                className={cn(
+                  "rounded-full border-0 px-2.5 py-1 text-xs font-medium",
+                  getPromotionStatusBadgeClassName(offer.status)
+                )}
+              >
+                {offer.statusLabel}
+              </Badge>
+            </div>
             {offer.promoCode ? (
               <p className="mt-1 truncate text-xs font-medium text-primary">
                 {offer.promoCode}

@@ -6,11 +6,14 @@ import { useState } from "react"
 import { PROMOTIONS_ROUTES } from "@/features/promotions/constants"
 import { useDeleteSpecialGiftOffer } from "@/features/promotions/hooks/use-promotion-mutations"
 import type { SpecialGiftOffer } from "@/features/promotions/types"
+import { getPromotionStatusBadgeClassName } from "@/features/promotions/utils/offer"
 import { formatSpecialOfferDateRange } from "@/features/promotions/utils/special-gift-offer"
 import { BaseAlertDialog } from "@/components/ui/base-alert-dialog"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Icons } from "@/components/ui/icons"
+import { cn } from "@/lib/utils"
 
 type SpecialGiftOfferCardProps = {
   offer: SpecialGiftOffer
@@ -23,14 +26,25 @@ export function SpecialGiftOfferCard({ offer }: SpecialGiftOfferCardProps) {
   return (
     <>
       <Card className="gap-0 py-0 transition-shadow duration-200 hover:shadow-soft">
-        <div className="flex items-start gap-4 px-5 py-5">
+        <div className="flex items-center gap-4 px-5 py-5">
           <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-secondary">
             <Icons.priceTag size={22} className="text-primary" />
           </div>
           <div className="min-w-0 flex-1">
-            <h3 className="truncate text-base font-semibold text-foreground">
-              {offer.name}
-            </h3>
+            <div className="flex flex-wrap items-center gap-2">
+              <h3 className="truncate text-base font-semibold text-foreground">
+                {offer.name}
+              </h3>
+              <Badge
+                variant="secondary"
+                className={cn(
+                  "rounded-full border-0 px-2.5 py-1 text-xs font-medium",
+                  getPromotionStatusBadgeClassName(offer.status)
+                )}
+              >
+                {offer.statusLabel}
+              </Badge>
+            </div>
             <p className="mt-1 text-xs font-medium text-primary">
               Min basket ₦{offer.minimumBasketValue.toLocaleString("en-NG")}
             </p>
@@ -39,9 +53,6 @@ export function SpecialGiftOfferCard({ offer }: SpecialGiftOfferCardProps) {
             </p>
             <p className="mt-1 text-xs text-muted-foreground">
               {formatSpecialOfferDateRange(offer.startsAt, offer.endsAt)}
-            </p>
-            <p className="mt-1 text-xs font-medium text-muted-foreground">
-              {offer.statusLabel}
             </p>
           </div>
           <div className="flex shrink-0 items-center gap-1">

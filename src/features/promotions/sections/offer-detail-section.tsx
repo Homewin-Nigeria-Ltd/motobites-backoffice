@@ -17,6 +17,7 @@ import { OfferUsageStats } from "@/features/promotions/components/offer-usage-st
 import { PROMOTIONS_ROUTES } from "@/features/promotions/constants"
 import { useDeleteOffer } from "@/features/promotions/hooks/use-promotion-mutations"
 import { usePromotionOffer } from "@/features/promotions/hooks/use-promotion-queries"
+import { getPromotionStatusBadgeClassName } from "@/features/promotions/utils/offer"
 import { AppLoader } from "@/components/ui/app-loader"
 import { BaseAlertDialog } from "@/components/ui/base-alert-dialog"
 import { Badge } from "@/components/ui/badge"
@@ -74,7 +75,6 @@ export function OfferDetailSection({ offerId }: OfferDetailSectionProps) {
   }
 
   const { offer, promotionInsight, usageTracking } = data
-  const isActive = offer.status === "active"
 
   return (
     <>
@@ -95,9 +95,7 @@ export function OfferDetailSection({ offerId }: OfferDetailSectionProps) {
                 variant="secondary"
                 className={cn(
                   "rounded-full border-0 px-2.5 py-1 text-xs font-medium",
-                  isActive
-                    ? "bg-emerald-500/10 text-emerald-700"
-                    : "bg-muted text-muted-foreground"
+                  getPromotionStatusBadgeClassName(offer.status)
                 )}
               >
                 {offer.statusLabel}
