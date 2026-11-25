@@ -34,16 +34,27 @@ export function GiftMenuItemCombobox({
   initialOption,
 }: GiftMenuItemComboboxProps) {
   const [search, setSearch] = useState("")
+  const [pickedOption, setPickedOption] = useState<GiftMenuItemOption | null>(
+    null
+  )
+
   const { data: groups = [], isPending } = useMenuGroupedItems({
     sort: "name",
     search: search.trim() || undefined,
   })
 
+  const retainedOption =
+    pickedOption?.id === value
+      ? pickedOption
+      : initialOption?.id === value
+        ? initialOption
+        : null
+
   const options = useMemo<GiftMenuItemOption[]>(() => {
     const byId = new Map<string, GiftMenuItemOption>()
 
-    if (initialOption?.id) {
-      byId.set(initialOption.id, initialOption)
+    if (retainedOption?.id) {
+      byId.set(retainedOption.id, retainedOption)
     }
 
     const groupList = Array.isArray(groups) ? groups : []
@@ -75,19 +86,17 @@ export function GiftMenuItemCombobox({
     }
 
     return Array.from(byId.values())
-  }, [groups, initialOption])
+  }, [groups, retainedOption])
 
   const selected =
-    options.find((option) => option.id === value) ??
-    (value
-      ? { id: value, label: initialOption?.label || "Selected menu item" }
-      : null)
+    options.find((option) => option.id === value) ?? retainedOption
 
   return (
     <Combobox
       items={options}
       value={selected}
       onValueChange={(next) => {
+        setPickedOption(next ?? null)
         onChange(next?.id ?? "")
       }}
       onInputValueChange={setSearch}
